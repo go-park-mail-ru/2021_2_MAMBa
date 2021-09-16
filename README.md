@@ -1,4 +1,5 @@
 # КиноПоиск
+Kino4U
 
 ## Деплой
 
@@ -18,3 +19,5 @@
 ## Ссылка на frontend
 
 https://github.com/frontend-park-mail-ru/2021_2_MAMBa
+
+
