@@ -53,35 +53,42 @@ func getCollectionsDB (skip int, limit int, order string) (collections, error) {
 	return collect, nil
 }
 
+var (
+	errSkip = `incorrect skip`
+	errlimit = `incorrect limit`
+	errDB = `DB error`
+	errEnc =`Encoding error`
+)
+
 func GetCollections(w http.ResponseWriter, r *http.Request) {
 	skipString, errBool := r.URL.Query()["skip"]
 	if errBool == false {
-		http.Error(w, `no skip`, http.StatusBadRequest)
+		http.Error(w, errSkip, http.StatusBadRequest)
 		return
 	}
 	limitString, errBool := r.URL.Query()["limit"]
 	if errBool == false {
-		http.Error(w, `no limit`, http.StatusBadRequest)
+		http.Error(w, errlimit, http.StatusBadRequest)
 		return
 	}
 	limit, err:= strconv.Atoi(limitString[0])
 	if err != nil || limit <= 0 {
-		http.Error(w, `wrong limit`, http.StatusBadRequest)
+		http.Error(w, errlimit, http.StatusBadRequest)
 		return
 	}
 	skip, err:= strconv.Atoi(skipString[0])
 	if err != nil || skip < 0 {
-		http.Error(w, `wrong skip`, http.StatusBadRequest)
+		http.Error(w, errSkip, http.StatusBadRequest)
 		return
 	}
 	collectionsList, err := getCollectionsDB(skip, limit, "")
 	if err != nil {
-		http.Error(w, `DB error`, http.StatusInternalServerError)
+		http.Error(w, errDB, http.StatusInternalServerError)
 		return
 	}
 	err = json.NewEncoder(w).Encode(collectionsList)
 	if err != nil {
-		http.Error(w, `Encoding error`, http.StatusInternalServerError)
+		http.Error(w, errEnc, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
