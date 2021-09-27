@@ -7,9 +7,8 @@ import (
 	"net/http"
 )
 
-var ErrUserNotLoggedIn = errors.New("user not in")
+var ErrUserNotLoggedIn = errors.New("user not logged in")
 
-// crypto/rand or securecookie.GenerateRandomKey(32) and persist the result.
 var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
 
 // MaxAge=0 means no Max-Age attribute specified and the cookie will be
@@ -17,7 +16,7 @@ var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
 // MaxAge<0 means delete cookie immediately.
 // MaxAge>0 means Max-Age attribute present and given in seconds.
 
-func StartSession (w http.ResponseWriter, r *http.Request, id uint) error {
+func StartSession(w http.ResponseWriter, r *http.Request, id uint) error {
 	session, _ := store.Get(r, "session-name")
 	session.Values["id"] = id
 	session.Options = &sessions.Options{MaxAge: 100000}
@@ -29,7 +28,7 @@ func StartSession (w http.ResponseWriter, r *http.Request, id uint) error {
 	return nil
 }
 
-func EndSession (w http.ResponseWriter, r *http.Request, id uint) error {
+func EndSession(w http.ResponseWriter, r *http.Request, id uint) error {
 	session, err := store.Get(r, "session-name")
 	if err != nil {
 		return err
@@ -48,15 +47,14 @@ func EndSession (w http.ResponseWriter, r *http.Request, id uint) error {
 	return nil
 }
 
-func CheckSession (r *http.Request) (uint, error) {
+func CheckSession(r *http.Request) (uint, error) {
 	session, err := store.Get(r, "session-name")
 	if err != nil {
 		return 0, err
 	}
 	id, isIn := session.Values["id"]
-	if !isIn  {
+	if !isIn {
 		return 0, ErrUserNotLoggedIn
 	}
 	return id.(uint), nil
-	//интересный type assert
 }

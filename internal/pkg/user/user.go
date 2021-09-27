@@ -24,19 +24,19 @@ type userSignupForm struct {
 }
 
 type userBasicInfo struct {
-	FirstName      string `json:"first_name"`
-	Surname        string `json:"surname"`
-	Email          string `json:"email"`
-	ProfilePic	   string `json:"profile_description"`
+	FirstName  string `json:"first_name"`
+	Surname    string `json:"surname"`
+	Email      string `json:"email"`
+	ProfilePic string `json:"profile_description"`
 }
 
 type User struct {
-	ID             uint
-	FirstName      string `json:"first_name"`
-	Surname        string `json:"surname"`
-	Email          string `json:"email"`
-	Password       string `json:"password"`
-	ProfilePic     string
+	ID         uint
+	FirstName  string `json:"first_name"`
+	Surname    string `json:"surname"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+	ProfilePic string
 }
 
 type mockDB struct {
@@ -44,20 +44,18 @@ type mockDB struct {
 	users []User
 }
 
-func (db *mockDB) addUser (user User){
+func (db *mockDB) addUser(user User) {
 	db.Lock()
 	db.users = append(db.users, user)
 	db.Unlock()
 }
 
 var (
-	db mockDB
+	db          mockDB
 	errorNoUser = errors.New(`"error": "no user"`)
 )
 
-
-
-func (db *mockDB) findEmail (email string) (user User, err error) {
+func (db *mockDB) findEmail(email string) (user User, err error) {
 	db.RLock()
 	defer db.RUnlock()
 	for _, us := range db.users {
@@ -68,7 +66,7 @@ func (db *mockDB) findEmail (email string) (user User, err error) {
 	return User{}, errorNoUser
 }
 
-func (db *mockDB) findId (id uint) (user User, err error) {
+func (db *mockDB) findId(id uint) (user User, err error) {
 	db.RLock()
 	defer db.RUnlock()
 	if int(id) < len(db.users) {
@@ -77,10 +75,9 @@ func (db *mockDB) findId (id uint) (user User, err error) {
 	return User{}, errorNoUser
 }
 
-
 func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	u64, err := strconv.ParseUint(params["id"], 10, 32)
+	u64, err := strconv.ParseUint(params["id"], 10, 64)
 	if err != nil {
 		http.Error(w, `error - bad input`, http.StatusBadRequest)
 		return
@@ -91,11 +88,11 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userInfo := userBasicInfo{
-		FirstName: user.FirstName,
-		Surname: user.Surname,
-		Email: user.Email,
+		FirstName:  user.FirstName,
+		Surname:    user.Surname,
+		Email:      user.Email,
 		ProfilePic: user.ProfilePic,
-		}
+	}
 	err = json.NewEncoder(w).Encode(userInfo)
 	if err != nil {
 		http.Error(w, `error - bad input`, http.StatusBadRequest)
@@ -113,7 +110,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `error - bad input`, http.StatusBadRequest)
 		return
 	}
-	if userForm.Email == "" || userForm.Password == "" || userForm.Password != userForm.PasswordRepeat{
+	if userForm.Email == "" || userForm.Password == "" || userForm.Password != userForm.PasswordRepeat {
 		http.Error(w, `error - bad input`, http.StatusBadRequest)
 		return
 	}
@@ -123,10 +120,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	db.addUser(User{ID: uint(len(db.users) + 3),
-					Email: userForm.Email,
-					FirstName: userForm.FirstName,
-					Password: userForm.Password,
-					ProfilePic: "/pic/1.jpg"})
+		Email:      userForm.Email,
+		FirstName:  userForm.FirstName,
+		Password:   userForm.Password,
+		ProfilePic: "/pic/1.jpg"})
 	w.WriteHeader(http.StatusOK)
 }
 
