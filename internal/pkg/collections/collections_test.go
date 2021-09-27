@@ -20,19 +20,19 @@ type testRow struct {
 var testTableSuccess = [...]testRow {
 	{
 		inQuery: "skip=0&limit=1",
-		out:`{"collections_list":[{"id":1,"title":"Для ценителей Хогвардса","picture_url":"server/images/collections1.png"}],"more_avaliable":true,"collection_total":12,"current_sort":"","current_limit":1,"currentSkip":1}` + "\n",
+		out:`{"collections_list":[{"id":1,"title":"Для ценителей Хогвардса","picture_url":"server/images/collections1.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":1}` + "\n",
 		status: http.StatusOK,
 		name: `limit works`,
 	},
 	{
 		inQuery: "skip=10&limit=1",
-		out:`{"collections_list":[{"id":11,"title":"Про петлю времени","picture_url":"server/images/collections11.png"}],"more_avaliable":true,"collection_total":12,"current_sort":"","current_limit":1,"currentSkip":11}` + "\n",
+		out:`{"collections_list":[{"id":11,"title":"Про петлю времени","picture_url":"server/images/collections11.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":11}` + "\n",
 		status: http.StatusOK,
 		name: `skip works`,
 	},
 	{
 		inQuery: "skip=11&limit=10",
-		out:`{"collections_list":[{"id":12,"title":"Классика на века","picture_url":"server/images/collections12.jpg"}],"more_avaliable":false,"collection_total":12,"current_sort":"","current_limit":10,"currentSkip":21}` + "\n",
+		out:`{"collections_list":[{"id":12,"title":"Классика на века","picture_url":"server/images/collections12.jpg"}],"more_available":false,"collection_total":12,"current_sort":"","current_limit":10,"current_skip":21}` + "\n",
 		status: http.StatusOK,
 		name: `does not overflow`,
 	},
@@ -45,22 +45,16 @@ var testTableFailure = [...]testRow{
 		name: `negative skip`,
 	},
 	{
-		inQuery: "limit=10",
-		out: errSkip + "\n",
-		status: http.StatusBadRequest,
-		name: `missing skip`,
-	},
-	{
 		inQuery: "skip=11&limit=-2",
 		out: errlimit + "\n",
 		status: http.StatusBadRequest,
 		name: `negative limit`,
 	},
 	{
-		inQuery: "skip=11",
-		out: errlimit + "\n",
+		inQuery: "skip=14&limit=1",
+		out: errSkip + "\n",
 		status: http.StatusBadRequest,
-		name: `missing limit`,
+		name: `skip overshoot`,
 	},
 }
 

@@ -2,6 +2,7 @@ package collections
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 )
@@ -14,12 +15,20 @@ type collectionPreview struct {
 
 type collections struct {
 	CollArray       []collectionPreview `json:"collections_list"`
-	MoreAvailable   bool                `json:"more_avaliable"`
+	MoreAvailable   bool                `json:"more_available"`
 	CollectionTotal int                 `json:"collection_total"`
 	CurrentSort     string `json:"current_sort"`
 	CurrentLimit    int `json:"current_limit"`
-	CurrentSkip     int `json:"currentSkip"`
+	CurrentSkip     int `json:"current_skip"`
 }
+
+var (
+	errSkip = `incorrect skip`
+	errlimit = `incorrect limit`
+	errDB = `DB error`
+	errEnc =`Encoding error`
+	errorsSkip = errors.New(errSkip)
+)
 
 var previewMock = []collectionPreview {
 	{Id: 1, Title: "Для ценителей Хогвардса", PictureUrl: "server/images/collections1.png"},
@@ -37,11 +46,14 @@ var previewMock = []collectionPreview {
 }
 
 // separating handler from DB methods
-func getCollectionsDB (skip int, limit int, order string) (collections, error) {
+func getCollectionsDB (skip int, limit int) (collections, error) {
 	moreAvailable := skip+limit < len(previewMock)
 	next := skip+limit
 	if !moreAvailable {
 		next = len(previewMock)
+	}
+	if skip >= len(previewMock) {
+		return collections{}, errorsSkip
 	}
 	collect := collections {
 		CollArray:       previewMock[skip:next],
@@ -53,35 +65,32 @@ func getCollectionsDB (skip int, limit int, order string) (collections, error) {
 	return collect, nil
 }
 
-var (
-	errSkip = `incorrect skip`
-	errlimit = `incorrect limit`
-	errDB = `DB error`
-	errEnc =`Encoding error`
-)
-
 func GetCollections(w http.ResponseWriter, r *http.Request) {
-	skipString, errBool := r.URL.Query()["skip"]
-	if errBool == false {
+	skipString, isIn := r.URL.Query()["skip"]
+	var err error
+	//default
+	limit, skip := 10,0
+	if isIn {
+		skip, err = strconv.Atoi(skipString[0])
+		if err != nil || skip < 0 {
+			http.Error(w, errSkip, http.StatusBadRequest)
+			return
+		}
+	}
+	limitString, isIn := r.URL.Query()["limit"]
+	if isIn {
+		limit, err = strconv.Atoi(limitString[0])
+		if err != nil || limit <= 0 {
+			http.Error(w, errlimit, http.StatusBadRequest)
+			return
+		}
+	}
+
+	collectionsList, err := getCollectionsDB(skip, limit)
+	if err == errorsSkip {
 		http.Error(w, errSkip, http.StatusBadRequest)
 		return
 	}
-	limitString, errBool := r.URL.Query()["limit"]
-	if errBool == false {
-		http.Error(w, errlimit, http.StatusBadRequest)
-		return
-	}
-	limit, err:= strconv.Atoi(limitString[0])
-	if err != nil || limit <= 0 {
-		http.Error(w, errlimit, http.StatusBadRequest)
-		return
-	}
-	skip, err:= strconv.Atoi(skipString[0])
-	if err != nil || skip < 0 {
-		http.Error(w, errSkip, http.StatusBadRequest)
-		return
-	}
-	collectionsList, err := getCollectionsDB(skip, limit, "")
 	if err != nil {
 		http.Error(w, errDB, http.StatusInternalServerError)
 		return
