@@ -23,7 +23,7 @@ func CORS(h http.Handler) http.Handler {
 		} else {
 
 			// TODO -  на nginx настроить cors и раскомментить
-			fmt.Println("unknown origin")
+			fmt.Println("unknown origin", `"`+origin+`"`)
 			// http.Error(w, `Access denied`, http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")

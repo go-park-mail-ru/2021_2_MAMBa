@@ -153,12 +153,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(b)
+
 	err = sessions.StartSession(w, r, user.ID)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(b)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
