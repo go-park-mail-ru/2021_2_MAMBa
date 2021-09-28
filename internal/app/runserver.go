@@ -10,8 +10,7 @@ import (
 )
 // TODO - add all desirable origins
 var allowedOrigins = map[string]struct{} {
-	"https://localhost":{},
-	"http://localhost":{},
+	"http://localhost": {},
 }
 
 func CORS(h http.Handler) http.Handler {
@@ -24,7 +23,7 @@ func CORS(h http.Handler) http.Handler {
 			http.Error(w, `Access denied`, http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET,POST")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")
 		if r.Method == "OPTIONS" {
 			return
