@@ -27,7 +27,7 @@ type userBasicInfo struct {
 	FirstName  string `json:"first_name"`
 	Surname    string `json:"surname"`
 	Email      string `json:"email"`
-	ProfilePic string `json:"profile_description"`
+	ProfilePic string `json:"profile_pic"`
 }
 
 var (

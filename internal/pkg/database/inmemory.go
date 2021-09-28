@@ -34,7 +34,7 @@ func (db *Database) AddUser(us *User) uint64 {
 	return us.ID
 }
 
-func (db *Database) FindEmail(email string) (us User, err error) {
+func (db *Database) FindEmail(email string) (User, error) {
 	db.RLock()
 	defer db.RUnlock()
 	loweredEmail := strings.ToLower(email)
@@ -46,7 +46,7 @@ func (db *Database) FindEmail(email string) (us User, err error) {
 	return User{}, errorNoUser
 }
 
-func (db *Database) FindId(id uint64) (us User, err error) {
+func (db *Database) FindId(id uint64) (User, error) {
 	db.RLock()
 	defer db.RUnlock()
 	if int(id) <= len(db.users) && id != 0 {

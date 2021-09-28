@@ -13,12 +13,13 @@ import (
 )
 
 type testRow struct {
-	inQuery string
+	inQuery    string
 	bodyString string
-	out string
-	status int
-	name string
+	out        string
+	status     int
+	name       string
 }
+
 /*
 	{
 		inQuery: "",
@@ -28,13 +29,13 @@ type testRow struct {
 		name: "register one",
 	},
 */
-var testTableRegisterSuccess = [...]testRow {
+var testTableRegisterSuccess = [...]testRow{
 	{
-		inQuery: "",
+		inQuery:    "",
 		bodyString: `{"first_name": "Ivan","surname": "Ivanov","email": "ivan1@mail.ru","password": "123456","password_repeat": "123456"}`,
-		out: `{"id":1,"first_name":"Ivan","surname":"Ivanov","email":"ivan1@mail.ru","profile_description":"/pic/1.jpg"}`,
-		status: http.StatusOK,
-		name: "register one",
+		out:        `{"id":1,"first_name":"Ivan","surname":"Ivanov","email":"ivan1@mail.ru","profile_pic":"/pic/1.jpg"}`,
+		status:     http.StatusOK,
+		name:       "register one",
 	},
 }
 var testTableRegisterFailure = [...]testRow{
@@ -46,67 +47,67 @@ var testTableRegisterFailure = [...]testRow{
 		name:       "already in",
 	},
 	{
-		inQuery: "",
+		inQuery:    "",
 		bodyString: `{"first_nme": "Ivan",}`,
-		out: errorBadInput + "\n",
-		status: http.StatusBadRequest,
-		name: "bad fields",
+		out:        errorBadInput + "\n",
+		status:     http.StatusBadRequest,
+		name:       "bad fields",
 	},
 	{
-		inQuery: "",
+		inQuery:    "",
 		bodyString: `{"first_name": "Ivan",}`,
-		out: errorBadInput + "\n",
-		status: http.StatusBadRequest,
-		name: "empty fields",
+		out:        errorBadInput + "\n",
+		status:     http.StatusBadRequest,
+		name:       "empty fields",
 	},
 }
 
 func TestRegisterSuccess(t *testing.T) {
 	for _, test := range testTableRegisterSuccess {
-		fmt.Fprintf(os.Stdout, "Test:" + test.name)
+		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
 		Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
 func TestRegisterFailure(t *testing.T) {
 	db.AddUser(&database.User{
-		FirstName: "Ivan",
-		Surname: "Ivanov",
-		Password: "123456",
-		Email: "ivan1@mail.ru",
+		FirstName:  "Ivan",
+		Surname:    "Ivanov",
+		Password:   "123456",
+		Email:      "ivan1@mail.ru",
 		ProfilePic: "/pic/1.jpg",
 	})
 	for _, test := range testTableRegisterFailure {
-		fmt.Fprintf(os.Stdout, "Test:" + test.name)
+		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
 		Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
-func fillMockDB () {
+func fillMockDB() {
 	db.AddUser(&database.User{
-		FirstName: "Ivan",
-		Surname: "Ivanov",
-		Password: "123456",
-		Email: "ivan@mail.ru",
+		FirstName:  "Ivan",
+		Surname:    "Ivanov",
+		Password:   "123456",
+		Email:      "ivan@mail.ru",
 		ProfilePic: "/pic/1.jpg",
 	})
 	db.AddUser(&database.User{
-		FirstName: "Ivan",
-		Surname: "Ivanov",
-		Password: "123456",
-		Email: "iva21@mail.ru",
+		FirstName:  "Ivan",
+		Surname:    "Ivanov",
+		Password:   "123456",
+		Email:      "iva21@mail.ru",
 		ProfilePic: "/pic/1.jpg",
 	})
 }
@@ -115,13 +116,13 @@ var testTableGetSuccess = [...]testRow{
 	{
 		inQuery:    "2",
 		bodyString: ``,
-		out:        `{"id":2,"first_name":"Ivan","surname":"Ivanov","email":"iva21@mail.ru","profile_description":"/pic/1.jpg"}`,
+		out:        `{"id":2,"first_name":"Ivan","surname":"Ivanov","email":"iva21@mail.ru","profile_pic":"/pic/1.jpg"}`,
 		status:     http.StatusOK,
 		name:       "find user",
 	},
 }
 
-var testTableGetFailure= [...]testRow{
+var testTableGetFailure = [...]testRow{
 	{
 		inQuery:    "3",
 		bodyString: ``,
@@ -148,18 +149,18 @@ var testTableGetFailure= [...]testRow{
 func TestGetBasicInfoSuccess(t *testing.T) {
 	fillMockDB()
 	for _, test := range testTableGetSuccess {
-		fmt.Fprintf(os.Stdout, "Test:" + test.name)
+		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
-		//Hack to try to fake gorilla/mux vars
+		// Hack to try to fake gorilla/mux vars
 		vars := map[string]string{
 			"id": test.inQuery,
 		}
 		r = mux.SetURLVars(r, vars)
 		GetBasicInfo(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -167,18 +168,18 @@ func TestGetBasicInfoSuccess(t *testing.T) {
 func TestGetBasicInfoFailure(t *testing.T) {
 	fillMockDB()
 	for _, test := range testTableGetFailure {
-		fmt.Fprintf(os.Stdout, "Test:" + test.name)
+		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
-		//Hack to try to fake gorilla/mux vars
+		// Hack to try to fake gorilla/mux vars
 		vars := map[string]string{
 			"id": test.inQuery,
 		}
 		r = mux.SetURLVars(r, vars)
 		GetBasicInfo(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -187,7 +188,7 @@ var testTableLoginSuccess = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru","password": "123456"}`,
-		out:        `{"id":2,"first_name":"Ivan","surname":"Ivanov","email":"iva21@mail.ru","profile_description":"/pic/1.jpg"}`,
+		out:        `{"id":2,"first_name":"Ivan","surname":"Ivanov","email":"iva21@mail.ru","profile_pic":"/pic/1.jpg"}`,
 		status:     http.StatusOK,
 		name:       "log in user",
 	},
@@ -234,13 +235,13 @@ var testTableLoginFailure = [...]testRow{
 func TestLoginSuccess(t *testing.T) {
 	fillMockDB()
 	for _, test := range testTableLoginSuccess {
-		fmt.Fprintf(os.Stdout, "Test:" + test.name)
+		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test.inQuery, bodyReader)
 		Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -248,17 +249,13 @@ func TestLoginSuccess(t *testing.T) {
 func TestLoginFailure(t *testing.T) {
 	fillMockDB()
 	for _, test := range testTableLoginFailure {
-		fmt.Fprintf(os.Stdout, "Test:" + test.name)
+		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test.inQuery, bodyReader)
 		Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
-
-
-
-
