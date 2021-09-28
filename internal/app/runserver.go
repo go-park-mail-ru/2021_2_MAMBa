@@ -11,7 +11,9 @@ import (
 
 // TODO - add all desirable origins
 var allowedOrigins = map[string]struct{}{
-	"http://localhost": {},
+	"http://localhost":      {},
+	"":                      {},
+	"http://localhost:3001": {},
 }
 
 func CORS(h http.Handler) http.Handler {
@@ -43,11 +45,11 @@ func RunServer(addr string) {
 	api.Use(CORS)
 
 	// Users
-	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET")
-	api.HandleFunc("/user/register", user.Register).Methods("POST")
-	api.HandleFunc("/user/login", user.Login).Methods("POST")
-	api.HandleFunc("/user/logout", user.Logout).Methods("GET")
-	api.HandleFunc("/user/checkAuth", user.CheckAuth).Methods("GET")
+	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET", "OPTIONS")
+	api.HandleFunc("/user/register", user.Register).Methods("POST", "OPTIONS")
+	api.HandleFunc("/user/login", user.Login).Methods("POST", "OPTIONS")
+	api.HandleFunc("/user/logout", user.Logout).Methods("GET", "OPTIONS")
+	api.HandleFunc("/user/checkAuth", user.CheckAuth).Methods("GET", "OPTIONS")
 
 	// Collections
 	api.HandleFunc("/collections/getCollections", collections.GetCollections).Methods("GET")
