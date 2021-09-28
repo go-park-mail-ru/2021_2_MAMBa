@@ -8,8 +8,9 @@ import (
 	"log"
 	"net/http"
 )
+
 // TODO - add all desirable origins
-var allowedOrigins = map[string]struct{} {
+var allowedOrigins = map[string]struct{}{
 	"http://localhost": {},
 }
 
@@ -23,7 +24,7 @@ func CORS(h http.Handler) http.Handler {
 
 			// TODO -  на nginx настроить cors и раскомментить
 			fmt.Println("unknown origin")
-			//http.Error(w, `Access denied`, http.StatusForbidden)
+			// http.Error(w, `Access denied`, http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
@@ -34,7 +35,6 @@ func CORS(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 }
-
 
 func RunServer(addr string) {
 	r := mux.NewRouter()

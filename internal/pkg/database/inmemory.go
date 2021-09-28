@@ -50,7 +50,7 @@ func (db *Database) FindId(id uint64) (User, error) {
 	db.RLock()
 	defer db.RUnlock()
 	if int(id) <= len(db.users) && id != 0 {
-		return db.users[id - 1], nil
+		return db.users[id-1], nil
 	}
 	return User{}, errorNoUser
 }

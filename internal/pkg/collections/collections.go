@@ -9,7 +9,7 @@ import (
 )
 
 type collectionPreview struct {
-	Id          uint  `json:"id"`
+	Id         uint   `json:"id"`
 	Title      string `json:"title"`
 	PictureUrl string `json:"picture_url"`
 }
@@ -18,13 +18,12 @@ type collections struct {
 	CollArray       []collectionPreview `json:"collections_list"`
 	MoreAvailable   bool                `json:"more_available"`
 	CollectionTotal int                 `json:"collection_total"`
-	CurrentSort     string `json:"current_sort"`
-	CurrentLimit    int `json:"current_limit"`
-	CurrentSkip     int `json:"current_skip"`
+	CurrentSort     string              `json:"current_sort"`
+	CurrentLimit    int                 `json:"current_limit"`
+	CurrentSkip     int                 `json:"current_skip"`
 }
 
-
-var previewMock = []collectionPreview {
+var previewMock = []collectionPreview{
 	{Id: 1, Title: "Для ценителей Хогвардса", PictureUrl: "server/images/collections1.png"},
 	{Id: 2, Title: "Про настоящую любовь", PictureUrl: "server/images/collections2.png"},
 	{Id: 3, Title: "Аферы века", PictureUrl: "server/images/collections3.png"},
@@ -45,23 +44,21 @@ type mockDB struct {
 }
 
 var (
-	errSkip  = `incorrect skip`
-	errLimit = `incorrect limit`
-	errDB    = `DB error`
-	errEnc =`Encoding error`
-	errorsSkip = errors.New(errSkip)
-	db mockDB = mockDB{c: previewMock}
+	errSkip           = `incorrect skip`
+	errLimit          = `incorrect limit`
+	errDB             = `DB error`
+	errEnc            = `Encoding error`
+	errorsSkip        = errors.New(errSkip)
+	db         mockDB = mockDB{c: previewMock}
 )
 
-
-
 // БД и хэндлер отдельно
-func getCollectionsDB (skip int, limit int) (collections, error) {
+func getCollectionsDB(skip int, limit int) (collections, error) {
 	db.RLock()
 	dbSize := len(db.c)
 	db.RUnlock()
 	moreAvailable := skip+limit < dbSize
-	next := skip+limit
+	next := skip + limit
 	if !moreAvailable {
 		next = dbSize
 	}
@@ -69,12 +66,12 @@ func getCollectionsDB (skip int, limit int) (collections, error) {
 		return collections{}, errorsSkip
 	}
 	db.RLock()
-	collect := collections {
+	collect := collections{
 		CollArray:       db.c[skip:next],
 		MoreAvailable:   moreAvailable,
 		CollectionTotal: dbSize,
 		CurrentLimit:    limit,
-		CurrentSkip:     skip+limit,
+		CurrentSkip:     skip + limit,
 	}
 	db.RUnlock()
 	return collect, nil
@@ -82,7 +79,7 @@ func getCollectionsDB (skip int, limit int) (collections, error) {
 
 func GetCollections(w http.ResponseWriter, r *http.Request) {
 	var err error
-	//default
+	// default
 	limit, skip := 10, 0
 	skipString, isIn := r.URL.Query()["skip"]
 	if isIn {
