@@ -18,6 +18,13 @@ var allowedOrigins = map[string]struct{}{
 	"http://89.208.198.137": {},
 }
 
+func Logger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RequestURI, "\nHeader: ", r.Header, "\n-------------------------")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func CORS(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -45,6 +52,7 @@ func RunServer(addr string) {
 	api := r.PathPrefix("/api").Subrouter()
 
 	api.Use(CORS)
+	api.Use(Logger)
 
 	// Users
 	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET", "OPTIONS")
