@@ -96,6 +96,7 @@ func TestRegisterFailure(t *testing.T) {
 }
 
 func fillMockDB() {
+	db = database.Database{}
 	db.AddUser(&database.User{
 		FirstName:  "Ivan",
 		Surname:    "Ivanov",
