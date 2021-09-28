@@ -34,7 +34,7 @@ var testTableRegisterSuccess = [...]testRow{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan","surname": "Ivanov","email": "ivan1@mail.ru","password": "123456","password_repeat": "123456"}`,
 		out:        `{"id":1,"first_name":"Ivan","surname":"Ivanov","email":"ivan1@mail.ru","profile_pic":"/pic/1.jpg"}`,
-		status:     http.StatusOK,
+		status:     http.StatusCreated,
 		name:       "register one",
 	},
 }
@@ -128,7 +128,7 @@ var testTableGetFailure = [...]testRow{
 		inQuery:    "3",
 		bodyString: ``,
 		out:        errorBadInput + "\n",
-		status:     http.StatusBadRequest,
+		status:     http.StatusNotFound,
 		name:       "out of index",
 	},
 	{
