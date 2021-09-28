@@ -14,6 +14,8 @@ var allowedOrigins = map[string]struct{}{
 	"http://localhost":      {},
 	"":                      {},
 	"http://localhost:3001": {},
+	"http://localhost:8080": {},
+	"http://89.208.198.137": {},
 }
 
 func CORS(h http.Handler) http.Handler {
@@ -52,7 +54,7 @@ func RunServer(addr string) {
 	api.HandleFunc("/user/checkAuth", user.CheckAuth).Methods("GET", "OPTIONS")
 
 	// Collections
-	api.HandleFunc("/collections/getCollections", collections.GetCollections).Methods("GET")
+	api.HandleFunc("/collections/getCollections", collections.GetCollections).Methods("GET", "OPTIONS")
 
 	server := http.Server{
 		Addr:    addr,
