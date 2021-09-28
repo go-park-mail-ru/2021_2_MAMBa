@@ -46,9 +46,9 @@ var testTableFailure = [...]testRow{
 	},
 	{
 		inQuery: "skip=11&limit=-2",
-		out: errlimit + "\n",
-		status: http.StatusBadRequest,
-		name: `negative limit`,
+		out:     errLimit + "\n",
+		status:  http.StatusBadRequest,
+		name:    `negative limit`,
 	},
 	{
 		inQuery: "skip=14&limit=1",
