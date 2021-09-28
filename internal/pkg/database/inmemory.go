@@ -17,7 +17,7 @@ type User struct {
 	Surname    string `json:"surname"`
 	Email      string `json:"email"`
 	Password   string `json:"password"`
-	ProfilePic string
+	ProfilePic string `json:"profile_pic"`
 }
 
 var errorNoUser = errors.New("error: no user")

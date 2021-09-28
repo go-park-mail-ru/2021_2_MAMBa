@@ -48,7 +48,7 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := db.FindId(u64)
 	if err != nil {
-		http.Error(w, errorBadInput, http.StatusBadRequest)
+		http.Error(w, errorBadInput, http.StatusNotFound)
 		return
 	}
 	userInfo := &userBasicInfo{
@@ -60,14 +60,14 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	b, err := json.Marshal(userInfo)
 	if err != nil {
-		http.Error(w, errorBadInput, http.StatusBadRequest)
+		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(b)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 		return
 	}
 }
@@ -116,8 +116,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
+	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write(b)
-	w.WriteHeader(http.StatusOK)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -153,12 +153,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
+	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(b)
 	err = sessions.StartSession(w, r, user.ID)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
-	w.WriteHeader(http.StatusOK)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
@@ -175,14 +175,16 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckAuth(w http.ResponseWriter, r *http.Request) {
-	_, err := sessions.CheckSession(r)
+	userID, err := sessions.CheckSession(r)
 	if err == sessions.ErrUserNotLoggedIn {
-		http.Error(w, errorBadInput, http.StatusForbidden)
+		http.Error(w, errorBadInput, http.StatusBadRequest)
 		return
 	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	
 	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte(strconv.FormatUint(userID, 10)))
 }
