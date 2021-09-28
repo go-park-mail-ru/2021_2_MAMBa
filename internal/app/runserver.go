@@ -20,7 +20,10 @@ func CORS(h http.Handler) http.Handler {
 		if isIn {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		} else {
-			http.Error(w, `Access denied`, http.StatusForbidden)
+
+			// TODO -  на nginx настроить cors и раскомментить
+			fmt.Println("unknown origin")
+			//http.Error(w, `Access denied`, http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
@@ -38,6 +41,7 @@ func RunServer(addr string) {
 	api := r.PathPrefix("/api").Subrouter()
 
 	api.Use(CORS)
+
 	// Users
 	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET")
 	api.HandleFunc("/user/register", user.Register).Methods("POST")
