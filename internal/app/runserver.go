@@ -8,11 +8,37 @@ import (
 	"log"
 	"net/http"
 )
+// TODO - add all desirable origins
+var allowedOrigins = map[string]int {
+	"https://localhost": 1,
+	"http://localhost": 1,
+}
+
+func CORS(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		_, isIn := allowedOrigins[origin]
+		if isIn {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		} else {
+			http.Error(w, `Access denied`, http.StatusForbidden)
+		}
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "GET,POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")
+		if r.Method == "OPTIONS" {
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
 
 func RunServer(addr string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 
+	api.Use(CORS)
 	// Users
 	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET")
 	api.HandleFunc("/user/register", user.Register).Methods("POST")
