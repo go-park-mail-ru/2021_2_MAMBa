@@ -83,7 +83,7 @@ func getCollectionsDB (skip int, limit int) (collections, error) {
 func GetCollections(w http.ResponseWriter, r *http.Request) {
 	var err error
 	//default
-	limit, skip := 10,0
+	limit, skip := 10, 0
 	skipString, isIn := r.URL.Query()["skip"]
 	if isIn {
 		skip, err = strconv.Atoi(skipString[0])
@@ -109,10 +109,10 @@ func GetCollections(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errDB, http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(collectionsList)
 	if err != nil {
 		http.Error(w, errEnc, http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 }
