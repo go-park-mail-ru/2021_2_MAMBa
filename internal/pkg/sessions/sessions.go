@@ -54,7 +54,7 @@ func CheckSession(r *http.Request) (uint64, error) {
 		return 0, err
 	}
 	id, isIn := session.Values["id"]
-	if !isIn {
+	if !isIn || session.IsNew {
 		return 0, ErrUserNotLoggedIn
 	}
 	idCasted, ok := id.(uint64)

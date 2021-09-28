@@ -23,6 +23,7 @@ type userSignupForm struct {
 }
 
 type userBasicInfo struct {
+	ID         uint64 `json:"id"`
 	FirstName  string `json:"first_name"`
 	Surname    string `json:"surname"`
 	Email      string `json:"email"`
@@ -51,13 +52,13 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userInfo := &userBasicInfo{
+		ID:         u64,
 		FirstName:  user.FirstName,
 		Surname:    user.Surname,
 		Email:      user.Email,
 		ProfilePic: user.ProfilePic,
 	}
 	b, err := json.Marshal(userInfo)
-
 	if err != nil {
 		http.Error(w, errorBadInput, http.StatusBadRequest)
 		return
@@ -99,11 +100,23 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Password:   userForm.Password,
 		ProfilePic: "/pic/1.jpg"}
 
-	db.AddUser(newUser)
+	idReg := db.AddUser(newUser)
 	err = sessions.StartSession(w, r, newUser.ID)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
+	userInfo := &userBasicInfo{
+		ID:         idReg,
+		FirstName:  userForm.FirstName,
+		Surname:    userForm.Surname,
+		Email:      userForm.Email,
+		ProfilePic: "/pic/1.jpg",
+	}
+	b, err := json.Marshal(userInfo)
+	if err != nil {
+		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+	}
+	_, err = w.Write(b)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -124,6 +137,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorBadCredentials, http.StatusUnauthorized)
 		return
 	}
+	_, err = sessions.CheckSession(r)
+	if err != sessions.ErrUserNotLoggedIn {
+		http.Error(w, errorAlreadyIn, http.StatusBadRequest)
+		return
+	}
+	userInfo := &userBasicInfo{
+		ID:         user.ID,
+		FirstName:  user.FirstName,
+		Surname:    user.Surname,
+		Email:      user.Email,
+		ProfilePic: user.ProfilePic,
+	}
+	b, err := json.Marshal(userInfo)
+	if err != nil {
+		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+	}
+	_, err = w.Write(b)
 	err = sessions.StartSession(w, r, user.ID)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)

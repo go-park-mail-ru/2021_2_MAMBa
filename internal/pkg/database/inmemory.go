@@ -22,7 +22,7 @@ type User struct {
 
 var errorNoUser = errors.New("error: no user")
 
-func (db *Database) AddUser(us *User) {
+func (db *Database) AddUser(us *User) uint64 {
 	us.ID = uint64(len(db.users) + 1)
 	us.Email = strings.ToLower(us.Email)
 	us.Surname = strings.Title(us.Surname)
@@ -31,6 +31,7 @@ func (db *Database) AddUser(us *User) {
 	db.Lock()
 	db.users = append(db.users, *us)
 	db.Unlock()
+	return us.ID
 }
 
 func (db *Database) FindEmail(email string) (us User, err error) {
@@ -48,8 +49,8 @@ func (db *Database) FindEmail(email string) (us User, err error) {
 func (db *Database) FindId(id uint64) (us User, err error) {
 	db.RLock()
 	defer db.RUnlock()
-	if int(id) < len(db.users) {
-		return db.users[id], nil
+	if int(id) <= len(db.users) && id != 0 {
+		return db.users[id - 1], nil
 	}
 	return User{}, errorNoUser
 }
