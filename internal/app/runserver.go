@@ -9,9 +9,9 @@ import (
 	"net/http"
 )
 // TODO - add all desirable origins
-var allowedOrigins = map[string]int {
-	"https://localhost": 1,
-	"http://localhost": 1,
+var allowedOrigins = map[string]struct{} {
+	"https://localhost":{},
+	"http://localhost":{},
 }
 
 func CORS(h http.Handler) http.Handler {
