@@ -20,7 +20,13 @@ var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
 func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 	session, _ := store.Get(r, "session-name")
 	session.Values["id"] = id
-	session.Options = &sessions.Options{MaxAge: 100000} // ~27 hours
+	session.Options = &sessions.Options{
+		MaxAge:   100000, // ~27 hours
+		Secure:   false,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Path:     "/",
+	}
 	err := session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

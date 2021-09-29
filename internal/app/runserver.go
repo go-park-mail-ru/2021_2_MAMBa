@@ -25,6 +25,19 @@ func Logger(next http.Handler) http.Handler {
 	})
 }
 
+func PanicRecovery(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			err := recover()
+			if err != nil {
+				fmt.Println(err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
+
 func CORS(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -53,6 +66,7 @@ func RunServer(addr string) {
 
 	api.Use(CORS)
 	api.Use(Logger)
+	api.Use(PanicRecovery)
 
 	// Users
 	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET", "OPTIONS")
