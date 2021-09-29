@@ -44,7 +44,7 @@ func EndSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 	sessionId, isIn := session.Values["id"]
 	if isIn && id == sessionId {
 		// deleting a session may only happen at maxage < 0
-		session.Options = &sessions.Options{MaxAge: -1}
+		session.Options.MaxAge = -1
 		err := session.Save(r, w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
