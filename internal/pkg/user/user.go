@@ -186,7 +186,11 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	userInfo := &userBasicInfo{ID: userID}
+	b, err := json.Marshal(userInfo)
+	if err != nil {
+		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+	}
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte(strconv.FormatUint(userID, 10)))
+	_, err = w.Write(b)
 }
