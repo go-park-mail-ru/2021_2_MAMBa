@@ -22,7 +22,7 @@ func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 	session.Values["id"] = id
 	session.Options = &sessions.Options{
 		MaxAge:   100000, // ~27 hours
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
