@@ -18,6 +18,13 @@ var allowedOrigins = map[string]struct{}{
 	"http://89.208.198.137": {},
 }
 
+func Logger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RequestURI, "\nHeader: ", r.Header, "\n-------------------------")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func PanicRecovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
@@ -58,6 +65,7 @@ func RunServer(addr string) {
 	api := r.PathPrefix("/api").Subrouter()
 
 	api.Use(CORS)
+	api.Use(Logger)
 	api.Use(PanicRecovery)
 
 	// Users
