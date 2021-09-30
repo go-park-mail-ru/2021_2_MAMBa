@@ -9,25 +9,23 @@ import (
 	"2021_2_MAMBa/internal/pkg/database"
 )
 
-
-
 type collections struct {
 	CollArray       []database.CollectionPreview `json:"collections_list"`
-	MoreAvailable   bool                `json:"more_available"`
-	CollectionTotal int                 `json:"collection_total"`
-	CurrentSort     string              `json:"current_sort"`
-	CurrentLimit    int                 `json:"current_limit"`
-	CurrentSkip     int                 `json:"current_skip"`
+	MoreAvailable   bool                         `json:"more_available"`
+	CollectionTotal int                          `json:"collection_total"`
+	CurrentSort     string                       `json:"current_sort"`
+	CurrentLimit    int                          `json:"current_limit"`
+	CurrentSkip     int                          `json:"current_skip"`
 }
 
 var (
-	errSkipMsg 		  = `incorrect skip`
-	errLimitMsg 	  = `incorrect limit`
-	errDBMsg          = `DB error`
-	errEncMsg         = `Encoding error`
-	errorSkip         = errors.New(errSkipMsg)
-	errorLimit        = errors.New(errLimitMsg)
-	db                = database.CollectionsMockDatabase{Previews: database.PreviewMock}
+	errSkipMsg  = `incorrect skip`
+	errLimitMsg = `incorrect limit`
+	errDBMsg    = `DB error`
+	errEncMsg   = `Encoding error`
+	errorSkip   = errors.New(errSkipMsg)
+	errorLimit  = errors.New(errLimitMsg)
+	db          = database.CollectionsMockDatabase{Previews: database.PreviewMock}
 )
 
 // БД и хэндлер отдельно
@@ -50,7 +48,7 @@ func getCollectionsDB(skip int, limit int) (collections, error) {
 	db.RUnlock()
 
 	collect := collections{
-		CollArray: previews,
+		CollArray:       previews,
 		MoreAvailable:   moreAvailable,
 		CollectionTotal: dbSize,
 		CurrentLimit:    limit,

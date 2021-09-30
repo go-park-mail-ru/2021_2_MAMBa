@@ -22,28 +22,29 @@ type User struct {
 }
 
 type UserMultiPurpose struct {
-	ID         uint64 `json:"id,omitempty"`
-	FirstName  string `json:"first_name"`
-	Surname    string `json:"surname"`
-	Email      string `json:"email"`
+	ID             uint64 `json:"id,omitempty"`
+	FirstName      string `json:"first_name"`
+	Surname        string `json:"surname"`
+	Email          string `json:"email"`
 	Password       string `json:"password,omitempty"`
 	PasswordRepeat string `json:"password_repeat,omitempty"`
-	ProfilePic string `json:"profile_pic,omitempty"`
+	ProfilePic     string `json:"profile_pic,omitempty"`
 }
+
 var basePicture = "/pic/1.jpg"
 
-func (us * UserMultiPurpose) ToUser () User {
+func (us *UserMultiPurpose) ToUser() User {
 	return User{
-		ID:             us.ID,
-		FirstName:      us.FirstName,
-		Surname:        us.Surname,
-		Email:          us.Email,
-		Password:       us.Password,
-		ProfilePic:     us.ProfilePic,
+		ID:         us.ID,
+		FirstName:  us.FirstName,
+		Surname:    us.Surname,
+		Email:      us.Email,
+		Password:   us.Password,
+		ProfilePic: us.ProfilePic,
 	}
 }
 
-func (us *User) Multipurpose () UserMultiPurpose {
+func (us *User) Multipurpose() UserMultiPurpose {
 	return UserMultiPurpose{
 		ID:             us.ID,
 		FirstName:      us.FirstName,
@@ -75,7 +76,7 @@ func (db *UserMockDatabase) AddUser(us *User) uint64 {
 	us.Email = strings.ToLower(us.Email)
 	us.Surname = strings.Title(us.Surname)
 	us.FirstName = strings.Title(us.FirstName)
-	passwordByte , err := bcrypt.GenerateFromPassword([]byte(us.Password), bcrypt.DefaultCost)
+	passwordByte, err := bcrypt.GenerateFromPassword([]byte(us.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0
 	}
@@ -108,8 +109,6 @@ func (db *UserMockDatabase) FindId(id uint64) (User, error) {
 	}
 	return User{}, errorNoUser
 }
-
-
 
 type CollectionPreview struct {
 	Id         uint   `json:"id"`

@@ -16,7 +16,7 @@ type userToLogin struct {
 }
 
 var (
-	db database.UserMockDatabase
+	db                  database.UserMockDatabase
 	errorBadInput       = "error - bad input"
 	errorAlreadyIn      = "error - already in"
 	errorBadCredentials = "error - bad credentials"

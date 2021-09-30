@@ -64,10 +64,10 @@ func TestGetCollectionsSuccess(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", apiPath + test.inQuery, bodyReader)
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		GetCollections(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -77,10 +77,10 @@ func TestGetCollectionsFailure(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", apiPath + test.inQuery, bodyReader)
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		GetCollections(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }

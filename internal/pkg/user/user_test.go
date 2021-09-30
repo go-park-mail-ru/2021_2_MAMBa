@@ -58,10 +58,10 @@ func TestRegisterSuccess(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/register" + test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
 		Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -79,10 +79,10 @@ func TestRegisterFailure(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -145,15 +145,15 @@ func TestGetBasicInfoSuccess(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/get/" + test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
 		// Hack to try to fake gorilla/mux vars
 		vars := map[string]string{
 			"id": test.inQuery,
 		}
 		r = mux.SetURLVars(r, vars)
 		GetBasicInfo(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -165,15 +165,15 @@ func TestGetBasicInfoFailure(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		// Hack to try to fake gorilla/mux vars
 		vars := map[string]string{
 			"id": test.inQuery,
 		}
 		r = mux.SetURLVars(r, vars)
 		GetBasicInfo(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -233,10 +233,10 @@ func TestLoginSuccess(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -248,10 +248,10 @@ func TestLoginFailure(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
-		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }

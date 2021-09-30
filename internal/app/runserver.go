@@ -11,23 +11,23 @@ import (
 
 // TODO - add all desirable origins
 var allowedOrigins = map[string]struct{}{
-	"":      {},
+	"": {},
 
-	"http://localhost":      {},
-	"http://localhost:3001": {},
-	"http://localhost:8080": {},
-	"http://89.208.198.137": {},
+	"http://localhost":           {},
+	"http://localhost:3001":      {},
+	"http://localhost:8080":      {},
+	"http://89.208.198.137":      {},
 	"http://89.208.198.137:3001": {},
-	"http://film4u.club": {},
-	"http://film4u.club:3001": {},
+	"http://film4u.club":         {},
+	"http://film4u.club:3001":    {},
 
-	"https://localhost":      {},
-	"https://localhost:3001": {},
-	"https://localhost:8080": {},
-	"https://89.208.198.137": {},
+	"https://localhost":           {},
+	"https://localhost:3001":      {},
+	"https://localhost:8080":      {},
+	"https://89.208.198.137":      {},
 	"https://89.208.198.137:3001": {},
-	"https://film4u.club": {},
-	"https://film4u.club:3001": {},
+	"https://film4u.club":         {},
+	"https://film4u.club:3001":    {},
 }
 
 func Logger(next http.Handler) http.Handler {
@@ -74,7 +74,7 @@ func RunServer(addr string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 
-	//middleware
+	// middleware
 	api.Use(PanicRecovery)
 	api.Use(Logger)
 	api.Use(CORS)
