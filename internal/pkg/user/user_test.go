@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -279,4 +280,50 @@ func TestLogoutFailure(t *testing.T) {
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
+}
+
+func TestLogoutSuccess(t *testing.T) {
+	fillMockDB()
+	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "/api/login", bodyReader)
+	Login(w, r)
+	require.Equal(t, http.StatusOK, w.Code)
+
+	r = httptest.NewRequest("GET", "/api/user/logout", bodyReader)
+	cookies := w.Result().Cookies()
+	for _, cookie := range cookies {
+		r.AddCookie(cookie)
+	}
+	w = httptest.NewRecorder()
+	Logout(w, r)
+	assert.Equal(t, http.StatusOK, w.Code, "Test: Logout OK")
+
+}
+
+func TestCheckAuthSuccess(t *testing.T) {
+	fillMockDB()
+	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "/api/login", bodyReader)
+	Login(w, r)
+	require.Equal(t, http.StatusOK, w.Code)
+
+	r = httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
+	cookies := w.Result().Cookies()
+	for _, cookie := range cookies {
+		r.AddCookie(cookie)
+	}
+	w = httptest.NewRecorder()
+	CheckAuth(w, r)
+	assert.Equal(t, http.StatusOK, w.Code, "Test: Logout OK")
+}
+
+func TestCheckAuthFailure(t *testing.T) {
+	fillMockDB()
+	bodyReader := strings.NewReader("")
+	r := httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
+	w := httptest.NewRecorder()
+	CheckAuth(w, r)
+	assert.Equal(t, http.StatusBadRequest, w.Code, "Test: Logout OK")
 }
