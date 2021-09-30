@@ -20,7 +20,7 @@ type testRow struct {
 var testTableSuccess = [...]testRow{
 	{
 		inQuery: "skip=0&limit=1",
-		out:     `{"collections_list":[{"id":1,"title":"Для ценителей Хогвардса","picture_url":"server/images/collections1.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":1}` + "\n",
+		out:     `{"collections_list":[{"id":1,"title":"Для ценителей Хогвартса","picture_url":"server/images/collections1.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":1}` + "\n",
 		status:  http.StatusOK,
 		name:    `limit works`,
 	},
@@ -40,19 +40,19 @@ var testTableSuccess = [...]testRow{
 var testTableFailure = [...]testRow{
 	{
 		inQuery: "skip=-1&limit=10",
-		out:     errSkip + "\n",
+		out:     errSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 	},
 	{
 		inQuery: "skip=11&limit=-2",
-		out:     errLimit + "\n",
+		out:     errLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 	},
 	{
 		inQuery: "skip=14&limit=1",
-		out:     errSkip + "\n",
+		out:     errSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 	},

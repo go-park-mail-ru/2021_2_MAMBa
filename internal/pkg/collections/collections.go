@@ -5,17 +5,14 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"sync"
+
+	"2021_2_MAMBa/internal/pkg/database"
 )
 
-type collectionPreview struct {
-	Id         uint   `json:"id"`
-	Title      string `json:"title"`
-	PictureUrl string `json:"picture_url"`
-}
+
 
 type collections struct {
-	CollArray       []collectionPreview `json:"collections_list"`
+	CollArray       []database.CollectionPreview `json:"collections_list"`
 	MoreAvailable   bool                `json:"more_available"`
 	CollectionTotal int                 `json:"collection_total"`
 	CurrentSort     string              `json:"current_sort"`
@@ -23,57 +20,40 @@ type collections struct {
 	CurrentSkip     int                 `json:"current_skip"`
 }
 
-var previewMock = []collectionPreview{
-	{Id: 1, Title: "Для ценителей Хогвартса", PictureUrl: "server/images/collections1.png"},
-	{Id: 2, Title: "Про настоящую любовь", PictureUrl: "server/images/collections2.png"},
-	{Id: 3, Title: "Аферы века", PictureUrl: "server/images/collections3.png"},
-	{Id: 4, Title: "Про Вторую Мировую", PictureUrl: "server/images/collections4.jpg"},
-	{Id: 5, Title: "Осеннее настроение", PictureUrl: "server/images/collections5.png"},
-	{Id: 6, Title: "Летняя атмосфера", PictureUrl: "server/images/collections6.png"},
-	{Id: 7, Title: "Про дружбу", PictureUrl: "server/images/collections7.png"},
-	{Id: 8, Title: "Романтические фильмы", PictureUrl: "server/images/collections8.jpg"},
-	{Id: 9, Title: "Джунгли зовут", PictureUrl: "server/images/collections9.jpg"},
-	{Id: 10, Title: "Фантастические фильмы", PictureUrl: "server/images/collections10.jpg"},
-	{Id: 11, Title: "Про петлю времени", PictureUrl: "server/images/collections11.png"},
-	{Id: 12, Title: "Классика на века", PictureUrl: "server/images/collections12.jpg"},
-}
-
-type mockDB struct {
-	c []collectionPreview
-	sync.RWMutex
-}
-
 var (
-	errSkip           = `incorrect skip`
-	errLimit          = `incorrect limit`
-	errDB             = `DB error`
-	errEnc            = `Encoding error`
-	errorsSkip        = errors.New(errSkip)
-	db         mockDB = mockDB{c: previewMock}
+	errSkipMsg 		  = `incorrect skip`
+	errLimitMsg 	  = `incorrect limit`
+	errDBMsg          = `DB error`
+	errEncMsg         = `Encoding error`
+	errorSkip         = errors.New(errSkipMsg)
+	errorLimit        = errors.New(errLimitMsg)
+	db                = database.CollectionsMockDatabase{Previews: database.PreviewMock}
 )
 
 // БД и хэндлер отдельно
 func getCollectionsDB(skip int, limit int) (collections, error) {
+	if limit < 0 {
+		return collections{}, errorLimit
+	}
 	db.RLock()
-	dbSize := len(db.c)
-	db.RUnlock()
+	dbSize := len(db.Previews)
 	moreAvailable := skip+limit < dbSize
 	next := skip + limit
 	if !moreAvailable {
 		next = dbSize
 	}
+	previews := db.Previews[skip:next]
+	db.RUnlock()
 	if skip >= dbSize {
-		return collections{}, errorsSkip
+		return collections{}, errorSkip
 	}
-	db.RLock()
 	collect := collections{
-		CollArray:       db.c[skip:next],
+		CollArray: previews,
 		MoreAvailable:   moreAvailable,
 		CollectionTotal: dbSize,
 		CurrentLimit:    limit,
 		CurrentSkip:     skip + limit,
 	}
-	db.RUnlock()
 	return collect, nil
 }
 
@@ -85,7 +65,7 @@ func GetCollections(w http.ResponseWriter, r *http.Request) {
 	if isIn {
 		skip, err = strconv.Atoi(skipString[0])
 		if err != nil || skip < 0 {
-			http.Error(w, errSkip, http.StatusBadRequest)
+			http.Error(w, errSkipMsg, http.StatusBadRequest)
 			return
 		}
 	}
@@ -93,23 +73,19 @@ func GetCollections(w http.ResponseWriter, r *http.Request) {
 	if isIn {
 		limit, err = strconv.Atoi(limitString[0])
 		if err != nil || limit <= 0 {
-			http.Error(w, errLimit, http.StatusBadRequest)
+			http.Error(w, errLimitMsg, http.StatusBadRequest)
 			return
 		}
 	}
 	collectionsList, err := getCollectionsDB(skip, limit)
-	if err == errorsSkip {
-		http.Error(w, errSkip, http.StatusBadRequest)
-		return
-	}
 	if err != nil {
-		http.Error(w, errDB, http.StatusInternalServerError)
+		http.Error(w, errDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(collectionsList)
 	if err != nil {
-		http.Error(w, errEnc, http.StatusInternalServerError)
+		http.Error(w, errEncMsg, http.StatusInternalServerError)
 		return
 	}
 }

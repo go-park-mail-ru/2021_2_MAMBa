@@ -11,6 +11,7 @@ var ErrUserNotLoggedIn = errors.New("user not logged in")
 var errUint64Cast = errors.New("id uint64 cast error")
 
 var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
+var sessionName = "session-name"
 
 // MaxAge=0 means no Max-Age attribute specified and the cookie will be
 // deleted after the browser session ends.
@@ -18,7 +19,7 @@ var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
 // MaxAge>0 means Max-Age attribute present and given in seconds.
 
 func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
-	session, _ := store.Get(r, "session-name")
+	session, _ := store.Get(r, sessionName)
 	session.Values["id"] = id
 	session.Options = &sessions.Options{
 		MaxAge:   100000, // ~27 hours
@@ -36,7 +37,7 @@ func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 }
 
 func EndSession(w http.ResponseWriter, r *http.Request, id uint64) error {
-	session, err := store.Get(r, "session-name")
+	session, err := store.Get(r, sessionName)
 	if err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func EndSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 }
 
 func CheckSession(r *http.Request) (uint64, error) {
-	session, err := store.Get(r, "session-name")
+	session, err := store.Get(r, sessionName)
 	if err != nil {
 		return 0, err
 	}

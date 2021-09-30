@@ -40,9 +40,8 @@ func Logger(next http.Handler) http.Handler {
 func PanicRecovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			err := recover()
-			if err != nil {
-				fmt.Println(err)
+			if err := recover(); err != nil {
+				fmt.Println("Recovered from panic with err: " + err.(string))
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 			}
 		}()
@@ -57,13 +56,12 @@ func CORS(h http.Handler) http.Handler {
 		if isIn {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		} else {
-
 			// TODO -  на nginx настроить cors и раскомментить
 			fmt.Println("unknown origin", `"`+origin+`"`)
 			// http.Error(w, `Access denied`, http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")
 		if r.Method == "OPTIONS" {
 			return
@@ -76,9 +74,10 @@ func RunServer(addr string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 
-	api.Use(CORS)
-	api.Use(Logger)
+	//middleware
 	api.Use(PanicRecovery)
+	api.Use(Logger)
+	api.Use(CORS)
 
 	// Users
 	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET", "OPTIONS")

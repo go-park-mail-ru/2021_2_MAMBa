@@ -30,9 +30,11 @@ type userBasicInfo struct {
 	ProfilePic string `json:"profile_pic"`
 }
 
-var (
-	db database.Database
 
+
+var (
+	db database.UserMockDatabase
+	basePicture         = "/pic/1.jpg"
 	errorBadInput       = "error - bad input"
 	errorAlreadyIn      = "error - already in"
 	errorBadCredentials = "error - bad credentials"
@@ -98,7 +100,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		FirstName:  userForm.FirstName,
 		Surname:    userForm.Surname,
 		Password:   userForm.Password,
-		ProfilePic: "/pic/1.jpg"}
+		ProfilePic: basePicture}
 
 	idReg := db.AddUser(newUser)
 	err = sessions.StartSession(w, r, newUser.ID)
@@ -110,7 +112,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		FirstName:  userForm.FirstName,
 		Surname:    userForm.Surname,
 		Email:      userForm.Email,
-		ProfilePic: "/pic/1.jpg",
+		ProfilePic: basePicture,
 	}
 	b, err := json.Marshal(userInfo)
 	if err != nil {
