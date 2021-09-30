@@ -75,11 +75,13 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	err = sessions.StartSession(w, r, userForm.ID)
 	if err != nil && idReg != 0 {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+		return
 	}
 	userForm.OmitPassword()
 	b, err := json.Marshal(userForm)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write(b)
@@ -112,11 +114,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	b, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+		return
 	}
 
 	err = sessions.StartSession(w, r, user.ID)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -132,6 +136,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	err = sessions.EndSession(w, r, id)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
@@ -151,6 +156,7 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 	b, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(b)
