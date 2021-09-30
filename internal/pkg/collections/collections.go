@@ -19,10 +19,10 @@ type collections struct {
 }
 
 var (
-	errSkipMsg  = `incorrect skip`
-	errLimitMsg = `incorrect limit`
-	errDBMsg    = `DB error`
-	errEncMsg   = `Encoding error`
+	errSkipMsg  = "incorrect skip"
+	errLimitMsg = "incorrect limit"
+	errDBMsg    = "DB error"
+	errEncMsg   = "Encoding error"
 	errorSkip   = errors.New(errSkipMsg)
 	errorLimit  = errors.New(errLimitMsg)
 	db          = database.CollectionsMockDatabase{Previews: database.PreviewMock}

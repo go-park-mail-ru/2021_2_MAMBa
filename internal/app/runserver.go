@@ -9,21 +9,14 @@ import (
 	"net/http"
 )
 
-// TODO - add all desirable origins
 var allowedOrigins = map[string]struct{}{
-	"": {},
-
 	"http://localhost":           {},
 	"http://localhost:3001":      {},
-	"http://localhost:8080":      {},
 	"http://89.208.198.137":      {},
 	"http://89.208.198.137:3001": {},
 	"http://film4u.club":         {},
 	"http://film4u.club:3001":    {},
 
-	"https://localhost":           {},
-	"https://localhost:3001":      {},
-	"https://localhost:8080":      {},
 	"https://89.208.198.137":      {},
 	"https://89.208.198.137:3001": {},
 	"https://film4u.club":         {},
@@ -41,7 +34,7 @@ func PanicRecovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				fmt.Println("Recovered from panic with err: " + err.(string))
+				fmt.Println("Recovered from panic with err:", err.(string), "on", r.RequestURI)
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 			}
 		}()
@@ -56,12 +49,11 @@ func CORS(h http.Handler) http.Handler {
 		if isIn {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		} else {
-			// TODO -  на nginx настроить cors и раскомментить
 			fmt.Println("unknown origin", `"`+origin+`"`)
-			// http.Error(w, `Access denied`, http.StatusForbidden)
+			http.Error(w, "Access denied", http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")
 		if r.Method == "OPTIONS" {
 			return
