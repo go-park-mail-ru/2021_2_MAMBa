@@ -20,15 +20,6 @@ type testRow struct {
 	name       string
 }
 
-/*
-	{
-		inQuery: "",
-		bodyString: ``,
-		out: ``,
-		status: http.StatusOK,
-		name: "register one",
-	},
-*/
 var testTableRegisterSuccess = [...]testRow{
 	{
 		inQuery:    "",
@@ -67,10 +58,10 @@ func TestRegisterSuccess(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", "/api/user/register" + test.inQuery, bodyReader)
 		Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
+		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -83,14 +74,15 @@ func TestRegisterFailure(t *testing.T) {
 		Email:      "ivan1@mail.ru",
 		ProfilePic: "/pic/1.jpg",
 	})
+	apiPath := "/api/user/register"
 	for _, test := range testTableRegisterFailure {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
 		Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
+		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -153,34 +145,35 @@ func TestGetBasicInfoSuccess(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", "/api/user/get/" + test.inQuery, bodyReader)
 		// Hack to try to fake gorilla/mux vars
 		vars := map[string]string{
 			"id": test.inQuery,
 		}
 		r = mux.SetURLVars(r, vars)
 		GetBasicInfo(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
+		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
 func TestGetBasicInfoFailure(t *testing.T) {
 	fillMockDB()
+	apiPath := "/api/user/get/"
 	for _, test := range testTableGetFailure {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
 		// Hack to try to fake gorilla/mux vars
 		vars := map[string]string{
 			"id": test.inQuery,
 		}
 		r = mux.SetURLVars(r, vars)
 		GetBasicInfo(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
+		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
@@ -235,28 +228,30 @@ var testTableLoginFailure = [...]testRow{
 
 func TestLoginSuccess(t *testing.T) {
 	fillMockDB()
+	apiPath := "/api/user/login"
 	for _, test := range testTableLoginSuccess {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/login"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
 		Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
+		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
 func TestLoginFailure(t *testing.T) {
 	fillMockDB()
+	apiPath := "/api/user/login"
 	for _, test := range testTableLoginFailure {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/login"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath + test.inQuery, bodyReader)
 		Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		assert.Equal(t, test.out, w.Body.String(), "Test: " + test.name)
+		assert.Equal(t, test.status, w.Code, "Test: " + test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
