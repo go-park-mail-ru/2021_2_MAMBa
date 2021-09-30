@@ -52,6 +52,13 @@ var testTableRegisterFailure = [...]testRow{
 		status:     http.StatusBadRequest,
 		name:       "empty fields",
 	},
+	{
+		inQuery:    "",
+		bodyString: `{"first_name": "Ivan12","surname": "Ivanov","email": "ivan131@mail.ru","password": "123455","password_repeat": "123456"}`,
+		out:        errorBadInput + "\n",
+		status:     http.StatusBadRequest,
+		name:       "unmatching passwords",
+	},
 }
 
 func TestRegisterSuccess(t *testing.T) {
