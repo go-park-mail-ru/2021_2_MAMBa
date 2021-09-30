@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -20,15 +21,6 @@ type testRow struct {
 	name       string
 }
 
-/*
-	{
-		inQuery: "",
-		bodyString: ``,
-		out: ``,
-		status: http.StatusOK,
-		name: "register one",
-	},
-*/
 var testTableRegisterSuccess = [...]testRow{
 	{
 		inQuery:    "",
@@ -60,6 +52,13 @@ var testTableRegisterFailure = [...]testRow{
 		status:     http.StatusBadRequest,
 		name:       "empty fields",
 	},
+	{
+		inQuery:    "",
+		bodyString: `{"first_name": "Ivan12","surname": "Ivanov","email": "ivan131@mail.ru","password": "123455","password_repeat": "123456"}`,
+		out:        errorBadInput + "\n",
+		status:     http.StatusBadRequest,
+		name:       "unmatching passwords",
+	},
 }
 
 func TestRegisterSuccess(t *testing.T) {
@@ -83,11 +82,12 @@ func TestRegisterFailure(t *testing.T) {
 		Email:      "ivan1@mail.ru",
 		ProfilePic: "/pic/1.jpg",
 	})
+	apiPath := "/api/user/register"
 	for _, test := range testTableRegisterFailure {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		Register(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
@@ -96,7 +96,7 @@ func TestRegisterFailure(t *testing.T) {
 }
 
 func fillMockDB() {
-	db = database.Database{}
+	db = database.UserMockDatabase{}
 	db.AddUser(&database.User{
 		FirstName:  "Ivan",
 		Surname:    "Ivanov",
@@ -168,11 +168,12 @@ func TestGetBasicInfoSuccess(t *testing.T) {
 
 func TestGetBasicInfoFailure(t *testing.T) {
 	fillMockDB()
+	apiPath := "/api/user/get/"
 	for _, test := range testTableGetFailure {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		// Hack to try to fake gorilla/mux vars
 		vars := map[string]string{
 			"id": test.inQuery,
@@ -235,11 +236,12 @@ var testTableLoginFailure = [...]testRow{
 
 func TestLoginSuccess(t *testing.T) {
 	fillMockDB()
+	apiPath := "/api/user/login"
 	for _, test := range testTableLoginSuccess {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/login"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		Login(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
@@ -249,14 +251,86 @@ func TestLoginSuccess(t *testing.T) {
 
 func TestLoginFailure(t *testing.T) {
 	fillMockDB()
+	apiPath := "/api/user/login"
 	for _, test := range testTableLoginFailure {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/login"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		Login(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
 	}
+}
+
+var testTableLogoutFailure = [...]testRow{
+	{
+		inQuery:    "",
+		bodyString: `{"email": "iva21@mail.ru","password": "123456"}`,
+		out:        errorBadInput + "\n",
+		status:     http.StatusForbidden,
+		name:       "logout not logged in",
+	},
+}
+
+func TestLogoutFailure(t *testing.T) {
+	fillMockDB()
+	apiPath := "/api/user/logout"
+	for _, test := range testTableLogoutFailure {
+		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+		bodyReader := strings.NewReader(test.bodyString)
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("POST", "https://localhost:8080"+apiPath+test.inQuery, bodyReader)
+		Logout(w, r)
+		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		fmt.Fprintf(os.Stdout, " done\n")
+	}
+}
+
+func TestLogoutSuccess(t *testing.T) {
+	fillMockDB()
+	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "/api/login", bodyReader)
+	Login(w, r)
+	require.Equal(t, http.StatusOK, w.Code)
+
+	r = httptest.NewRequest("GET", "/api/user/logout", bodyReader)
+	cookies := w.Result().Cookies()
+	for _, cookie := range cookies {
+		r.AddCookie(cookie)
+	}
+	w = httptest.NewRecorder()
+	Logout(w, r)
+	assert.Equal(t, http.StatusOK, w.Code, "Test: Logout OK")
+
+}
+
+func TestCheckAuthSuccess(t *testing.T) {
+	fillMockDB()
+	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "/api/login", bodyReader)
+	Login(w, r)
+	require.Equal(t, http.StatusOK, w.Code)
+
+	r = httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
+	cookies := w.Result().Cookies()
+	for _, cookie := range cookies {
+		r.AddCookie(cookie)
+	}
+	w = httptest.NewRecorder()
+	CheckAuth(w, r)
+	assert.Equal(t, http.StatusOK, w.Code, "Test: Logout OK")
+}
+
+func TestCheckAuthFailure(t *testing.T) {
+	fillMockDB()
+	bodyReader := strings.NewReader("")
+	r := httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
+	w := httptest.NewRecorder()
+	CheckAuth(w, r)
+	assert.Equal(t, http.StatusBadRequest, w.Code, "Test: Logout OK")
 }

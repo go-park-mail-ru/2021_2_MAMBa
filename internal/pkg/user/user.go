@@ -5,6 +5,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/sessions"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strconv"
 )
@@ -14,25 +15,8 @@ type userToLogin struct {
 	Password string `json:"password"`
 }
 
-type userSignupForm struct {
-	FirstName      string `json:"first_name"`
-	Surname        string `json:"surname"`
-	Email          string `json:"email"`
-	Password       string `json:"password"`
-	PasswordRepeat string `json:"password_repeat"`
-}
-
-type userBasicInfo struct {
-	ID         uint64 `json:"id"`
-	FirstName  string `json:"first_name"`
-	Surname    string `json:"surname"`
-	Email      string `json:"email"`
-	ProfilePic string `json:"profile_pic"`
-}
-
 var (
-	db database.Database
-
+	db                  database.UserMockDatabase
 	errorBadInput       = "error - bad input"
 	errorAlreadyIn      = "error - already in"
 	errorBadCredentials = "error - bad credentials"
@@ -51,14 +35,8 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorBadInput, http.StatusNotFound)
 		return
 	}
-	userInfo := &userBasicInfo{
-		ID:         u64,
-		FirstName:  user.FirstName,
-		Surname:    user.Surname,
-		Email:      user.Email,
-		ProfilePic: user.ProfilePic,
-	}
-	b, err := json.Marshal(userInfo)
+	user.OmitPassword()
+	b, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 		return
@@ -74,7 +52,7 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	userForm := new(userSignupForm)
+	userForm := new(database.User)
 	err := json.NewDecoder(r.Body).Decode(&userForm)
 	if err != nil {
 		http.Error(w, errorBadInput, http.StatusBadRequest)
@@ -92,27 +70,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser := &database.User{
-		// ID устанавливается в addUser под заблокированным RWMutex
-		Email:      userForm.Email,
-		FirstName:  userForm.FirstName,
-		Surname:    userForm.Surname,
-		Password:   userForm.Password,
-		ProfilePic: "/pic/1.jpg"}
 
-	idReg := db.AddUser(newUser)
-	err = sessions.StartSession(w, r, newUser.ID)
-	if err != nil {
+	idReg := db.AddUser(userForm)
+	err = sessions.StartSession(w, r, userForm.ID)
+	if err != nil && idReg != 0 {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
-	userInfo := &userBasicInfo{
-		ID:         idReg,
-		FirstName:  userForm.FirstName,
-		Surname:    userForm.Surname,
-		Email:      userForm.Email,
-		ProfilePic: "/pic/1.jpg",
-	}
-	b, err := json.Marshal(userInfo)
+	userForm.OmitPassword()
+	b, err := json.Marshal(userForm)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
@@ -133,7 +98,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user, err := db.FindEmail(userForm.Email)
-	if err != nil || user.Password != userForm.Password {
+	errPassword := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userForm.Password))
+	if err != nil || errPassword != nil {
 		http.Error(w, errorBadCredentials, http.StatusUnauthorized)
 		return
 	}
@@ -142,14 +108,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorAlreadyIn, http.StatusBadRequest)
 		return
 	}
-	userInfo := &userBasicInfo{
-		ID:         user.ID,
-		FirstName:  user.FirstName,
-		Surname:    user.Surname,
-		Email:      user.Email,
-		ProfilePic: user.ProfilePic,
-	}
-	b, err := json.Marshal(userInfo)
+	user.OmitPassword()
+	b, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
@@ -186,7 +146,8 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	userInfo := &userBasicInfo{ID: userID}
+
+	userInfo := database.User{ID: userID}
 	b, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)

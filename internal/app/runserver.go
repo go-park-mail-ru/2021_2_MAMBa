@@ -9,25 +9,18 @@ import (
 	"net/http"
 )
 
-// TODO - add all desirable origins
 var allowedOrigins = map[string]struct{}{
-	"":      {},
-
-	"http://localhost":      {},
-	"http://localhost:3001": {},
-	"http://localhost:8080": {},
-	"http://89.208.198.137": {},
+	"http://localhost":           {},
+	"http://localhost:3001":      {},
+	"http://89.208.198.137":      {},
 	"http://89.208.198.137:3001": {},
-	"http://film4u.club": {},
-	"http://film4u.club:3001": {},
+	"http://film4u.club":         {},
+	"http://film4u.club:3001":    {},
 
-	"https://localhost":      {},
-	"https://localhost:3001": {},
-	"https://localhost:8080": {},
-	"https://89.208.198.137": {},
+	"https://89.208.198.137":      {},
 	"https://89.208.198.137:3001": {},
-	"https://film4u.club": {},
-	"https://film4u.club:3001": {},
+	"https://film4u.club":         {},
+	"https://film4u.club:3001":    {},
 }
 
 func Logger(next http.Handler) http.Handler {
@@ -40,9 +33,8 @@ func Logger(next http.Handler) http.Handler {
 func PanicRecovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			err := recover()
-			if err != nil {
-				fmt.Println(err)
+			if err := recover(); err != nil {
+				fmt.Printf("Recovered from panic with err: %s on %s", err, r.RequestURI)
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 			}
 		}()
@@ -57,13 +49,11 @@ func CORS(h http.Handler) http.Handler {
 		if isIn {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		} else {
-
-			// TODO -  на nginx настроить cors и раскомментить
 			fmt.Println("unknown origin", `"`+origin+`"`)
-			// http.Error(w, `Access denied`, http.StatusForbidden)
+			http.Error(w, "Access denied", http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")
 		if r.Method == "OPTIONS" {
 			return
@@ -76,9 +66,10 @@ func RunServer(addr string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 
-	api.Use(CORS)
-	api.Use(Logger)
+	// middleware
 	api.Use(PanicRecovery)
+	api.Use(Logger)
+	api.Use(CORS)
 
 	// Users
 	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET", "OPTIONS")

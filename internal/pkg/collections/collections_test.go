@@ -20,7 +20,7 @@ type testRow struct {
 var testTableSuccess = [...]testRow{
 	{
 		inQuery: "skip=0&limit=1",
-		out:     `{"collections_list":[{"id":1,"title":"Для ценителей Хогвардса","picture_url":"server/images/collections1.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":1}` + "\n",
+		out:     `{"collections_list":[{"id":1,"title":"Для ценителей Хогвартса","picture_url":"server/images/collections1.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":1}` + "\n",
 		status:  http.StatusOK,
 		name:    `limit works`,
 	},
@@ -40,30 +40,31 @@ var testTableSuccess = [...]testRow{
 var testTableFailure = [...]testRow{
 	{
 		inQuery: "skip=-1&limit=10",
-		out:     errSkip + "\n",
+		out:     errSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 	},
 	{
 		inQuery: "skip=11&limit=-2",
-		out:     errLimit + "\n",
+		out:     errLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 	},
 	{
 		inQuery: "skip=14&limit=1",
-		out:     errSkip + "\n",
+		out:     errSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 	},
 }
 
 func TestGetCollectionsSuccess(t *testing.T) {
+	apiPath := "/api/collections/getCollections?"
 	for _, test := range testTableSuccess {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", "/api/collections/getCollections?"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		GetCollections(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
@@ -71,11 +72,12 @@ func TestGetCollectionsSuccess(t *testing.T) {
 	}
 }
 func TestGetCollectionsFailure(t *testing.T) {
+	apiPath := "/api/collections/getCollections?"
 	for _, test := range testTableFailure {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", "/api/collections/getCollections?"+test.inQuery, bodyReader)
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		GetCollections(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
