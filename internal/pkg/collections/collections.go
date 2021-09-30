@@ -30,9 +30,6 @@ var (
 
 // БД и хэндлер отдельно
 func getCollectionsDB(skip int, limit int) (collections, error) {
-	if limit < 0 {
-		return collections{}, errorLimit
-	}
 	db.RLock()
 	dbSize := len(db.Previews)
 	db.RUnlock()
