@@ -35,8 +35,8 @@ func getCollectionsDB(skip int, limit int) (collections, error) {
 	}
 	db.RLock()
 	dbSize := len(db.Previews)
+	db.RUnlock()
 	if skip >= dbSize {
-		db.RUnlock()
 		return collections{}, errorSkip
 	}
 	moreAvailable := skip+limit < dbSize
@@ -44,6 +44,7 @@ func getCollectionsDB(skip int, limit int) (collections, error) {
 	if !moreAvailable {
 		next = dbSize
 	}
+	db.RLock()
 	previews := db.Previews[skip:next]
 	db.RUnlock()
 

@@ -35,9 +35,8 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorBadInput, http.StatusNotFound)
 		return
 	}
-	userInfo := user.Multipurpose()
-	userInfo.OmitPassword()
-	b, err := json.Marshal(userInfo)
+	user.OmitPassword()
+	b, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 		return
@@ -53,7 +52,7 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	userForm := new(database.UserMultiPurpose)
+	userForm := new(database.User)
 	err := json.NewDecoder(r.Body).Decode(&userForm)
 	if err != nil {
 		http.Error(w, errorBadInput, http.StatusBadRequest)
@@ -71,16 +70,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser := userForm.ToUser()
 
-	idReg := db.AddUser(&newUser)
-	err = sessions.StartSession(w, r, newUser.ID)
+	idReg := db.AddUser(userForm)
+	err = sessions.StartSession(w, r, userForm.ID)
 	if err != nil && idReg != 0 {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
-	userInfo := newUser.Multipurpose()
-	userInfo.OmitPassword()
-	b, err := json.Marshal(userInfo)
+	userForm.OmitPassword()
+	b, err := json.Marshal(userForm)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
@@ -111,9 +108,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorAlreadyIn, http.StatusBadRequest)
 		return
 	}
-	userInfo := user.Multipurpose()
-	userInfo.OmitPassword()
-	b, err := json.Marshal(userInfo)
+	user.OmitPassword()
+	b, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
@@ -151,7 +147,7 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userInfo := database.UserMultiPurpose{ID: userID}
+	userInfo := database.User{ID: userID}
 	b, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)

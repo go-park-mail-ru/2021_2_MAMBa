@@ -18,54 +18,22 @@ type User struct {
 	Surname    string `json:"surname"`
 	Email      string `json:"email"`
 	Password   string `json:"password"`
-	ProfilePic string `json:"profile_pic"`
-}
-
-type UserMultiPurpose struct {
-	ID             uint64 `json:"id,omitempty"`
-	FirstName      string `json:"first_name"`
-	Surname        string `json:"surname"`
-	Email          string `json:"email"`
-	Password       string `json:"password,omitempty"`
 	PasswordRepeat string `json:"password_repeat,omitempty"`
-	ProfilePic     string `json:"profile_pic,omitempty"`
+	ProfilePic string `json:"profile_pic"`
 }
 
 var basePicture = "/pic/1.jpg"
 
-func (us *UserMultiPurpose) ToUser() User {
-	return User{
-		ID:         us.ID,
-		FirstName:  us.FirstName,
-		Surname:    us.Surname,
-		Email:      us.Email,
-		Password:   us.Password,
-		ProfilePic: us.ProfilePic,
-	}
-}
-
-func (us *User) Multipurpose() UserMultiPurpose {
-	return UserMultiPurpose{
-		ID:             us.ID,
-		FirstName:      us.FirstName,
-		Surname:        us.Surname,
-		Email:          us.Email,
-		Password:       us.Password,
-		PasswordRepeat: us.Password,
-		ProfilePic:     us.ProfilePic,
-	}
-}
-
-func (us *UserMultiPurpose) OmitPassword() {
+func (us *User) OmitPassword() {
 	us.Password = ""
 	us.PasswordRepeat = ""
 }
 
-func (us *UserMultiPurpose) OmitId() {
+func (us *User) OmitId() {
 	us.ID = 0
 }
 
-func (us *UserMultiPurpose) OmitPic() {
+func (us *User) OmitPic() {
 	us.ProfilePic = ""
 }
 
