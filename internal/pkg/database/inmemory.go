@@ -40,7 +40,9 @@ func (us *User) OmitPic() {
 var errorNoUser = errors.New("error: no user")
 
 func (db *UserMockDatabase) AddUser(us *User) uint64 {
+	db.RLock()
 	us.ID = uint64(len(db.users) + 1)
+	db.RUnlock()
 	us.Email = strings.ToLower(us.Email)
 	us.Surname = strings.Title(us.Surname)
 	us.FirstName = strings.Title(us.FirstName)
