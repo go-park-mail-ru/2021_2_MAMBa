@@ -13,13 +13,13 @@ type UserMockDatabase struct {
 }
 
 type User struct {
-	ID         uint64 `json:"id"`
+	ID         uint64 `json:"id,omitempty"`
 	FirstName  string `json:"first_name"`
 	Surname    string `json:"surname"`
 	Email      string `json:"email"`
-	Password   string `json:"password"`
+	Password   string `json:"password,omitempty"`
 	PasswordRepeat string `json:"password_repeat,omitempty"`
-	ProfilePic string `json:"profile_pic"`
+	ProfilePic string `json:"profile_pic,omitempty"`
 }
 
 var basePicture = "/pic/1.jpg"
