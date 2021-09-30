@@ -281,7 +281,7 @@ func TestLogoutFailure(t *testing.T) {
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "https://localhost:8080"+apiPath+test.inQuery, bodyReader)
+		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		Logout(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
