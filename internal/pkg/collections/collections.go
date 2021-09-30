@@ -37,6 +37,10 @@ func getCollectionsDB(skip int, limit int) (collections, error) {
 	}
 	db.RLock()
 	dbSize := len(db.Previews)
+	if skip >= dbSize {
+		db.RUnlock()
+		return collections{}, errorSkip
+	}
 	moreAvailable := skip+limit < dbSize
 	next := skip + limit
 	if !moreAvailable {
@@ -44,9 +48,7 @@ func getCollectionsDB(skip int, limit int) (collections, error) {
 	}
 	previews := db.Previews[skip:next]
 	db.RUnlock()
-	if skip >= dbSize {
-		return collections{}, errorSkip
-	}
+
 	collect := collections{
 		CollArray: previews,
 		MoreAvailable:   moreAvailable,
@@ -78,6 +80,10 @@ func GetCollections(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	collectionsList, err := getCollectionsDB(skip, limit)
+	if err == errorSkip {
+		http.Error(w, errSkipMsg, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, errDBMsg, http.StatusInternalServerError)
 		return

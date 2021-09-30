@@ -5,6 +5,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/sessions"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strconv"
 )
@@ -135,7 +136,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user, err := db.FindEmail(userForm.Email)
-	if err != nil || user.Password != userForm.Password {
+	errPassword := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userForm.Password))
+	if err != nil || errPassword != nil {
 		http.Error(w, errorBadCredentials, http.StatusUnauthorized)
 		return
 	}

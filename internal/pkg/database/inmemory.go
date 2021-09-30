@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"sync"
 )
@@ -49,6 +50,11 @@ func (db *UserMockDatabase) AddUser(us *User) uint64 {
 	us.Email = strings.ToLower(us.Email)
 	us.Surname = strings.Title(us.Surname)
 	us.FirstName = strings.Title(us.FirstName)
+	passwordByte , err := bcrypt.GenerateFromPassword([]byte(us.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return 0
+	}
+	us.Password = string(passwordByte)
 
 	db.Lock()
 	db.users = append(db.users, *us)
