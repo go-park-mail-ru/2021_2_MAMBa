@@ -15,27 +15,8 @@ type userToLogin struct {
 	Password string `json:"password"`
 }
 
-type userSignupForm struct {
-	FirstName      string `json:"first_name"`
-	Surname        string `json:"surname"`
-	Email          string `json:"email"`
-	Password       string `json:"password"`
-	PasswordRepeat string `json:"password_repeat"`
-}
-
-type userBasicInfo struct {
-	ID         uint64 `json:"id"`
-	FirstName  string `json:"first_name"`
-	Surname    string `json:"surname"`
-	Email      string `json:"email"`
-	ProfilePic string `json:"profile_pic"`
-}
-
-
-
 var (
 	db database.UserMockDatabase
-	basePicture         = "/pic/1.jpg"
 	errorBadInput       = "error - bad input"
 	errorAlreadyIn      = "error - already in"
 	errorBadCredentials = "error - bad credentials"
@@ -54,13 +35,8 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorBadInput, http.StatusNotFound)
 		return
 	}
-	userInfo := &userBasicInfo{
-		ID:         u64,
-		FirstName:  user.FirstName,
-		Surname:    user.Surname,
-		Email:      user.Email,
-		ProfilePic: user.ProfilePic,
-	}
+	userInfo := user.Multipurpose()
+	userInfo.OmitPassword()
 	b, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
@@ -77,7 +53,7 @@ func GetBasicInfo(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	userForm := new(userSignupForm)
+	userForm := new(database.UserMultiPurpose)
 	err := json.NewDecoder(r.Body).Decode(&userForm)
 	if err != nil {
 		http.Error(w, errorBadInput, http.StatusBadRequest)
@@ -95,26 +71,15 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser := &database.User{
-		// ID устанавливается в addUser под заблокированным RWMutex
-		Email:      userForm.Email,
-		FirstName:  userForm.FirstName,
-		Surname:    userForm.Surname,
-		Password:   userForm.Password,
-		ProfilePic: basePicture}
+	newUser := userForm.ToUser()
 
-	idReg := db.AddUser(newUser)
+	idReg := db.AddUser(&newUser)
 	err = sessions.StartSession(w, r, newUser.ID)
-	if err != nil {
+	if err != nil && idReg != 0 {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
 	}
-	userInfo := &userBasicInfo{
-		ID:         idReg,
-		FirstName:  userForm.FirstName,
-		Surname:    userForm.Surname,
-		Email:      userForm.Email,
-		ProfilePic: basePicture,
-	}
+	userInfo := newUser.Multipurpose()
+	userInfo.OmitPassword()
 	b, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
@@ -146,13 +111,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorAlreadyIn, http.StatusBadRequest)
 		return
 	}
-	userInfo := &userBasicInfo{
-		ID:         user.ID,
-		FirstName:  user.FirstName,
-		Surname:    user.Surname,
-		Email:      user.Email,
-		ProfilePic: user.ProfilePic,
-	}
+	userInfo := user.Multipurpose()
+	userInfo.OmitPassword()
 	b, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)
@@ -190,7 +150,8 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	userInfo := &userBasicInfo{ID: userID}
+
+	userInfo := database.UserMultiPurpose{ID: userID}
 	b, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, errorInternalServer, http.StatusInternalServerError)

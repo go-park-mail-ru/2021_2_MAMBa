@@ -30,6 +30,18 @@ type UserMultiPurpose struct {
 	PasswordRepeat string `json:"password_repeat,omitempty"`
 	ProfilePic string `json:"profile_pic,omitempty"`
 }
+var basePicture = "/pic/1.jpg"
+
+func (us * UserMultiPurpose) ToUser () User {
+	return User{
+		ID:             us.ID,
+		FirstName:      us.FirstName,
+		Surname:        us.Surname,
+		Email:          us.Email,
+		Password:       us.Password,
+		ProfilePic:     us.ProfilePic,
+	}
+}
 
 func (us *User) Multipurpose () UserMultiPurpose {
 	return UserMultiPurpose{
@@ -41,6 +53,19 @@ func (us *User) Multipurpose () UserMultiPurpose {
 		PasswordRepeat: us.Password,
 		ProfilePic:     us.ProfilePic,
 	}
+}
+
+func (us *UserMultiPurpose) OmitPassword() {
+	us.Password = ""
+	us.PasswordRepeat = ""
+}
+
+func (us *UserMultiPurpose) OmitId() {
+	us.ID = 0
+}
+
+func (us *UserMultiPurpose) OmitPic() {
+	us.ProfilePic = ""
 }
 
 var errorNoUser = errors.New("error: no user")
@@ -55,6 +80,7 @@ func (db *UserMockDatabase) AddUser(us *User) uint64 {
 		return 0
 	}
 	us.Password = string(passwordByte)
+	us.ProfilePic = basePicture
 
 	db.Lock()
 	db.users = append(db.users, *us)
