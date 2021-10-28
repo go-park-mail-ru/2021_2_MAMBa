@@ -1,85 +1,41 @@
 package server
 
 import (
-	"2021_2_MAMBa/internal/pkg/collections"
-	"2021_2_MAMBa/internal/pkg/user"
+	collectionsDelivery "2021_2_MAMBa/internal/pkg/collections/delivery/http"
+	collectionsRepository "2021_2_MAMBa/internal/pkg/collections/repository"
+	collectionsUsecase "2021_2_MAMBa/internal/pkg/collections/usecase"
+	"2021_2_MAMBa/internal/pkg/middlewares"
+	userDelivery "2021_2_MAMBa/internal/pkg/user/delivery/http"
+	userRepository "2021_2_MAMBa/internal/pkg/user/repository"
+	userUsecase "2021_2_MAMBa/internal/pkg/user/usecase"
+	"2021_2_MAMBa/internal/pkg/utils/log"
 	"fmt"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 )
-
-var allowedOrigins = map[string]struct{}{
-	"http://localhost":           {},
-	"http://localhost:3001":      {},
-	"http://89.208.198.137":      {},
-	"http://89.208.198.137:3001": {},
-	"http://film4u.club":         {},
-	"http://film4u.club:3001":    {},
-
-	"https://89.208.198.137":      {},
-	"https://89.208.198.137:3001": {},
-	"https://film4u.club":         {},
-	"https://film4u.club:3001":    {},
-}
-
-func Logger(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.RequestURI, "\nHeader: ", r.Header, "\n-------------------------")
-		next.ServeHTTP(w, r)
-	})
-}
-
-func PanicRecovery(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if err := recover(); err != nil {
-				fmt.Printf("Recovered from panic with err: %s on %s", err, r.RequestURI)
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-			}
-		}()
-		next.ServeHTTP(w, r)
-	})
-}
-
-func CORS(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := r.Header.Get("Origin")
-		_, isIn := allowedOrigins[origin]
-		if isIn {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-		} else {
-			fmt.Println("unknown origin", `"`+origin+`"`)
-			http.Error(w, "Access denied", http.StatusForbidden)
-		}
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE, PATCH")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")
-		if r.Method == "OPTIONS" {
-			return
-		}
-		h.ServeHTTP(w, r)
-	})
-}
 
 func RunServer(addr string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 
 	// middleware
-	api.Use(PanicRecovery)
-	api.Use(Logger)
-	api.Use(CORS)
+	api.Use(middlewares.PanicRecovery)
+	api.Use(middlewares.Logger)
+	api.Use(middlewares.CORS)
 
-	// Users
-	api.HandleFunc("/user/{id:[0-9]+}", user.GetBasicInfo).Methods("GET", "OPTIONS")
-	api.HandleFunc("/user/register", user.Register).Methods("POST", "OPTIONS")
-	api.HandleFunc("/user/login", user.Login).Methods("POST", "OPTIONS")
-	api.HandleFunc("/user/logout", user.Logout).Methods("GET", "OPTIONS")
-	api.HandleFunc("/user/checkAuth", user.CheckAuth).Methods("GET", "OPTIONS")
+	userRepo := userRepository.NewUserRepository()
+	collectionsRepo := collectionsRepository.NewCollectionsRepository()
 
-	// Collections
-	api.HandleFunc("/collections/getCollections", collections.GetCollections).Methods("GET", "OPTIONS")
+	usUsecase := userUsecase.NewUserUsecase(userRepo)
+	colUsecase := collectionsUsecase.NewCollectionsUsecase(collectionsRepo)
+
+	userDelivery.NewHandlers(api, usUsecase)
+	collectionsDelivery.NewHandlers(api, colUsecase)
+
+	// Static files
+	fileRouter := r.PathPrefix("/static").Subrouter()
+	fileServer := http.StripPrefix("/static", http.FileServer(http.Dir("./static")))
+	fileRouter.PathPrefix("/media/").Handler(fileServer)
 
 	server := http.Server{
 		Addr:    addr,
@@ -89,6 +45,6 @@ func RunServer(addr string) {
 	fmt.Println("Starting web-server at", addr)
 	err := server.ListenAndServe()
 	if err != nil {
-		log.Fatalln(err)
+		log.Error(err)
 	}
 }
