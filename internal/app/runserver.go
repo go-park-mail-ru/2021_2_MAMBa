@@ -26,11 +26,11 @@ func RunServer(addr string) {
 	userRepo := userRepository.NewUserRepository()
 	collectionsRepo := collectionsRepository.NewCollectionsRepository()
 
-	userUsecase := userUsecase.NewUserUsecase(userRepo)
-	collectionsUsecase := collectionsUsecase.NewCollectionsUsecase(collectionsRepo)
+	usUsecase := userUsecase.NewUserUsecase(userRepo)
+	colUsecase := collectionsUsecase.NewCollectionsUsecase(collectionsRepo)
 
-	userDelivery.NewHandlers(api, userUsecase)
-	collectionsDelivery.NewHandlers(api, collectionsUsecase)
+	userDelivery.NewHandlers(api, usUsecase)
+	collectionsDelivery.NewHandlers(api, colUsecase)
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()
