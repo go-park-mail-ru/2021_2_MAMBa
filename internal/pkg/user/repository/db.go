@@ -64,7 +64,6 @@ func (ur *dbUserRepository) GetById(id uint64) (domain.User, error) {
 	return found, nil
 }
 
-// AddUser TODO: Разобраться с локами, чтобы не было одинаковых ID у пользователей
 func (ur *dbUserRepository) AddUser(us *domain.User) (uint64, error) {
 
 	passwordByte, err := bcrypt.GenerateFromPassword([]byte(us.Password), bcrypt.DefaultCost)
