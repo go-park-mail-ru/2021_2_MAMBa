@@ -42,7 +42,7 @@ func RunServer(addr string) {
 		Handler: r,
 	}
 
-	fmt.Println("Starting web-server at", addr)
+	log.Info(fmt.Sprintf("Starting web-server at %s", addr))
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Error(err)

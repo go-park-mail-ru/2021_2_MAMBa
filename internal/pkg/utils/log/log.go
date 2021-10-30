@@ -1,36 +1,61 @@
 package log
 
 import (
+	"fmt"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"io"
 	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 )
 
+const debugMode = false // true - write to File, false - write to Stdout
+const logsFileName = "logs.txt"
+
 func init() {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	SetOutput(os.Stdout)
+	if debugMode {
+		SetOutput(os.Stdout)
+	} else {
+		outputFile, err := os.Create(logsFileName)
+		if err != nil {
+			fmt.Println("Switched logging to Stdout because of log file open error")
+			SetOutput(os.Stdout)
+		}
+		SetOutput(outputFile)
+	}
 }
 
 func SetOutput(out io.Writer) {
-	log.Output(zerolog.ConsoleWriter{
+	log.Logger = log.Output(zerolog.ConsoleWriter{
 		Out:        out,
-		TimeFormat: time.RFC3339,
+		TimeFormat: time.RFC1123,
 		NoColor:    !(out == os.Stdout || out == os.Stderr),
 	})
 }
 
 func Debug(msg string) {
-	log.Debug().Msg(msg)
+	_, filename, line, _ := runtime.Caller(1)
+	log.Debug().Msg(fmt.Sprintf("%s:%d: %s",
+		filepath.Base(filename), line, msg))
 }
 
 func Info(msg string) {
+	_, filename, line, _ := runtime.Caller(1)
+	log.Info().Msg(fmt.Sprintf("%s:%d: %s",
+		filepath.Base(filename), line, msg))
+}
+
+func InfoWithoutCaller(msg string) {
 	log.Info().Msg(msg)
 }
 
 func Warn(msg string) {
-	log.Warn().Msg(msg)
+	_, filename, line, _ := runtime.Caller(1)
+	log.Warn().Msg(fmt.Sprintf("%s:%d: %s",
+		filepath.Base(filename), line, msg))
 }
 
 func Error(err error) {
