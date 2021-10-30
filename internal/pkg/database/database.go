@@ -7,13 +7,13 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type DatabasePool interface {
+type ConnectionPool interface {
 	Begin(context.Context) (pgx.Tx, error)
 	Close()
 }
 
 type DBManager struct {
-	Pool DatabasePool
+	Pool ConnectionPool
 }
 
 func Connect() *DBManager {
@@ -26,6 +26,11 @@ func Connect() *DBManager {
 	}
 	mylog.Info("Successful connection to postgres")
 	return &DBManager{Pool: pool}
+}
+
+func (dbm *DBManager) Disconnect() {
+	dbm.Pool.Close()
+	mylog.Info("postgres disconnected")
 }
 
 func (dbm *DBManager) Query (queryString string, params ...interface{}) ([][][]byte, error) {
@@ -49,7 +54,9 @@ func (dbm *DBManager) Query (queryString string, params ...interface{}) ([][][]b
 
 	result := make([][][] byte, 0)
 	for rows.Next() {
-		result = append(result, rows.RawValues())
+		rowBuffer:= make ([][]byte, 0)
+		rowBuffer = append(rowBuffer, rows.RawValues()...)
+		result = append(result, rowBuffer)
 	}
 
 	err = tx.Commit(transactionContext)
@@ -59,4 +66,31 @@ func (dbm *DBManager) Query (queryString string, params ...interface{}) ([][][]b
 		return nil, err
 	}
 	return result, nil
+}
+
+func (dbm *DBManager) Execute (queryString string, params ...interface{}) error {
+	transactionContext := context.Background()
+	tx, err := dbm.Pool.Begin(transactionContext)
+	if err != nil {
+		mylog.Info("error connecting to a pool")
+		mylog.Error(err)
+		return err
+	}
+	// ВАЖНО - Rollback не проходит после commit
+	defer tx.Rollback(transactionContext)
+
+	_, err = tx.Exec(transactionContext, queryString, params...)
+	if err != nil {
+		mylog.Info("error in query")
+		mylog.Error(err)
+		return err
+	}
+
+	err = tx.Commit(transactionContext)
+	if err != nil {
+		mylog.Info("error committing")
+		mylog.Error(err)
+		return err
+	}
+	return nil
 }

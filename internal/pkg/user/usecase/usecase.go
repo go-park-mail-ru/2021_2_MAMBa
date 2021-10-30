@@ -3,6 +3,7 @@ package usecase
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	userErrors "2021_2_MAMBa/internal/pkg/user"
+	"2021_2_MAMBa/internal/pkg/utils/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,6 +19,8 @@ func NewUserUsecase(u domain.UserRepository) domain.UserUsecase {
 
 func (uc userUsecase) GetBasicInfo(id uint64) (domain.User, error) {
 	user, err := uc.userRepo.GetById(id)
+	passwordByte, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	log.Info(string(passwordByte))
 	user.OmitPassword()
 	if err != nil {
 		return domain.User{}, userErrors.ErrorInternalServer

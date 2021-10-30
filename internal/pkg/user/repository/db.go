@@ -1,60 +1,81 @@
 package repository
 
 import (
+	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
 	"2021_2_MAMBa/internal/pkg/user"
+	"encoding/binary"
 	"golang.org/x/crypto/bcrypt"
-	"strings"
-	"sync"
 )
 
 type dbUserRepository struct {
-	sync.RWMutex
-	users []domain.User
+	dbm *database.DBManager
 }
 
-func NewUserRepository() domain.UserRepository {
-	return &dbUserRepository{}
+func NewUserRepository(manager *database.DBManager) domain.UserRepository {
+	return &dbUserRepository{dbm: manager}
 }
+
+const (
+	queryGetById = "SELECT * FROM Profile WHERE User_ID = $1"
+	queryGetByEmail = "SELECT * FROM Profile WHERE email = $1"
+	queryAddUser = "INSERT INTO Profile(first_name, surname, email, password, picture_url, register_date) VALUES ($1, $2, $3, $4, $5, current_timestamp) RETURNING User_ID"
+)
 
 func (ur *dbUserRepository) GetByEmail(email string) (domain.User, error) {
-	ur.RLock()
-	defer ur.RUnlock()
-	loweredEmail := strings.ToLower(email)
-	for _, us := range ur.users {
-		if us.Email == loweredEmail {
-			return us, nil
-		}
+	result, err := ur.dbm.Query(queryGetByEmail, email)
+	if err != nil {
+		return domain.User{}, user.ErrorInternalServer
 	}
-	return domain.User{}, user.ErrorNoUser
+	if len(result) == 0 {
+		return domain.User{}, user.ErrorNoUser
+	}
+	raw := result[0]
+	found := domain.User{
+		ID:             binary.BigEndian.Uint64(raw[0]),
+		FirstName:      string(raw[1]),
+		Surname:        string(raw[2]),
+		Email:          string(raw[3]),
+		Password:       string(raw[4]),
+		PasswordRepeat: "",
+		ProfilePic:     string(raw[5]),
+	}
+	return found, nil
 }
 
 func (ur *dbUserRepository) GetById(id uint64) (domain.User, error) {
-	ur.RLock()
-	defer ur.RUnlock()
-	if int(id) <= len(ur.users) && id != 0 {
-		return ur.users[id-1], nil
+	result, err := ur.dbm.Query(queryGetById, id)
+	if err != nil {
+		return domain.User{}, user.ErrorInternalServer
 	}
-	return domain.User{}, user.ErrorNoUser
+	if len(result) == 0 {
+		return domain.User{}, user.ErrorNoUser
+	}
+	raw := result[0]
+	found := domain.User{
+		ID:             binary.BigEndian.Uint64(raw[0]),
+		FirstName:      string(raw[1]),
+		Surname:        string(raw[2]),
+		Email:          string(raw[3]),
+		Password:       string(raw[4]),
+		PasswordRepeat: "",
+		ProfilePic:     string(raw[5]),
+	}
+	return found, nil
 }
 
 // AddUser TODO: Разобраться с локами, чтобы не было одинаковых ID у пользователей
 func (ur *dbUserRepository) AddUser(us *domain.User) (uint64, error) {
-	ur.RLock()
-	us.ID = uint64(len(ur.users) + 1)
-	ur.RUnlock()
-	us.Email = strings.ToLower(us.Email)
-	us.Surname = strings.Title(us.Surname)
-	us.FirstName = strings.Title(us.FirstName)
+
 	passwordByte, err := bcrypt.GenerateFromPassword([]byte(us.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0, user.ErrorInternalServer
 	}
 	us.Password = string(passwordByte)
 	us.ProfilePic = domain.BasePicture
+	result, err := ur.dbm.Query(queryAddUser, us.FirstName, us.Surname, us.Email, us.Password, us.ProfilePic)
 
-	ur.Lock()
-	ur.users = append(ur.users, *us)
-	ur.Unlock()
+	us.ID = binary.BigEndian.Uint64(result[0][0])
+
 	return us.ID, nil
 }

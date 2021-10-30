@@ -25,10 +25,11 @@ func RunServer(addr string) {
 	api.Use(middlewares.CORS)
 
 	//database
-	_ := database.Connect()
+	db := database.Connect()
+	defer db.Disconnect()
 
-	userRepo := userRepository.NewUserRepository()
-	collectionsRepo := collectionsRepository.NewCollectionsRepository()
+	userRepo := userRepository.NewUserRepository(db)
+	collectionsRepo := collectionsRepository.NewCollectionsRepository(db)
 
 	usUsecase := userUsecase.NewUserUsecase(userRepo)
 	colUsecase := collectionsUsecase.NewCollectionsUsecase(collectionsRepo)
