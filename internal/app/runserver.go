@@ -4,6 +4,7 @@ import (
 	collectionsDelivery "2021_2_MAMBa/internal/pkg/collections/delivery/http"
 	collectionsRepository "2021_2_MAMBa/internal/pkg/collections/repository"
 	collectionsUsecase "2021_2_MAMBa/internal/pkg/collections/usecase"
+	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/middlewares"
 	userDelivery "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	userRepository "2021_2_MAMBa/internal/pkg/user/repository"
@@ -23,6 +24,9 @@ func RunServer(addr string) {
 	api.Use(middlewares.Logger)
 	api.Use(middlewares.CORS)
 
+	//database
+	_ := database.Connect()
+
 	userRepo := userRepository.NewUserRepository()
 	collectionsRepo := collectionsRepository.NewCollectionsRepository()
 
@@ -31,6 +35,7 @@ func RunServer(addr string) {
 
 	userDelivery.NewHandlers(api, usUsecase)
 	collectionsDelivery.NewHandlers(api, colUsecase)
+
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()
