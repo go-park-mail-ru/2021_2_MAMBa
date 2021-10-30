@@ -2,49 +2,56 @@ package repository
 
 import (
 	"2021_2_MAMBa/internal/pkg/collections"
+	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"sync"
+	"2021_2_MAMBa/internal/pkg/user"
+	"encoding/binary"
 )
 
 type dbCollectionsRepository struct {
-	sync.RWMutex
-	Previews []domain.CollectionPreview
+	dbm *database.DBManager
 }
 
-func NewCollectionsRepository() domain.CollectionsRepository {
-	return &dbCollectionsRepository{Previews: PreviewMock}
+func NewCollectionsRepository(manager *database.DBManager) domain.CollectionsRepository {
+	return &dbCollectionsRepository{dbm: manager}
 }
 
-var PreviewMock = []domain.CollectionPreview{
-	{Id: 1, Title: "Для ценителей Хогвартса", PictureUrl: "server/images/collections1.png"},
-	{Id: 2, Title: "Про настоящую любовь", PictureUrl: "server/images/collections2.png"},
-	{Id: 3, Title: "Аферы века", PictureUrl: "server/images/collections3.png"},
-	{Id: 4, Title: "Про Вторую Мировую", PictureUrl: "server/images/collections4.jpg"},
-	{Id: 5, Title: "Осеннее настроение", PictureUrl: "server/images/collections5.png"},
-	{Id: 6, Title: "Летняя атмосфера", PictureUrl: "server/images/collections6.png"},
-	{Id: 7, Title: "Про дружбу", PictureUrl: "server/images/collections7.png"},
-	{Id: 8, Title: "Романтические фильмы", PictureUrl: "server/images/collections8.jpg"},
-	{Id: 9, Title: "Джунгли зовут", PictureUrl: "server/images/collections9.jpg"},
-	{Id: 10, Title: "Фантастические фильмы", PictureUrl: "server/images/collections10.jpg"},
-	{Id: 11, Title: "Про петлю времени", PictureUrl: "server/images/collections11.png"},
-	{Id: 12, Title: "Классика на века", PictureUrl: "server/images/collections12.jpg"},
-}
+const (
+	queryCountCollections = "SELECT COUNT(*) FROM Collection"
+	queryGetCollections = "SELECT collection_id, collection_name, picture_url FROM Collection LIMIT $1 OFFSET $2 "
+)
 
 func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.Collections, error) {
-	cr.RLock()
-	dbSize := len(cr.Previews)
-	cr.RUnlock()
+
+	result, err := cr.dbm.Query(queryCountCollections)
+	if err != nil {
+		return domain.Collections{}, user.ErrorInternalServer
+	}
+	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
+	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
 		return domain.Collections{}, collections.ErrorSkip
 	}
-	moreAvailable := skip+limit < dbSize
-	next := skip + limit
-	if !moreAvailable {
-		next = dbSize
+	
+	if err != nil {
+		return domain.Collections{}, user.ErrorInternalServer
 	}
-	cr.RLock()
-	previews := cr.Previews[skip:next]
-	cr.RUnlock()
+	if len(result) == 0 {
+		return domain.Collections{}, user.ErrorNoUser
+	}
+
+	moreAvailable := skip+limit < dbSize
+	result, err = cr.dbm.Query(queryGetCollections, limit, skip)
+	
+	previews := make([]domain.CollectionPreview, 0)
+	for i := range result {
+		previewBuffer := domain.CollectionPreview{
+			Id: 		uint(binary.BigEndian.Uint64(result[i][0])),
+			Title:      string(result[i][1]),
+			PictureUrl: string(result[i][2]),
+		}
+		previews = append(previews, previewBuffer)
+	}
 
 	collect := domain.Collections{
 		CollArray:       previews,
