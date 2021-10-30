@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"2021_2_MAMBa/internal/pkg/utils/log"
 	"fmt"
 	"net/http"
 )
@@ -27,7 +28,7 @@ func CORS(h http.Handler) http.Handler {
 		if isIn {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		} else {
-			fmt.Println("unknown origin", `"`+origin+`"`)
+			log.Warn(fmt.Sprintf("unknown origin: \"%s\"", origin))
 			http.Error(w, "Access denied", http.StatusForbidden)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")

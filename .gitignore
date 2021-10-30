@@ -19,3 +19,4 @@ go.sum
 .DS_Store
 profile
 profile.cov
+logs*.txt
