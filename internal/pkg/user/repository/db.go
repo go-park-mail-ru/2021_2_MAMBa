@@ -17,9 +17,9 @@ func NewUserRepository(manager *database.DBManager) domain.UserRepository {
 }
 
 const (
-	queryGetById = "SELECT * FROM Profile WHERE User_ID = $1"
+	queryGetById    = "SELECT * FROM Profile WHERE User_ID = $1"
 	queryGetByEmail = "SELECT * FROM Profile WHERE email = $1"
-	queryAddUser = "INSERT INTO Profile(first_name, surname, email, password, picture_url, register_date) VALUES ($1, $2, $3, $4, $5, current_timestamp) RETURNING User_ID"
+	queryAddUser    = "INSERT INTO Profile(first_name, surname, email, password, picture_url, register_date) VALUES ($1, $2, $3, $4, $5, current_timestamp) RETURNING User_ID"
 )
 
 func (ur *dbUserRepository) GetByEmail(email string) (domain.User, error) {

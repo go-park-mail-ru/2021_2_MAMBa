@@ -24,7 +24,7 @@ func RunServer(addr string) {
 	api.Use(middlewares.Logger)
 	api.Use(middlewares.CORS)
 
-	//database
+	// database
 	db := database.Connect()
 	defer db.Disconnect()
 
@@ -36,7 +36,6 @@ func RunServer(addr string) {
 
 	userDelivery.NewHandlers(api, usUsecase)
 	collectionsDelivery.NewHandlers(api, colUsecase)
-
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()

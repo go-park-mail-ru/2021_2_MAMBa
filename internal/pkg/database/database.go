@@ -3,7 +3,7 @@ package database
 import (
 	mylog "2021_2_MAMBa/internal/pkg/utils/log"
 	"context"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -20,7 +20,7 @@ func Connect() *DBManager {
 	connString := "user=dev password=1234 host=localhost port=5432 dbname=film4u"
 	pool, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
-		mylog.Info("Postgres error")
+		mylog.Warn("Postgres error")
 		mylog.Error(err)
 		return nil
 	}
@@ -30,14 +30,14 @@ func Connect() *DBManager {
 
 func (dbm *DBManager) Disconnect() {
 	dbm.Pool.Close()
-	mylog.Info("postgres disconnected")
+	mylog.Info("Postgres disconnected")
 }
 
-func (dbm *DBManager) Query (queryString string, params ...interface{}) ([][][]byte, error) {
+func (dbm *DBManager) Query(queryString string, params ...interface{}) ([][][]byte, error) {
 	transactionContext := context.Background()
 	tx, err := dbm.Pool.Begin(transactionContext)
 	if err != nil {
-		mylog.Info("error connecting to a pool")
+		mylog.Warn("Error connecting to a pool")
 		mylog.Error(err)
 		return nil, err
 	}
@@ -46,33 +46,33 @@ func (dbm *DBManager) Query (queryString string, params ...interface{}) ([][][]b
 
 	rows, err := tx.Query(transactionContext, queryString, params...)
 	if err != nil {
-		mylog.Info("error in query")
+		mylog.Warn("Error in query")
 		mylog.Error(err)
 		return nil, err
 	}
 	defer rows.Close()
 
-	result := make([][][] byte, 0)
+	result := make([][][]byte, 0)
 	for rows.Next() {
-		rowBuffer:= make ([][]byte, 0)
+		rowBuffer := make([][]byte, 0)
 		rowBuffer = append(rowBuffer, rows.RawValues()...)
 		result = append(result, rowBuffer)
 	}
 
 	err = tx.Commit(transactionContext)
 	if err != nil {
-		mylog.Info("error committing")
+		mylog.Warn("Error committing")
 		mylog.Error(err)
 		return nil, err
 	}
 	return result, nil
 }
 
-func (dbm *DBManager) Execute (queryString string, params ...interface{}) error {
+func (dbm *DBManager) Execute(queryString string, params ...interface{}) error {
 	transactionContext := context.Background()
 	tx, err := dbm.Pool.Begin(transactionContext)
 	if err != nil {
-		mylog.Info("error connecting to a pool")
+		mylog.Warn("Error connecting to a pool")
 		mylog.Error(err)
 		return err
 	}
@@ -81,14 +81,14 @@ func (dbm *DBManager) Execute (queryString string, params ...interface{}) error 
 
 	_, err = tx.Exec(transactionContext, queryString, params...)
 	if err != nil {
-		mylog.Info("error in query")
+		mylog.Warn("Error in query")
 		mylog.Error(err)
 		return err
 	}
 
 	err = tx.Commit(transactionContext)
 	if err != nil {
-		mylog.Info("error committing")
+		mylog.Warn("Error committing")
 		mylog.Error(err)
 		return err
 	}

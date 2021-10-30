@@ -18,7 +18,7 @@ func NewCollectionsRepository(manager *database.DBManager) domain.CollectionsRep
 
 const (
 	queryCountCollections = "SELECT COUNT(*) FROM Collection"
-	queryGetCollections = "SELECT collection_id, collection_name, picture_url FROM Collection LIMIT $1 OFFSET $2 "
+	queryGetCollections   = "SELECT collection_id, collection_name, picture_url FROM Collection LIMIT $1 OFFSET $2 "
 )
 
 func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.Collections, error) {
@@ -32,7 +32,7 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 	if skip >= dbSize {
 		return domain.Collections{}, collections.ErrorSkip
 	}
-	
+
 	if err != nil {
 		return domain.Collections{}, user.ErrorInternalServer
 	}
@@ -42,11 +42,11 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 
 	moreAvailable := skip+limit < dbSize
 	result, err = cr.dbm.Query(queryGetCollections, limit, skip)
-	
+
 	previews := make([]domain.CollectionPreview, 0)
 	for i := range result {
 		previewBuffer := domain.CollectionPreview{
-			Id: 		uint(binary.BigEndian.Uint64(result[i][0])),
+			Id:         uint(binary.BigEndian.Uint64(result[i][0])),
 			Title:      string(result[i][1]),
 			PictureUrl: string(result[i][2]),
 		}

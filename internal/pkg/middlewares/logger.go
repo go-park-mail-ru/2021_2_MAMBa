@@ -13,7 +13,5 @@ func Logger(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		log.InfoWithoutCaller(fmt.Sprintf("[%s] %s, %s %s",
 			r.Method, r.RemoteAddr, r.URL.Path, time.Since(start)))
-		time.Sleep(1*time.Second)
-		log.Warn("Error!")
 	})
 }
