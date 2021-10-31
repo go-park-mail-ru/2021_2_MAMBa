@@ -206,7 +206,6 @@ func (fr *dbFilmRepository) GetFilmRecommendations (id uint64, skip int, limit i
 }
 
 func  (fr *dbFilmRepository) PostRating (id uint64, author_id uint64, rating float64) (float64, error) {
-
 	result, err := fr.dbm.Query(queryGetReviewByAuthor, id, author_id)
 	if err != nil {
 		return 0, err
@@ -229,6 +228,8 @@ func  (fr *dbFilmRepository) PostRating (id uint64, author_id uint64, rating flo
 	newRating := math.Float64frombits(binary.BigEndian.Uint64(result[0][0]))
 	return newRating, nil
 }
+
+
 func (fr *dbFilmRepository) GetMyReview (id uint64, author_id uint64) (domain.Review, error) {
 	result, err := fr.dbm.Query(queryGetReviewByAuthor, id, author_id)
 	if err != nil {
@@ -256,7 +257,7 @@ func (fr *dbFilmRepository) GetMyReview (id uint64, author_id uint64) (domain.Re
 	if err != nil {
 		return domain.Review{}, err
 	}
-	review.AuthorName = string(result[0][0]) + string(result[0][1])
+	review.AuthorName = string(result[0][0]) +" "+ string(result[0][1])
 	review.AuthorPictureUrl = string(result[0][2])
 	result, err = fr.dbm.Query(queryGetFilmShort, id)
 	if err != nil {

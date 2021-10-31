@@ -187,4 +187,5 @@ SELECT review.* FROM review JOIN  WHERE film_id = 1 AND author_id = 1;
             */
 
 SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10 OFFSET 0
-SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10
+SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10;
+select * from review
