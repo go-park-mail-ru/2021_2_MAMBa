@@ -20,19 +20,19 @@ func NewFilmRepository(manager *database.DBManager) domain.FilmRepository {
 }
 
 const (
-	queryCountFilmReviews = "SELECT COUNT(*) FROM Review WHERE Film_ID = $1"
+	queryCountFilmReviews = "SELECT COUNT(*) FROM Review WHERE Film_ID = $1 AND (NOT type = 0)"
 	queryCountFilmRecommendations = "SELECT COUNT(*) FROM recommended WHERE Film_ID = $1"
 	queryGetFilmId = "SELECT * FROM film WHERE film_id = $1"
 	queryGetFilmDirScr = "SELECT film.*, p.person_id,p.name_en,p.name_rus,p.picture_url,p.career, p1.person_id,p1.name_en,p1.name_rus,p1.picture_url,p1.career FROM film JOIN person p on film.director = p.person_id JOIN person p1 on film.screenwriter = p1.person_id WHERE film_id = $1"
 	queryGetFilmCountries = "SELECT country.country_name FROM country JOIN countryproduction c ON country.country_id = c.country_id WHERE c.Film_ID = $1"
 	queryGetFilmGenres = "SELECT genre.* FROM genre JOIN filmgenres f on genre.genre_id = f.genre_id WHERE f.film_id = $1"
 	queryGetFilmCast = "SELECT p.person_id,p.name_en,p.name_rus,p.picture_url,p.career  FROM person p JOIN filmcast f on p.person_id = f.person_id WHERE f.film_id = $1"
-	queryGetFilmReviews = "SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 LIMIT $2 OFFSET $3"
+	queryGetFilmReviews = "SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 AND (NOT type = 0) LIMIT $2 OFFSET $3"
 	queryGetFilmRecommendations = "SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = $1 LIMIT $2 OFFSET $3"
-	queryGetFilmRating = "SELECT AVG(stars) FROM review WHERE film_id = $1"
+	queryGetFilmRating = "SELECT AVG(stars) FROM review WHERE film_id = $1AND (NOT stars = 0)"
 	queryPostRating = "INSERT INTO  review VALUES (DEFAULT, $1, $2, '', $3, $4, $5)"
 	queryGetReviewByAuthor = "SELECT * FROM review WHERE film_id = $1 AND author_id = $2"
-	queryUpdateRating = "UPDATE review SET stars = $1, type = $2 WHERE film_id = $3 AND author_id = $4"
+	queryUpdateRating = "UPDATE review SET stars = $1 WHERE film_id = $2 AND author_id = $3"
 	queryGetAuthorName = "SELECT first_name, surname, picture_url FROM profile WHERE user_id = $1"
 	queryGetFilmShort = "SELECT title, title_original, poster_url FROM FILM WHERE Film_ID = $1"
 )
@@ -157,6 +157,7 @@ func (fr *dbFilmRepository) GetFilmReviews (id uint64, skip int, limit int) (dom
 			FilmId:            binary.BigEndian.Uint64(result[i][1]),
 			AuthorName:        string(result[i][7])+ " " +string(result[i][8]),
 			ReviewText:        string(result[i][3]),
+			AuthorPictureUrl:  string(result[i][9]),
 			ReviewType:        int(binary.BigEndian.Uint32(result[i][4])),
 			Stars:             math.Float64frombits(binary.BigEndian.Uint64(result[i][5])),
 			Date:              timeBuffer.Time,
@@ -205,23 +206,18 @@ func (fr *dbFilmRepository) GetFilmRecommendations (id uint64, skip int, limit i
 }
 
 func  (fr *dbFilmRepository) PostRating (id uint64, author_id uint64, rating float64) (float64, error) {
-	revType := 3
-	if rating < 4 {
-		revType = 1
-	} else if rating < 6.5 {
-		revType = 2
-	}
+
 	result, err := fr.dbm.Query(queryGetReviewByAuthor, id, author_id)
 	if err != nil {
 		return 0, err
 	}
 	if len(result) == 0 {
-		err = fr.dbm.Execute(queryPostRating, id, author_id, revType, rating, time.Now())
+		err = fr.dbm.Execute(queryPostRating, id, author_id, 0, rating, time.Now())
 		if err != nil {
 			return 0, err
 		}
 	} else {
-		err = fr.dbm.Execute(queryUpdateRating, rating, revType, id, author_id)
+		err = fr.dbm.Execute(queryUpdateRating, rating, id, author_id)
 		if err != nil {
 			return 0, err
 		}

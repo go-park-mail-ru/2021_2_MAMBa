@@ -142,17 +142,19 @@ INSERT INTO filmcast VALUES
 
 
 INSERT INTO review VALUES 
-    (DEFAULT, 1, 1, 'норм', 0, 5.0, current_date),
-    (DEFAULT, 2, 1, ')', 0, 6.0, current_date),
-    (DEFAULT, 3, 1, 'ао ', 0, 7.0, current_date),
-    (DEFAULT, 4, 1, 'неплохо', 0, 7.0, current_date),
-    (DEFAULT, 5, 1, 'скучно', 0, 2.0, current_date),
-    (DEFAULT, 6, 1, 'да', 0, 7.0, current_date),
-    (DEFAULT, 7, 1, 'интересно', 0, 8.0, current_date),
-    (DEFAULT, 8, 1, 'отвал башки', 0, 10.0, current_date),
-    (DEFAULT, 1, 2, 'ввввввв', 0, 1.0, current_date),
+    (DEFAULT, 1, 1, 'норм', 2, 5.0, current_date),
+    (DEFAULT, 2, 1, ')', 2, 6.0, current_date),
+    (DEFAULT, 3, 1, 'ао ', 3, 7.0, current_date),
+    (DEFAULT, 4, 1, 'неплохо', 3, 7.0, current_date),
+    (DEFAULT, 5, 1, 'скучно', 1, 2.0, current_date),
+    (DEFAULT, 6, 1, 'да', 3, 7.0, current_date),
+    (DEFAULT, 7, 1, 'интересно', 3, 8.0, current_date),
+    (DEFAULT, 8, 1, 'отвал башки', 3, 10.0, current_date),
+    (DEFAULT, 1, 2, 'ввввввв', 1, 1.0, current_date),
     (DEFAULT, 8, 2, '', 0, 9.0, current_date),
-    (DEFAULT, 8, 3, '', 0, 5.0, current_date);
+    (DEFAULT, 8, 3, '', 0, 5.0, current_date),
+    (DEFAULT, 8, 4, '', 0, 10.0, current_date),
+    (DEFAULT, 8, 5, 'ffff', 1, 0, current_date);
 
 INSERT INTO recommended VALUES
     (1, 2),
@@ -178,9 +180,11 @@ SELECT * FROM review
 SELECT COUNT(*) FROM Review WHERE Film_ID = 6   ;
 SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 6 LIMIT 10 OFFSET 0
 SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = 7
-
-            */
 SELECT * FROM review where film_id = 2                           ;
-SELECT AVG(stars) FROM review WHERE film_id =4                             ;
+SELECT AVG(stars) FROM review WHERE film_id =4 AND (NOT type = 0);
 
-SELECT review.* FROM review JOIN  WHERE film_id = 1 AND author_id = 1"
+SELECT review.* FROM review JOIN  WHERE film_id = 1 AND author_id = 1;
+            */
+
+SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10 OFFSET 0
+SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10
