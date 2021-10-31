@@ -47,15 +47,15 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	us, err := handler.UserUsecase.Login(userForm)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	_, err = sessions.CheckSession(r)
 	if err != sessions.ErrUserNotLoggedIn {
 		http.Error(w, user.ErrorAlreadyIn.Error(), http.StatusBadRequest)
+		return
+	}
+
+	us, err := handler.UserUsecase.Login(userForm)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -101,7 +101,7 @@ func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	us, err := handler.UserUsecase.CheckAuth(userID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

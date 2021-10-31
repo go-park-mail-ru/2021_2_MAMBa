@@ -22,8 +22,8 @@ func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 	session, _ := store.Get(r, sessionName)
 	session.Values["id"] = id
 	session.Options = &sessions.Options{
-		MaxAge:   100000, // ~27 hours
-		Secure:   false,
+		MaxAge: 100000, // ~27 hours
+		Secure: false,
 		// TODO: Раскомментировать после дебага
 		// Secure:   true,
 		HttpOnly: true,
@@ -59,7 +59,7 @@ func EndSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 
 func CheckSession(r *http.Request) (uint64, error) {
 	session, err := store.Get(r, sessionName)
-	if err != nil {
+	if err != nil && !session.IsNew {
 		return 0, err
 	}
 	id, isIn := session.Values["id"]
