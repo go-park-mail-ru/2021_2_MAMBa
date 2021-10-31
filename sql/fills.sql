@@ -180,3 +180,7 @@ SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id
 SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = 7
 
             */
+SELECT * FROM review where film_id = 2                           ;
+SELECT AVG(stars) FROM review WHERE film_id =4                             ;
+
+SELECT review.* FROM review JOIN  WHERE film_id = 1 AND author_id = 1"

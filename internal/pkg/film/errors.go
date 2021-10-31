@@ -11,6 +11,7 @@ var (
 	ErrEncMsg   = "Encoding error"
 	ErrorSkip   = errors.New(ErrSkipMsg)
 	ErrorLimit  = errors.New(ErrLimitMsg)
+	ErrorNoReviewForFilm = errors.New("error - no review")
 )
 
 // TODO: Добавить определение JSON-Status кода ошибки по ошибке

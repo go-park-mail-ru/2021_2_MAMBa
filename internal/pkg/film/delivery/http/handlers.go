@@ -14,4 +14,8 @@ func NewHandlers(router *mux.Router, uc domain.FilmUsecase) {
 	}
 
 	router.HandleFunc("/film/getFilm", handler.GetFilm).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/postRating", handler.PostRating).Methods("POST", "OPTIONS")
+	router.HandleFunc("/film/loadFilmReviews", handler.loadFilmReviews).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/loadFilmRecommendations", handler.loadFilmReviews).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/loadMyReviewForFilm", handler.LoadMyRv).Methods("GET", "OPTIONS")
 }

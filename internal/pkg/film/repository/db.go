@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"github.com/jackc/pgx/pgtype"
 	"math"
+	"time"
 )
 
 type dbFilmRepository struct {
@@ -28,6 +29,12 @@ const (
 	queryGetFilmCast = "SELECT p.person_id,p.name_en,p.name_rus,p.picture_url,p.career  FROM person p JOIN filmcast f on p.person_id = f.person_id WHERE f.film_id = $1"
 	queryGetFilmReviews = "SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 LIMIT $2 OFFSET $3"
 	queryGetFilmRecommendations = "SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = $1 LIMIT $2 OFFSET $3"
+	queryGetFilmRating = "SELECT AVG(stars) FROM review WHERE film_id = $1"
+	queryPostRating = "INSERT INTO  review VALUES (DEFAULT, $1, $2, '', $3, $4, $5)"
+	queryGetReviewByAuthor = "SELECT * FROM review WHERE film_id = $1 AND author_id = $2"
+	queryUpdateRating = "UPDATE review SET stars = $1, type = $2 WHERE film_id = $3 AND author_id = $4"
+	queryGetAuthorName = "SELECT first_name, surname, picture_url FROM profile WHERE user_id = $1"
+	queryGetFilmShort = "SELECT title, title_original, poster_url FROM FILM WHERE Film_ID = $1"
 )
 
 func (fr *dbFilmRepository) GetFilm (id uint64) (domain.Film, error) {
@@ -71,6 +78,11 @@ func (fr *dbFilmRepository) GetFilm (id uint64) (domain.Film, error) {
 		},
 		Genres:       nil,
 	}
+	result, err = fr.dbm.Query(queryGetFilmRating, id)
+	if err != nil {
+		return domain.Film{}, err
+	}
+	film.Rating = math.Float64frombits(binary.BigEndian.Uint64(result[0][0]))
 	result, err = fr.dbm.Query(queryGetFilmCountries, id)
 	if err != nil {
 		return domain.Film{}, err
@@ -190,4 +202,73 @@ func (fr *dbFilmRepository) GetFilmRecommendations (id uint64, skip int, limit i
 		CurrentSkip:   skip+limit,
 	}
 	return reviewsList, nil
+}
+
+func  (fr *dbFilmRepository) PostRating (id uint64, author_id uint64, rating float64) (float64, error) {
+	revType := 3
+	if rating < 4 {
+		revType = 1
+	} else if rating < 6.5 {
+		revType = 2
+	}
+	result, err := fr.dbm.Query(queryGetReviewByAuthor, id, author_id)
+	if err != nil {
+		return 0, err
+	}
+	if len(result) == 0 {
+		err = fr.dbm.Execute(queryPostRating, id, author_id, revType, rating, time.Now())
+		if err != nil {
+			return 0, err
+		}
+	} else {
+		err = fr.dbm.Execute(queryUpdateRating, rating, revType, id, author_id)
+		if err != nil {
+			return 0, err
+		}
+	}
+	result, err = fr.dbm.Query(queryGetFilmRating, id)
+	if err != nil {
+		return 0, err
+	}
+	newRating := math.Float64frombits(binary.BigEndian.Uint64(result[0][0]))
+	return newRating, nil
+}
+func (fr *dbFilmRepository) GetMyReview (id uint64, author_id uint64) (domain.Review, error) {
+	result, err := fr.dbm.Query(queryGetReviewByAuthor, id, author_id)
+	if err != nil {
+		return domain.Review{}, err
+	}
+	if len(result) == 0 {
+		return domain.Review{}, film.ErrorNoReviewForFilm
+	}
+	timeBuffer := pgtype.Timestamp{}
+	err =timeBuffer.DecodeBinary(nil, result[0][6])
+	urtype := binary.BigEndian.Uint32(result[0][4])
+	rtype := int(urtype)
+	if err != nil {
+		return domain.Review{}, err
+	}
+	review := domain.Review{
+		Id:					binary.BigEndian.Uint64(result[0][0]),
+		FilmId:            binary.BigEndian.Uint64(result[0][1]),
+		ReviewText:        string(result[0][3]),
+		ReviewType:        rtype,
+		Stars:             math.Float64frombits(binary.BigEndian.Uint64(result[0][5])),
+		Date:              timeBuffer.Time,
+	}
+	result, err = fr.dbm.Query(queryGetAuthorName, author_id)
+	if err != nil {
+		return domain.Review{}, err
+	}
+	review.AuthorName = string(result[0][0]) + string(result[0][1])
+	review.AuthorPictureUrl = string(result[0][2])
+	result, err = fr.dbm.Query(queryGetFilmShort, id)
+	if err != nil {
+		return domain.Review{}, err
+	}
+	review.FilmTitleRu = string(result[0][0])
+	review.FilmTitleOriginal = string(result[0][1])
+	review.FilmPictureUrl = string(result[0][2])
+
+	return review, nil
 }

@@ -69,12 +69,22 @@ type FilmPageInfo struct {
 	MyRating        float64             `json:"my_rating"`
 }
 
+type NewRate struct {
+	Rating float64 `json:"rating,omitempty"`
+}
+
 type FilmRepository interface {
 	GetFilm(id uint64) (Film, error)
 	GetFilmReviews (id uint64, skip int, limit int) (FilmReviews, error)
 	GetFilmRecommendations (id uint64, skip int, limit int) (FilmRecommendations, error)
+	PostRating (id uint64, authorId uint64, rating float64) (float64, error)
+	GetMyReview (id uint64, authorId uint64) (Review, error)
 }
 
 type FilmUsecase interface {
 	GetFilm(id uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (FilmPageInfo, error)
+	PostRating(id uint64, authorId uint64, rating float64) (float64, error)
+	LoadFilmReviews(id uint64, skip int, limit int) (FilmReviews, error)
+	LoadFilmRecommendations (id uint64, skip int, limit int) (FilmRecommendations, error)
+	LoadMyReview (id uint64, authorId uint64) (Review, error)
 }
