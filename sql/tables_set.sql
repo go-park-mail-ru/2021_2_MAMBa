@@ -32,6 +32,7 @@ CREATE TABLE FILM
     duration       integer,
     screenwriter   integer default -1,
     director       integer default -1,
+    content_type   varchar(30),
     CONSTRAINT film_screenwriter FOREIGN KEY (screenwriter) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT,
     CONSTRAINT film_director FOREIGN KEY (director) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT
 );
@@ -53,8 +54,8 @@ DROP TABLE IF EXISTS Review CASCADE;
 CREATE TABLE Review
 (
     Review_ID   BIGSERIAL NOT NULL PRIMARY KEY,
-    Film_ID     integer,
-    Author_ID   integer,
+    Film_ID     BIGINT,
+    Author_ID   BIGINT,
     review_text varchar(2000),
     type        integer,
     stars       double precision,
@@ -67,7 +68,7 @@ DROP TABLE IF EXISTS Collection CASCADE;
 CREATE TABLE Collection
 (
     Collection_ID   BIGSERIAL NOT NULL PRIMARY KEY,
-    Author_ID       integer,
+    Author_ID       BIGINT,
     collection_name varchar(60),
     description     varchar(200),
     creation_time   timestamp,
@@ -147,4 +148,14 @@ CREATE TABLE CollectionConnection
     CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM (Film_ID) ON DELETE CASCADE,
     CONSTRAINT to_coll FOREIGN KEY (Collection_ID) REFERENCES Collection (Collection_ID) ON DELETE CASCADE,
     CONSTRAINT Connect_ID PRIMARY KEY (Film_ID, Collection_ID)
+);
+
+DROP TABLE IF EXISTS Recommended CASCADE;
+CREATE TABLE Recommended
+(
+    Film_ID bigint NOT NULL,
+    Recommended_ID bigint NOT NULL,
+    CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM(Film_ID) ON DELETE CASCADE,
+    CONSTRAINT to_filmRec FOREIGN KEY (Film_ID) REFERENCES  FILM(Film_ID) ON DELETE CASCADE,
+    CONSTRAINT Recommended_ID PRIMARY KEY (Film_ID, Recommended_ID)
 );

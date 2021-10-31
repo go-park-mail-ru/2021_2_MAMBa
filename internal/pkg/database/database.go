@@ -3,7 +3,7 @@ package database
 import (
 	mylog "2021_2_MAMBa/internal/pkg/utils/log"
 	"context"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 

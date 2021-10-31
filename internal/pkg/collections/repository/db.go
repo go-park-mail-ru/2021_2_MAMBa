@@ -33,13 +33,6 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 		return domain.Collections{}, collections.ErrorSkip
 	}
 
-	if err != nil {
-		return domain.Collections{}, user.ErrorInternalServer
-	}
-	if len(result) == 0 {
-		return domain.Collections{}, user.ErrorNoUser
-	}
-
 	moreAvailable := skip+limit < dbSize
 	result, err = cr.dbm.Query(queryGetCollections, limit, skip)
 

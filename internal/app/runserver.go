@@ -5,6 +5,9 @@ import (
 	collectionsRepository "2021_2_MAMBa/internal/pkg/collections/repository"
 	collectionsUsecase "2021_2_MAMBa/internal/pkg/collections/usecase"
 	"2021_2_MAMBa/internal/pkg/database"
+	filmDelivery "2021_2_MAMBa/internal/pkg/film/delivery/http"
+	filmRepository "2021_2_MAMBa/internal/pkg/film/repository"
+	filmUsecase "2021_2_MAMBa/internal/pkg/film/usecase"
 	"2021_2_MAMBa/internal/pkg/middlewares"
 	userDelivery "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	userRepository "2021_2_MAMBa/internal/pkg/user/repository"
@@ -30,12 +33,15 @@ func RunServer(addr string) {
 
 	userRepo := userRepository.NewUserRepository(db)
 	collectionsRepo := collectionsRepository.NewCollectionsRepository(db)
+	filmRepo := filmRepository.NewFilmRepository(db)
 
 	usUsecase := userUsecase.NewUserUsecase(userRepo)
 	colUsecase := collectionsUsecase.NewCollectionsUsecase(collectionsRepo)
+	filUsecase := filmUsecase.NewFilmUsecase(filmRepo)
 
 	userDelivery.NewHandlers(api, usUsecase)
 	collectionsDelivery.NewHandlers(api, colUsecase)
+	filmDelivery.NewHandlers(api, filUsecase)
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()
