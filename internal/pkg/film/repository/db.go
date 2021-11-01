@@ -46,8 +46,6 @@ func (fr *dbFilmRepository) GetFilm (id uint64) (domain.Film, error) {
 		return domain.Film{}, err
 	}
 	raw := result[0]
-	money :=  string(raw[7]);
-	print(money)
 	film := domain.Film{
 		Id:              binary.BigEndian.Uint64(raw[0]),
 		Title:           string(raw[1]),
@@ -110,6 +108,7 @@ func (fr *dbFilmRepository) GetFilm (id uint64) (domain.Film, error) {
 			Name: string(result[i][1]),
 		})
 	}
+	film.Genres = bufferGenres
 
 	result, err = fr.dbm.Query(queryGetFilmCast, id)
 	if err != nil {
@@ -128,6 +127,7 @@ func (fr *dbFilmRepository) GetFilm (id uint64) (domain.Film, error) {
 			Career: []string{string(result[i][4])},
 		})
 	}
+	film.Cast = bufferCast
 	return film, nil
 }
 
