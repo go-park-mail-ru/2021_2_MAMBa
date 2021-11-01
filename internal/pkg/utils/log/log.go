@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const debugMode = false // true - write to File, false - write to Stdout
+const debugMode = true // true - write to Stdout, false - write to File
 const logsFileName = "logs.txt"
 
 func init() {

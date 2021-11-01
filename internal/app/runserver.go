@@ -12,6 +12,9 @@ import (
 	personDelivery "2021_2_MAMBa/internal/pkg/person/delivery/http"
 	personRepository "2021_2_MAMBa/internal/pkg/person/repository"
 	personUsecase "2021_2_MAMBa/internal/pkg/person/usecase"
+	reviewsDelivery "2021_2_MAMBa/internal/pkg/reviews/delivery/http"
+	reviewsRepository "2021_2_MAMBa/internal/pkg/reviews/repository"
+	reviewsUsecase "2021_2_MAMBa/internal/pkg/reviews/usecase"
 	userDelivery "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	userRepository "2021_2_MAMBa/internal/pkg/user/repository"
 	userUsecase "2021_2_MAMBa/internal/pkg/user/usecase"
@@ -38,16 +41,19 @@ func RunServer(addr string) {
 	collectionsRepo := collectionsRepository.NewCollectionsRepository(db)
 	filmRepo := filmRepository.NewFilmRepository(db)
 	personRepo := personRepository.NewPersonRepository(db)
+	reviewRepo := reviewsRepository.NewReviewRepository(db)
 
 	usUsecase := userUsecase.NewUserUsecase(userRepo)
 	colUsecase := collectionsUsecase.NewCollectionsUsecase(collectionsRepo)
 	filUsecase := filmUsecase.NewFilmUsecase(filmRepo)
 	persUsecase := personUsecase.NewPersonUsecase(personRepo)
+	revUsecase := reviewsUsecase.NewReviewUsecase(reviewRepo)
 
 	userDelivery.NewHandlers(api, usUsecase)
 	collectionsDelivery.NewHandlers(api, colUsecase)
 	filmDelivery.NewHandlers(api, filUsecase)
 	personDelivery.NewHandlers(api, persUsecase)
+	reviewsDelivery.NewHandlers(api, revUsecase)
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()

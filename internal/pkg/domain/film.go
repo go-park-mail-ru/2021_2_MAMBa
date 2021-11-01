@@ -1,7 +1,5 @@
 package domain
 
-import "time"
-
 type Country struct {
 	Id          uint64
 	CountryName string
@@ -31,19 +29,7 @@ type Film struct {
 	Genres          []Genre  `json:"genres,omitempty"`
 }
 
-type Review struct {
-	Id                uint64    `json:"id"`
-	FilmId            uint64    `json:"film_id"`
-	FilmTitleRu       string    `json:"film_title_ru,omitempty"`
-	FilmTitleOriginal string    `json:"film_title_original,omitempty"`
-	FilmPictureUrl    string    `json:"film_picture_url,omitempty"`
-	AuthorName        string    `json:"author_name,omitempty"`
-	AuthorPictureUrl  string    `json:"author_picture_url,omitempty"`
-	ReviewText        string    `json:"review_text,omitempty"`
-	ReviewType        int       `json:"review_type,omitempty"`
-	Stars             float64   `json:"stars"`
-	Date              time.Time `json:"date"`
-}
+
 
 type FilmRecommendations struct {
 	RecommendationList  []Film `json:"recommendation_list"`

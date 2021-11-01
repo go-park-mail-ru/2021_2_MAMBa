@@ -187,8 +187,5 @@ SELECT review.* FROM review JOIN  WHERE film_id = 1 AND author_id = 1;
             */
 
 SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10 OFFSET 0
-SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10
-SELECT * FROM person WHERE person_id = 1;
-SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url FROM filmcast JOIN film f on filmcast.film_id = f.film_id where filmcast.person_id = 8;
-SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url, ord.avg FROM (filmcast JOIN film f on filmcast.film_id = f.film_id) JOIN (SELECT AVG(stars) as avg, film_id FROM review WHERE (NOT type = 0) GROUP BY film_id) ord ON ord.film_id = f.film_id where filmcast.person_id = 8 ORDER BY ord.avg DESC;
-SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url, ord.avg FROM (filmcast JOIN film f on filmcast.film_id = f.film_id) JOIN (SELECT AVG(stars) as avg, film_id FROM review WHERE (NOT type = 0) GROUP BY film_id) ord ON ord.film_id = f.film_id where filmcast.person_id = 8 ORDER BY ord.avg DESC LIMIT 10 OFFSET 0
+SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10;
+select * from review
