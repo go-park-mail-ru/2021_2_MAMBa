@@ -67,7 +67,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmList{}, person.ErrorBadCredentials
+		return domain.FilmList{}, person.ErrorSkip
 	}
 
 	result, err = pr.dbm.Query(queryGetPersonFilms, id, limit, skip)
