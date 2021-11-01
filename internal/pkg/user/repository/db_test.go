@@ -30,7 +30,6 @@ func MockDatabase() (*database.DBManager, pgxmock.PgxPoolIface, error) {
 }
 
 func TestGetSuccess(t *testing.T) {
-	mylog.Info("test get success")
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
 	repository := NewUserRepository(mdb)
@@ -57,11 +56,9 @@ func TestGetSuccess(t *testing.T) {
 	actual, err := repository.GetById(mu.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, mu, actual)
-	mylog.Info("test get success done")
 }
 
 func TestGetFailure(t *testing.T) {
-	mylog.Info("test get failure")
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
 	repository := NewUserRepository(mdb)
@@ -81,11 +78,9 @@ func TestGetFailure(t *testing.T) {
 	actual, err := repository.GetById(mu.ID)
 	assert.Equal(t, user.ErrorNoUser, err)
 	assert.Equal(t, domain.User{}, actual)
-	mylog.Info("test get failure done")
 }
 
 func TestGetEmailSuccess(t *testing.T) {
-	mylog.Info("test get success")
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
 	repository := NewUserRepository(mdb)
@@ -112,11 +107,9 @@ func TestGetEmailSuccess(t *testing.T) {
 	actual, err := repository.GetByEmail(mu.Email)
 	assert.NoError(t, err)
 	assert.Equal(t, mu, actual)
-	mylog.Info("test get success done")
 }
 
 func TestGetEmailFailure(t *testing.T) {
-	mylog.Info("test get email failure")
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
 	repository := NewUserRepository(mdb)
@@ -137,11 +130,9 @@ func TestGetEmailFailure(t *testing.T) {
 	actual, err := repository.GetByEmail(mu.Email)
 	assert.Equal(t, user.ErrorNoUser, err)
 	assert.Equal(t, domain.User{}, actual)
-	mylog.Info("test get email failure done")
 }
 
 func TestAddSuccess (t *testing.T) {
-	mylog.Info("test add success")
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
 	repository := NewUserRepository(mdb)
@@ -168,5 +159,4 @@ func TestAddSuccess (t *testing.T) {
 	actual, err := repository.AddUser(&mu)
 	assert.NoError(t, err)
 	assert.Equal(t, mu.ID, actual)
-	mylog.Info("test add success done")
 }
