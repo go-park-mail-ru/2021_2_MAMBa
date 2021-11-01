@@ -37,7 +37,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	skipString, isIn = r.URL.Query()["skip_recommnd"]
+	skipString, isIn = r.URL.Query()["skip_recommend"]
 	if isIn {
 		skipRecom, err = strconv.Atoi(skipString[0])
 		if err != nil || skipRecom < 0 {
@@ -91,7 +91,7 @@ func (handler *FilmHandler) PostRating (w http.ResponseWriter, r *http.Request) 
 	ratingString, isIn := r.URL.Query()["rating"]
 	if isIn {
 		rating, err = strconv.ParseFloat(ratingString[0], 64)
-		if err != nil || rating < 0 {
+		if err != nil || rating <= 0 {
 			http.Error(w, film.ErrEncMsg, http.StatusBadRequest)
 			return
 		}
