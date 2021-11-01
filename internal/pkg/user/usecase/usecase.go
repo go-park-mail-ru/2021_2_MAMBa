@@ -18,7 +18,7 @@ func NewUserUsecase(u domain.UserRepository) domain.UserUsecase {
 }
 
 func (uc userUsecase) GetBasicInfo(id uint64) (domain.User, error) {
-	user, err := uc.userRepo.GetById(id)
+	user, err := uc.userRepo.GetUserById(id)
 	passwordByte, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	log.Info(string(passwordByte))
 	user.OmitPassword()
@@ -33,7 +33,7 @@ func (uc userUsecase) Register(u *domain.User) (domain.User, error) {
 		u.Password == "" || u.Password != u.PasswordRepeat {
 		return domain.User{}, userErrors.ErrorBadInput
 	}
-	_, err := uc.userRepo.GetByEmail(u.Email)
+	_, err := uc.userRepo.GetUserByEmail(u.Email)
 	if err == nil {
 		return domain.User{}, userErrors.ErrorAlreadyExists
 	}
@@ -50,7 +50,7 @@ func (uc userUsecase) Login(u *domain.UserToLogin) (domain.User, error) {
 	if u.Email == "" || u.Password == "" {
 		return domain.User{}, userErrors.ErrorBadInput
 	}
-	us, err := uc.userRepo.GetByEmail(u.Email)
+	us, err := uc.userRepo.GetUserByEmail(u.Email)
 	errPassword := bcrypt.CompareHashAndPassword([]byte(us.Password), []byte(u.Password))
 	if err != nil || errPassword != nil {
 		return domain.User{}, userErrors.ErrorBadCredentials

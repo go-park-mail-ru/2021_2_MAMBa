@@ -171,6 +171,38 @@ INSERT INTO recommended VALUES
     (7, 8),
     (8, 6),
     (8, 7);
+
+INSERT INTO bookmark VALUES
+     (1, 1),
+     (2, 1),
+     (3, 1),
+     (5, 1),
+     (4, 2),
+     (3, 2),
+     (1, 3),
+     (2, 3),
+     (7, 3),
+     (8, 4),
+     (2, 5),
+     (1, 6),
+     (4, 7),
+     (3, 8);
+
+INSERT INTO subscription VALUES
+     (1, 1),
+     (2, 1),
+     (3, 1),
+     (5, 1),
+     (4, 2),
+     (3, 2),
+     (1, 3),
+     (2, 3),
+     (7, 3),
+     (8, 4),
+     (2, 5),
+     (1, 6),
+     (4, 7),
+     (3, 8);
            /*
 SELECT film.*, p.person_id,p.name_en,p.name_rus,p.picture_url,p.career, p1.person_id,p1.name_en,p1.name_rus,p1.picture_url,p1.career FROM film JOIN person p on film.director = p.person_id JOIN person p1 on film.screenwriter = p1.person_id WHERE film_id = 7
 SELECT country.country_name FROM country JOIN countryproduction c ON country.country_id = c.country_id WHERE c.Film_ID = 7;
@@ -186,6 +218,6 @@ SELECT AVG(stars) FROM review WHERE film_id =4 AND (NOT type = 0);
 SELECT review.* FROM review JOIN  WHERE film_id = 1 AND author_id = 1;
             */
 
-SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10 OFFSET 0
-SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10;
-select * from review
+-- SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10 OFFSET 0
+-- SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10;
+-- select * from review
