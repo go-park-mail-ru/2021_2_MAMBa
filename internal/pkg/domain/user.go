@@ -22,7 +22,7 @@ type UserRepository interface {
 	GetByEmail(email string) (User, error)
 	AddUser(user *User) (uint64, error)
 }
-
+//go:generate mockgen -destination=../user/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain UserUsecase
 type UserUsecase interface {
 	GetBasicInfo(id uint64) (User, error)
 	Register(u *User) (User, error)

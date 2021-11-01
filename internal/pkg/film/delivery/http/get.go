@@ -172,6 +172,10 @@ func (handler *FilmHandler) loadFilmReviews (w http.ResponseWriter, r *http.Requ
 		}
 	}
 	reviews, err := handler.FilmUsecase.LoadFilmReviews(id, skip, limit)
+	if err == film.ErrorSkip {
+		http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
 		return
@@ -213,6 +217,10 @@ func (handler *FilmHandler) loadFilmRecommendations (w http.ResponseWriter, r *h
 		}
 	}
 	recommendations, err := handler.FilmUsecase.LoadFilmRecommendations(id, skip, limit)
+	if err == film.ErrorSkip {
+		http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
 		return
