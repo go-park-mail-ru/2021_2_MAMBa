@@ -88,7 +88,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: false,
+		MoreAvaliable: skip + limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,
@@ -124,7 +124,7 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: false,
+		MoreAvaliable: skip + limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,

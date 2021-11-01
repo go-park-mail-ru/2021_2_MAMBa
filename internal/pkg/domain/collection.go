@@ -1,7 +1,7 @@
 package domain
 
 type CollectionPreview struct {
-	Id         uint   `json:"id"`
+	Id         uint64   `json:"id"`
 	Title      string `json:"title"`
 	PictureUrl string `json:"picture_url"`
 }
