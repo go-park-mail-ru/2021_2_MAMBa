@@ -92,7 +92,7 @@ func TestGetBasicInfoFailure(t *testing.T) {
 		var cl domain.User
 		_ = json.Unmarshal([]byte(test.out), &cl)
 		handler := UserHandler{UserUsecase: mock}
-		if i==0 {
+		if i == 0 {
 			mock.EXPECT().GetBasicInfo(uint64(3)).Times(1).Return(domain.User{}, customErrors.ErrorNoUser)
 		}
 		bodyReader := strings.NewReader(test.bodyString)

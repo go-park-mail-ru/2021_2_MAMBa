@@ -96,7 +96,6 @@ func TestRegisterFailure(t *testing.T) {
 	}
 }
 
-
 var testTableLoginSuccess = [...]testRow{
 	{
 		inQuery:    "",
@@ -166,7 +165,7 @@ func TestLoginSuccess(t *testing.T) {
 	}
 }
 
-func TestLoginFailure (t *testing.T) {
+func TestLoginFailure(t *testing.T) {
 	apiPath := "/api/user/login"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -280,4 +279,3 @@ func TestCheckAuthFailure(t *testing.T) {
 	handler.CheckAuth(w, r)
 	assert.Equal(t, http.StatusBadRequest, w.Code, "Test: CheckAuth FL")
 }
-

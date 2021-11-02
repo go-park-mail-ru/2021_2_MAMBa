@@ -17,9 +17,9 @@ func NewPersonRepository(manager *database.DBManager) domain.PersonRepository {
 }
 
 const (
-	queryGetPerson      = "SELECT * FROM person WHERE person_id = $1"
-	queryGetPersonFilms = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url FROM filmcast JOIN film f on filmcast.film_id = f.film_id where filmcast.person_id = $1 LIMIT $2 OFFSET $3"
-	queryCountFilm      = "SELECT COUNT(*) FROM filmcast JOIN film f on filmcast.film_id = f.film_id where filmcast.person_id = $1"
+	queryGetPerson             = "SELECT * FROM person WHERE person_id = $1"
+	queryGetPersonFilms        = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url FROM filmcast JOIN film f on filmcast.film_id = f.film_id where filmcast.person_id = $1 LIMIT $2 OFFSET $3"
+	queryCountFilm             = "SELECT COUNT(*) FROM filmcast JOIN film f on filmcast.film_id = f.film_id where filmcast.person_id = $1"
 	queryGetPersonFilmsPopular = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url, ord.avg FROM (filmcast JOIN film f on filmcast.film_id = f.film_id) JOIN (SELECT AVG(stars) as avg, film_id FROM review WHERE (NOT type = 0) GROUP BY film_id) ord ON ord.film_id = f.film_id where filmcast.person_id = $1 ORDER BY ord.avg DESC LIMIT $2 OFFSET $3"
 )
 
@@ -83,7 +83,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: skip + limit < dbSize,
+		MoreAvaliable: skip+limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,
@@ -118,7 +118,7 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: skip + limit < dbSize,
+		MoreAvaliable: skip+limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,

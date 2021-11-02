@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func CheckIsIn (w http.ResponseWriter, r *http.Request, queryString string, defaultValue int, returnError error) (int, error) {
+func CheckIsIn(w http.ResponseWriter, r *http.Request, queryString string, defaultValue int, returnError error) (int, error) {
 	valueString, isIn := r.URL.Query()[queryString]
 	if isIn {
 		value, err := strconv.Atoi(valueString[0])
@@ -18,7 +18,7 @@ func CheckIsIn (w http.ResponseWriter, r *http.Request, queryString string, defa
 	return defaultValue, nil
 }
 
-func CheckIsIn64 (w http.ResponseWriter, r *http.Request, queryString string, defaultValue uint64, returnError error) (uint64, error) {
+func CheckIsIn64(w http.ResponseWriter, r *http.Request, queryString string, defaultValue uint64, returnError error) (uint64, error) {
 	valueString, isIn := r.URL.Query()[queryString]
 	if isIn {
 		value, err := strconv.ParseUint(valueString[0], 10, 64)
@@ -31,7 +31,7 @@ func CheckIsIn64 (w http.ResponseWriter, r *http.Request, queryString string, de
 	return defaultValue, nil
 }
 
-func CheckIsInFloat64 (w http.ResponseWriter, r *http.Request, queryString string, defaultValue float64, returnError error) (float64, error) {
+func CheckIsInFloat64(w http.ResponseWriter, r *http.Request, queryString string, defaultValue float64, returnError error) (float64, error) {
 	valueString, isIn := r.URL.Query()[queryString]
 	if isIn {
 		value, err := strconv.ParseFloat(valueString[0], 64)

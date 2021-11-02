@@ -29,8 +29,6 @@ type Film struct {
 	Genres          []Genre  `json:"genres,omitempty"`
 }
 
-
-
 type FilmRecommendations struct {
 	RecommendationList  []Film `json:"recommendation_list"`
 	MoreAvaliable       bool   `json:"more_avaliable"`
@@ -61,16 +59,17 @@ type NewRate struct {
 
 type FilmRepository interface {
 	GetFilm(id uint64) (Film, error)
-	GetFilmReviews (id uint64, skip int, limit int) (FilmReviews, error)
-	GetFilmRecommendations (id uint64, skip int, limit int) (FilmRecommendations, error)
-	PostRating (id uint64, authorId uint64, rating float64) (float64, error)
-	GetMyReview (id uint64, authorId uint64) (Review, error)
+	GetFilmReviews(id uint64, skip int, limit int) (FilmReviews, error)
+	GetFilmRecommendations(id uint64, skip int, limit int) (FilmRecommendations, error)
+	PostRating(id uint64, authorId uint64, rating float64) (float64, error)
+	GetMyReview(id uint64, authorId uint64) (Review, error)
 }
+
 //go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
 type FilmUsecase interface {
 	GetFilm(id uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (FilmPageInfo, error)
 	PostRating(id uint64, authorId uint64, rating float64) (float64, error)
 	LoadFilmReviews(id uint64, skip int, limit int) (FilmReviews, error)
-	LoadFilmRecommendations (id uint64, skip int, limit int) (FilmRecommendations, error)
-	LoadMyReview (id uint64, authorId uint64) (Review, error)
+	LoadFilmRecommendations(id uint64, skip int, limit int) (FilmRecommendations, error)
+	LoadMyReview(id uint64, authorId uint64) (Review, error)
 }

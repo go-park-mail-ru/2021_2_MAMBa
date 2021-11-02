@@ -21,7 +21,7 @@ func (uc *FilmUsecase) GetFilm(id uint64, skipReviews int, limitReviews int, ski
 	if err != nil {
 		return domain.FilmPageInfo{}, err
 	}
-	Recommended , err := uc.FilmRepo.GetFilmRecommendations(id, skipReviews, limitRecommend)
+	Recommended, err := uc.FilmRepo.GetFilmRecommendations(id, skipReviews, limitRecommend)
 	if err != nil {
 		return domain.FilmPageInfo{}, err
 	}
@@ -34,7 +34,7 @@ func (uc *FilmUsecase) GetFilm(id uint64, skipReviews int, limitReviews int, ski
 	return result, nil
 }
 
-func (uc *FilmUsecase) PostRating (id uint64, authorId uint64, rating float64) (float64, error) {
+func (uc *FilmUsecase) PostRating(id uint64, authorId uint64, rating float64) (float64, error) {
 	rating, err := uc.FilmRepo.PostRating(id, authorId, rating)
 	if err != nil {
 		return 0, err
@@ -49,14 +49,14 @@ func (uc *FilmUsecase) LoadFilmReviews(id uint64, skip int, limit int) (domain.F
 	}
 	return Reviews, nil
 }
-func (uc *FilmUsecase) LoadFilmRecommendations (id uint64, skip int, limit int) (domain.FilmRecommendations, error) {
+func (uc *FilmUsecase) LoadFilmRecommendations(id uint64, skip int, limit int) (domain.FilmRecommendations, error) {
 	Recommendations, err := uc.FilmRepo.GetFilmRecommendations(id, skip, limit)
 	if err != nil {
 		return domain.FilmRecommendations{}, err
 	}
 	return Recommendations, nil
 }
-func (uc *FilmUsecase) LoadMyReview (id uint64, authorId uint64) (domain.Review, error) {
+func (uc *FilmUsecase) LoadMyReview(id uint64, authorId uint64) (domain.Review, error) {
 	myRev, err := uc.FilmRepo.GetMyReview(id, authorId)
 	if err != nil {
 		return domain.Review{}, err

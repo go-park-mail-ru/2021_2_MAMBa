@@ -61,7 +61,7 @@ var testTableGetFilmFailure = [...]testRow{
 		skip:    -1,
 		limit:   10,
 		skip1:   0,
-		limit1: 10,
+		limit1:  10,
 	},
 	{
 		inQuery: "id=8&skip_reviews=11&limit_reviews=-2",
@@ -71,7 +71,7 @@ var testTableGetFilmFailure = [...]testRow{
 		skip:    11,
 		limit:   -2,
 		skip1:   0,
-		limit1: 10,
+		limit1:  10,
 	},
 	{
 		inQuery: "id=8&skip_reviews=14&limit_reviews=1",
@@ -81,37 +81,37 @@ var testTableGetFilmFailure = [...]testRow{
 		skip:    14,
 		limit:   1,
 		skip1:   0,
-		limit1: 10,
+		limit1:  10,
 	},
 	{
 		inQuery: "id=8&skip_recommend=-1&limit_recommend=10",
 		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
-		skip1:    -1,
-		limit1:   10,
-		skip:   0,
-		limit: 10,
+		skip1:   -1,
+		limit1:  10,
+		skip:    0,
+		limit:   10,
 	},
 	{
 		inQuery: "id=8&skip_recommend=11&limit_recommend=-2",
 		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
-		skip1:    11,
-		limit1:   -2,
-		skip:   0,
-		limit: 10,
+		skip1:   11,
+		limit1:  -2,
+		skip:    0,
+		limit:   10,
 	},
 	{
 		inQuery: "id=8&skip_recommend=14&limit_recommend=1",
 		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
-		skip1:    14,
-		limit1:   1,
-		skip:   0,
-		limit: 10,
+		skip1:   14,
+		limit1:  1,
+		skip:    0,
+		limit:   10,
 	},
 }
 
@@ -144,7 +144,7 @@ func TestGetFilmFailure(t *testing.T) {
 		var cl domain.FilmPageInfo
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockFilmUsecase(ctrl)
-		if (i == 2 || i == 5) {
+		if i == 2 || i == 5 {
 			mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, customErrors.ErrorSkip)
 		}
 		handler := FilmHandler{FilmUsecase: mock}
@@ -159,13 +159,13 @@ func TestGetFilmFailure(t *testing.T) {
 	}
 }
 
-var testTablePostRatingSuccess = [...]testRow {
+var testTablePostRatingSuccess = [...]testRow{
 	{
-		inQuery: "id=2&rating=10",
-		out:     `{"rating":10}` + "\n",
+		inQuery:    "id=2&rating=10",
+		out:        `{"rating":10}` + "\n",
 		bodyString: `{"film_id":7,"review_text":"и так тоже","review_type":2}`,
-		status:  http.StatusOK,
-		name:    `normal`,
+		status:     http.StatusOK,
+		name:       `normal`,
 	},
 }
 
@@ -196,7 +196,7 @@ func TestPostReviewSuccess(t *testing.T) {
 		_ = json.Unmarshal([]byte(test.bodyString), &cl)
 		_ = json.Unmarshal([]byte(test.out), &ret)
 		mock2 := mock2.NewMockFilmUsecase(ctrl)
-		mock2.EXPECT().PostRating(uint64(2), uint64(2),10.0).Times(1).Return(10.0, nil)
+		mock2.EXPECT().PostRating(uint64(2), uint64(2), 10.0).Times(1).Return(10.0, nil)
 		handler2 := FilmHandler{FilmUsecase: mock2}
 		r = httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		cookies := w.Result().Cookies()
@@ -204,19 +204,19 @@ func TestPostReviewSuccess(t *testing.T) {
 			r.AddCookie(cookie)
 		}
 		w = httptest.NewRecorder()
-		handler2.PostRating(w,r)
+		handler2.PostRating(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
 
-var testTableGetMySuccess = [...]testRow {
+var testTableGetMySuccess = [...]testRow{
 	{
-		inQuery: "id=2",
-		out:     `{"id":2,"film_id":2,"film_title_ru":"С любовью, Рози","film_title_original":"Love, Rosie","film_picture_url":"server/images/love-rosie.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":")","review_type":2,"stars":10,"date":"2021-10-31T00:00:00Z"}` + "\n",
+		inQuery:    "id=2",
+		out:        `{"id":2,"film_id":2,"film_title_ru":"С любовью, Рози","film_title_original":"Love, Rosie","film_picture_url":"server/images/love-rosie.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":")","review_type":2,"stars":10,"date":"2021-10-31T00:00:00Z"}` + "\n",
 		bodyString: ``,
-		status:  http.StatusOK,
-		name:    `normal`,
+		status:     http.StatusOK,
+		name:       `normal`,
 	},
 }
 
@@ -255,7 +255,7 @@ func TestGetMySuccess(t *testing.T) {
 			r.AddCookie(cookie)
 		}
 		w = httptest.NewRecorder()
-		handler2.LoadMyRv(w,r)
+		handler2.LoadMyRv(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}

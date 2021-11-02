@@ -22,7 +22,6 @@ func MockDatabase() (*database.DBManager, pgxmock.PgxPoolIface, error) {
 	return &database.DBManager{Pool: mock}, mock, err
 }
 
-
 func TestGetSuccess(t *testing.T) {
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
@@ -63,7 +62,6 @@ func TestGetSuccess(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetPerson)).WithArgs(pers.Id).WillReturnRows(rowPerson)
 	pool.ExpectCommit()
 
-
 	actual, err := repository.GetPerson(pers.Id)
 	assert.NoError(t, err)
 	assert.Equal(t, pers, actual)
@@ -78,13 +76,13 @@ func TestGetFilms(t *testing.T) {
 	pId := uint64(1)
 
 	fl := domain.FilmList{
-		FilmList:      []domain.Film{
+		FilmList: []domain.Film{
 			domain.Film{
-				Id:              1,
-				Title:           "TestFilm",
-				Description:     "ahahah ehehehe",
-				PosterUrl:       "joebiden.pres",
-				ReleaseYear:     2020,
+				Id:          1,
+				Title:       "TestFilm",
+				Description: "ahahah ehehehe",
+				PosterUrl:   "joebiden.pres",
+				ReleaseYear: 2020,
 			},
 		},
 		MoreAvaliable: false,
@@ -108,7 +106,7 @@ func TestGetFilms(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetPersonFilms)).WithArgs(pId, 10, 0).WillReturnRows(rowFilm)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetFilms(uint64(1),0,10)
+	actual, err := repository.GetFilms(uint64(1), 0, 10)
 	assert.NoError(t, err)
 	assert.Equal(t, fl, actual)
 }
@@ -122,13 +120,13 @@ func TestGetPopularFilms(t *testing.T) {
 	pId := uint64(1)
 
 	fl := domain.FilmList{
-		FilmList:      []domain.Film{
+		FilmList: []domain.Film{
 			domain.Film{
-				Id:              1,
-				Title:           "TestFilm",
-				Description:     "ahahah ehehehe",
-				PosterUrl:       "joebiden.pres",
-				ReleaseYear:     2020,
+				Id:          1,
+				Title:       "TestFilm",
+				Description: "ahahah ehehehe",
+				PosterUrl:   "joebiden.pres",
+				ReleaseYear: 2020,
 			},
 		},
 		MoreAvaliable: false,
@@ -154,7 +152,7 @@ func TestGetPopularFilms(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetPersonFilmsPopular)).WithArgs(pId, 10, 0).WillReturnRows(rowFilm)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetFilmsPopular(uint64(1),0,10)
+	actual, err := repository.GetFilmsPopular(uint64(1), 0, 10)
 	assert.NoError(t, err)
 	assert.Equal(t, fl, actual)
 }

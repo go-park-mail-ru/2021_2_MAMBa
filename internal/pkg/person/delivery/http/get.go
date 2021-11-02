@@ -9,10 +9,10 @@ import (
 
 const (
 	defaultLimit = 10
-	defaultSkip = 0
+	defaultSkip  = 0
 )
 
-func (handler *PersonHandler) GetPerson (w http.ResponseWriter, r *http.Request) {
+func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) {
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
@@ -35,13 +35,13 @@ func (handler *PersonHandler) GetPerson (w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (handler *PersonHandler) GetPersonFilms (w http.ResponseWriter, r *http.Request) {
+func (handler *PersonHandler) GetPersonFilms(w http.ResponseWriter, r *http.Request) {
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
-	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
@@ -49,7 +49,7 @@ func (handler *PersonHandler) GetPersonFilms (w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return
 	}
-	films, err := handler.PersonUsecase.GetFilms(id,skip, limit)
+	films, err := handler.PersonUsecase.GetFilms(id, skip, limit)
 	if err == customErrors.ErrorSkip {
 		http.Error(w, customErrors.ErrorSkip.Error(), http.StatusBadRequest)
 		return

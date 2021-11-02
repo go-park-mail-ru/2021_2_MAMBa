@@ -118,7 +118,6 @@ func TestPostSuccess(t *testing.T) {
 	assert.Equal(t, r.Id, actual)
 }
 
-
 func TestGetExceptSuccess(t *testing.T) {
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
@@ -147,7 +146,7 @@ func TestGetExceptSuccess(t *testing.T) {
 		CurrentSkip:   10,
 	}
 	byteCount := make([]uint8, 8)
-	binary.BigEndian.PutUint64(byteCount, r.Id + 1)
+	binary.BigEndian.PutUint64(byteCount, r.Id+1)
 	byteId := make([]uint8, 8)
 	binary.BigEndian.PutUint64(byteId, r.Id)
 	timeBuffer := pgtype.Timestamp{}
@@ -167,7 +166,7 @@ func TestGetExceptSuccess(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryCountFilmReviews)).WithArgs(r.FilmId).WillReturnRows(rowsCount)
 	pool.ExpectCommit()
 	pool.ExpectBegin()
-	pool.ExpectQuery(regexp.QuoteMeta(queryGetReviewByFilmIDEXCEPT)).WithArgs(r.FilmId, r.Id + 1, 10, 0).WillReturnRows(rowsRev)
+	pool.ExpectQuery(regexp.QuoteMeta(queryGetReviewByFilmIDEXCEPT)).WithArgs(r.FilmId, r.Id+1, 10, 0).WillReturnRows(rowsRev)
 	pool.ExpectCommit()
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetAuthorName)).WithArgs(r.Id).WillReturnRows(rowsAuth)
@@ -176,7 +175,7 @@ func TestGetExceptSuccess(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetFilmShort)).WithArgs(r.Id).WillReturnRows(rowsFilm)
 	pool.ExpectCommit()
 
-	actual, err := repository.LoadReviewsExcept(r.Id + 1,r.FilmId,0,10)
+	actual, err := repository.LoadReviewsExcept(r.Id+1, r.FilmId, 0, 10)
 	assert.NoError(t, err)
 	assert.Equal(t, rlist, actual)
 }
