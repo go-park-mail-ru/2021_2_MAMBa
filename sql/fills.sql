@@ -171,6 +171,7 @@ INSERT INTO recommended VALUES
     (7, 8),
     (8, 6),
     (8, 7);
+<<<<<<< Updated upstream
     
 INSERT INTO bookmark VALUES
      (1, 1),
@@ -203,3 +204,5 @@ INSERT INTO subscription VALUES
      (1, 6),
      (4, 7),
      (3, 8);
+=======
+>>>>>>> Stashed changes
