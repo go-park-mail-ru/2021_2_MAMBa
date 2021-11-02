@@ -129,7 +129,6 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 	return found, nil
 }
 
-
 func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 	result, err := ur.dbm.Query(queryCheckSubscription, src, dst)
 	if err != nil {

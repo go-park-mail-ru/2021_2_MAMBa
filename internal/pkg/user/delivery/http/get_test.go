@@ -145,7 +145,7 @@ func TestGetProfileInfoSuccess(t *testing.T) {
 	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
 	for _, testCase := range testTableGetProfileSuccess {
-		r = httptest.NewRequest("GET", "/api/user/getProfile?" + testCase.inQuery, bodyReader)
+		r = httptest.NewRequest("GET", "/api/user/getProfile?"+testCase.inQuery, bodyReader)
 		cookies := w.Result().Cookies()
 		for _, cookie := range cookies {
 			r.AddCookie(cookie)
@@ -199,7 +199,7 @@ func TestUpdateProfileInfoSuccess(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 	for _, testCase := range testTableUpdateProfileSuccess {
 		bodyReader := strings.NewReader(testCase.bodyString)
-		r = httptest.NewRequest("GET", "/api/user/changeProfile?" + testCase.inQuery, bodyReader)
+		r = httptest.NewRequest("GET", "/api/user/changeProfile?"+testCase.inQuery, bodyReader)
 		cookies := w.Result().Cookies()
 		for _, cookie := range cookies {
 			r.AddCookie(cookie)
@@ -222,7 +222,7 @@ func TestUpdateProfileInfoFailure(t *testing.T) {
 	handler := UserHandler{UserUsecase: mock}
 	for _, testCase := range testTableUpdateProfileFailure {
 		bodyReader := strings.NewReader(testCase.bodyString)
-		r := httptest.NewRequest("GET", "/api/user/changeProfile?" + testCase.inQuery, bodyReader)
+		r := httptest.NewRequest("GET", "/api/user/changeProfile?"+testCase.inQuery, bodyReader)
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
 		handler.UpdateProfile(w, r)
@@ -251,7 +251,6 @@ var testTableSubscribeFailure = [...]testRow{
 	},
 }
 
-
 func TestSubscribeSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	test := LoginSuccess[0]
@@ -269,7 +268,7 @@ func TestSubscribeSuccess(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 	for _, testCase := range testTableSubscribeSuccess {
 		bodyReader := strings.NewReader(testCase.bodyString)
-		r = httptest.NewRequest("GET", "/api/user/subscribeTo?" + testCase.inQuery, bodyReader)
+		r = httptest.NewRequest("GET", "/api/user/subscribeTo?"+testCase.inQuery, bodyReader)
 		cookies := w.Result().Cookies()
 		for _, cookie := range cookies {
 			r.AddCookie(cookie)
@@ -292,7 +291,7 @@ func TestSubscribeFailure(t *testing.T) {
 	handler := UserHandler{UserUsecase: mock}
 	for _, testCase := range testTableSubscribeFailure {
 		bodyReader := strings.NewReader(testCase.bodyString)
-		r := httptest.NewRequest("GET", "/api/user/subscribeTo?" + testCase.inQuery, bodyReader)
+		r := httptest.NewRequest("GET", "/api/user/subscribeTo?"+testCase.inQuery, bodyReader)
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
 		handler.CreateSubscription(w, r)

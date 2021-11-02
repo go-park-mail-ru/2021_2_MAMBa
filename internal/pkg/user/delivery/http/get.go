@@ -14,7 +14,7 @@ import (
 
 const (
 	defaultLimit = 10
-	defaultSkip = 0
+	defaultSkip  = 0
 )
 
 func (handler *UserHandler) GetBasicInfo(w http.ResponseWriter, r *http.Request) {
@@ -147,7 +147,7 @@ func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		return
 	}
-	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}

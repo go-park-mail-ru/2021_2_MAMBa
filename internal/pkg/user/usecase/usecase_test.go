@@ -101,8 +101,8 @@ var testTableRegFailure = [...]testRow{
 			PasswordRepeat: "123",
 		},
 		outUser: domain.User{},
-		err:  customErrors.ErrorBadInput,
-		name: `usecase get id`,
+		err:     customErrors.ErrorBadInput,
+		name:    `usecase get id`,
 	},
 	{
 		inUser: domain.User{
@@ -112,8 +112,8 @@ var testTableRegFailure = [...]testRow{
 			PasswordRepeat: "123",
 		},
 		outUser: domain.User{},
-		err:  customErrors.ErrorBadInput,
-		name: `usecase get id`,
+		err:     customErrors.ErrorBadInput,
+		name:    `usecase get id`,
 	},
 	{
 		inUser: domain.User{
@@ -124,8 +124,8 @@ var testTableRegFailure = [...]testRow{
 			PasswordRepeat: "123",
 		},
 		outUser: domain.User{},
-		err:  customErrors.ErrorAlreadyExists,
-		name: `usecase get id`,
+		err:     customErrors.ErrorAlreadyExists,
+		name:    `usecase get id`,
 	},
 }
 
@@ -187,7 +187,7 @@ func TestUserUsecase_GetProfileById(t *testing.T) {
 	defer ctrl.Finish()
 	mock := mock2.NewMockUserRepository(ctrl)
 	usecase := NewUserUsecase(mock)
-	mock.EXPECT().GetProfileById(gomock.Any(),gomock.Any()).Return(targetProfile,nil)
+	mock.EXPECT().GetProfileById(gomock.Any(), gomock.Any()).Return(targetProfile, nil)
 	actual, err := usecase.GetProfileById(targetProfile.ID, targetProfile.ID)
 	assert.Equal(t, targetProfile, actual)
 	assert.Equal(t, err, nil)
@@ -198,7 +198,7 @@ func TestUserUsecase_UpdateProfile(t *testing.T) {
 	defer ctrl.Finish()
 	mock := mock2.NewMockUserRepository(ctrl)
 	usecase := NewUserUsecase(mock)
-	mock.EXPECT().UpdateProfile(gomock.Any()).Return(targetProfile,nil)
+	mock.EXPECT().UpdateProfile(gomock.Any()).Return(targetProfile, nil)
 	actual, err := usecase.UpdateProfile(targetProfile)
 	assert.Equal(t, targetProfile, actual)
 	assert.Equal(t, err, nil)
@@ -208,8 +208,8 @@ func TestUserUsecase_CreateSubscription(t *testing.T) {
 	defer ctrl.Finish()
 	mock := mock2.NewMockUserRepository(ctrl)
 	usecase := NewUserUsecase(mock)
-	mock.EXPECT().CreateSubscription(gomock.Any(),gomock.Any()).Return(targetProfile, nil)
-	actual, err := usecase.CreateSubscription(targetProfile.ID - 1, targetProfile.ID)
+	mock.EXPECT().CreateSubscription(gomock.Any(), gomock.Any()).Return(targetProfile, nil)
+	actual, err := usecase.CreateSubscription(targetProfile.ID-1, targetProfile.ID)
 	assert.Equal(t, targetProfile, actual)
 	assert.Equal(t, err, nil)
 }
@@ -228,19 +228,18 @@ func TestUserUsecase_LoadUserReviews(t *testing.T) {
 	defer ctrl.Finish()
 	mock := mock2.NewMockUserRepository(ctrl)
 	usecase := NewUserUsecase(mock)
-	mock.EXPECT().LoadUserReviews(gomock.Any(),gomock.Any(), gomock.Any()).Return(filmList,nil)
+	mock.EXPECT().LoadUserReviews(gomock.Any(), gomock.Any(), gomock.Any()).Return(filmList, nil)
 	actual, err := usecase.LoadUserReviews(targetProfile.ID, 0, 10)
 	assert.Equal(t, filmList, actual)
 	assert.Equal(t, err, nil)
 }
-
 
 func TestUserUsecase_UpdateAvatar(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mock := mock2.NewMockUserRepository(ctrl)
 	usecase := NewUserUsecase(mock)
-	mock.EXPECT().UpdateAvatar(gomock.Any(),gomock.Any()).Return(targetProfile, nil)
+	mock.EXPECT().UpdateAvatar(gomock.Any(), gomock.Any()).Return(targetProfile, nil)
 	actual, err := usecase.UpdateAvatar(targetProfile.ID, targetProfile.PictureUrl)
 	assert.Equal(t, targetProfile, actual)
 	assert.Equal(t, err, nil)

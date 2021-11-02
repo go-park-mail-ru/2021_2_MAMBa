@@ -238,11 +238,11 @@ func TestGetProfileSuccess(t *testing.T) {
 	byteTime, err = timeBuffer.EncodeBinary(nil, byteTime)
 
 	mu := domain.Profile{
-		ID:             1,
-		FirstName:      "Test",
-		Surname:        "Testovich",
-		Email:          "Testosteron@mail.ru",
-		PictureUrl:     "/pic/1.jpg",
+		ID:            1,
+		FirstName:     "Test",
+		Surname:       "Testovich",
+		Email:         "Testosteron@mail.ru",
+		PictureUrl:    "/pic/1.jpg",
 		Gender:        "male",
 		RegisterDate:  timeBuffer.Time,
 		SubCount:      2,
@@ -288,11 +288,11 @@ func TestUpdateProfileSuccess(t *testing.T) {
 	byteTime, err = timeBuffer.EncodeBinary(nil, byteTime)
 
 	mu := domain.Profile{
-		ID:             1,
-		FirstName:      "Test",
-		Surname:        "Testovich",
-		Email:          "Testosteron@mail.ru",
-		PictureUrl:     "/pic/1.jpg",
+		ID:            1,
+		FirstName:     "Test",
+		Surname:       "Testovich",
+		Email:         "Testosteron@mail.ru",
+		PictureUrl:    "/pic/1.jpg",
 		Gender:        "male",
 		RegisterDate:  timeBuffer.Time,
 		SubCount:      2,
