@@ -21,21 +21,21 @@ INSERT INTO genre(genre_name) VALUES
 
 
 INSERT INTO profile(first_name, surname, email, password, picture_url, gender, register_date) VALUES
-    ('Иван', 'Иванов', 'ivan@mail.ru', '$2a$10$XFUgsxdBN.UiILtfITr/4urH1WIQWBMkqvLnAgfiYpZNguvySCBAq', '/pic/1.jpg', 'male', current_timestamp),
+    ('Иван', 'Иванов', 'ivan@mail.ru', '$2a$10$XFUgsxdBN.UiILtfITr/4urH1WIQWBMkqvLnAgfiYpZNguvySCBAq', '/static/media/img/users/base.jpg', 'male', current_timestamp),
     -- 1234abcd
-    ('Алексей','Самойлов','lexa@mail.ru','$2a$10$c5Ku7dxUrlqqxCox6iRMLuKH8m7ohsBFv8OXIcEStH40/HqHuDAUO','/pic/1.jpg','male',current_timestamp),
+    ('Алексей','Самойлов','lexa@mail.ru','$2a$10$c5Ku7dxUrlqqxCox6iRMLuKH8m7ohsBFv8OXIcEStH40/HqHuDAUO','/static/media/img/users/base.jpg','male',current_timestamp),
     -- 123ab321bc
-    ('Катя','Кириллова','kate@mail.ru','$2a$10$ioIHXpmM2l0PMmd/4gJs..9yqt0O9kzklrIZoSTnZRnm2mmC8AMAi','/pic/1.jpg','female',current_timestamp),
+    ('Катя','Кириллова','kate@mail.ru','$2a$10$ioIHXpmM2l0PMmd/4gJs..9yqt0O9kzklrIZoSTnZRnm2mmC8AMAi','/static/media/img/users/base.jpg','female',current_timestamp),
     -- ab1423bc
-    ('Настя','Куликова','kulikovAnast@mail.ru','$2a$10$gATPQVuopB77CwgXWfR1behANZ9KI.nH2vPDIJTvN1yuIdEcQtcPa','/pic/1.jpg','female',current_timestamp),
+    ('Настя','Куликова','kulikovAnast@mail.ru','$2a$10$gATPQVuopB77CwgXWfR1behANZ9KI.nH2vPDIJTvN1yuIdEcQtcPa','/static/media/img/users/base.jpg','female',current_timestamp),
     --kkk111kkk
-    ('Максим','Дудник','maksongold@mail.ru','2a$10$T62vmMhEeRKFLF82O6YhTOx8VmHKsYWximYpF3y7qLbTV4tPIFBEa','/pic/1.jpg','male',current_timestamp),
+    ('Максим','Дудник','maksongold@mail.ru','2a$10$T62vmMhEeRKFLF82O6YhTOx8VmHKsYWximYpF3y7qLbTV4tPIFBEa','/static/media/img/users/base.jpg','male',current_timestamp),
     --maks2000
-    ('Борис','Кожуро','borisK@mail.ru','2a$10$J2qOuCh9e9h4OE7DtQ7lZ.969oLF0B1N3HLWoq/tQg/zx38qFwd1y','/pic/1.jpg','male',current_timestamp),
+    ('Борис','Кожуро','borisK@mail.ru','2a$10$J2qOuCh9e9h4OE7DtQ7lZ.969oLF0B1N3HLWoq/tQg/zx38qFwd1y','/static/media/img/users/base.jpg','male',current_timestamp),
     --bk1234ev
-    ('Анна','Морозова','morozAN@gmail.com','2a$10$t.QpAwfS.nj3m/v59z17FOsCbJzBdL0XipAVK4ecEFp9r4EUOVCYO','/pic/1.jpg','female',current_timestamp),
+    ('Анна','Морозова','morozAN@gmail.com','2a$10$t.QpAwfS.nj3m/v59z17FOsCbJzBdL0XipAVK4ecEFp9r4EUOVCYO','/static/media/img/users/base.jpg','female',current_timestamp),
     --moroz1523
-    ('Игорь','Николаевич','IgorNikol@yandex.ru','$2a$10$sHl.NJcJTSeGqvJbmRXUQ.iOez7Ah4U4kFNKbAAB1YcqeMrbluzlq','/pic/1.jpg','male',current_timestamp);
+    ('Игорь','Николаевич','IgorNikol@yandex.ru','$2a$10$sHl.NJcJTSeGqvJbmRXUQ.iOez7Ah4U4kFNKbAAB1YcqeMrbluzlq','/static/media/img/users/base.jpg','male',current_timestamp);
     -- kolya1967
     
     
@@ -171,3 +171,35 @@ INSERT INTO recommended VALUES
     (7, 8),
     (8, 6),
     (8, 7);
+    
+INSERT INTO bookmark VALUES
+     (1, 1),
+     (2, 1),
+     (3, 1),
+     (5, 1),
+     (4, 2),
+     (3, 2),
+     (1, 3),
+     (2, 3),
+     (7, 3),
+     (8, 4),
+     (2, 5),
+     (1, 6),
+     (4, 7),
+     (3, 8);
+
+INSERT INTO subscription VALUES
+     (1, 1),
+     (2, 1),
+     (3, 1),
+     (5, 1),
+     (4, 2),
+     (3, 2),
+     (1, 3),
+     (2, 3),
+     (7, 3),
+     (8, 4),
+     (2, 5),
+     (1, 6),
+     (4, 7),
+     (3, 8);

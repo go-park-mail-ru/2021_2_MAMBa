@@ -19,4 +19,9 @@ func NewHandlers(router *mux.Router, uc domain.UserUsecase) {
 	router.HandleFunc("/user/login", handler.Login).Methods("POST", "OPTIONS")
 	router.HandleFunc("/user/logout", handler.Logout).Methods("GET", "OPTIONS")
 	router.HandleFunc("/user/checkAuth", handler.CheckAuth).Methods("GET", "OPTIONS")
+	router.HandleFunc("/user/getProfile", handler.GetProfile).Methods("GET", "OPTIONS")
+	router.HandleFunc("/user/changeProfile", handler.UpdateProfile).Methods("POST", "OPTIONS")
+	router.HandleFunc("/user/subscribeTo", handler.CreateSubscription).Methods("POST", "OPTIONS")
+	router.HandleFunc("/user/getReviewsAndStars", handler.LoadUserReviews).Methods("GET", "OPTIONS")
+	router.HandleFunc("/user/avatar", handler.UploadAvatar).Methods("POST", "OPTIONS")
 }
