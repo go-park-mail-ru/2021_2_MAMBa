@@ -3,7 +3,8 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+
 	mylog "2021_2_MAMBa/internal/pkg/utils/log"
 	"encoding/binary"
 	"errors"
@@ -76,7 +77,7 @@ func TestGetFailure(t *testing.T) {
 	pool.ExpectCommit()
 
 	actual, err := repository.GetById(mu.ID)
-	assert.Equal(t, user.ErrorNoUser, err)
+	assert.Equal(t, customErrors.ErrorNoUser, err)
 	assert.Equal(t, domain.User{}, actual)
 }
 
@@ -128,7 +129,7 @@ func TestGetEmailFailure(t *testing.T) {
 	pool.ExpectCommit()
 
 	actual, err := repository.GetByEmail(mu.Email)
-	assert.Equal(t, user.ErrorNoUser, err)
+	assert.Equal(t, customErrors.ErrorNoUser, err)
 	assert.Equal(t, domain.User{}, actual)
 }
 

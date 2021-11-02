@@ -3,7 +3,7 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"encoding/binary"
 )
 
@@ -24,10 +24,10 @@ const (
 func (ur *dbUserRepository) GetByEmail(email string) (domain.User, error) {
 	result, err := ur.dbm.Query(queryGetByEmail, email)
 	if err != nil {
-		return domain.User{}, user.ErrorInternalServer
+		return domain.User{}, customErrors.ErrorInternalServer
 	}
 	if len(result) == 0 {
-		return domain.User{}, user.ErrorNoUser
+		return domain.User{}, customErrors.ErrorNoUser
 	}
 	raw := result[0]
 	found := domain.User{
@@ -45,10 +45,10 @@ func (ur *dbUserRepository) GetByEmail(email string) (domain.User, error) {
 func (ur *dbUserRepository) GetById(id uint64) (domain.User, error) {
 	result, err := ur.dbm.Query(queryGetById, id)
 	if err != nil {
-		return domain.User{}, user.ErrorInternalServer
+		return domain.User{}, customErrors.ErrorInternalServer
 	}
 	if len(result) == 0 {
-		return domain.User{}, user.ErrorNoUser
+		return domain.User{}, customErrors.ErrorNoUser
 	}
 	raw := result[0]
 	found := domain.User{

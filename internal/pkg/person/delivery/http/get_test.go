@@ -2,7 +2,7 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/person"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/person/usecase/mock"
 	"encoding/json"
 	"github.com/golang/mock/gomock"
@@ -40,13 +40,13 @@ var testTableGetPersonSuccess = [...]testRow{
 var testTableGetPersonFailure = [...]testRow{
 	{
 		inQuery: "",
-		out:     person.ErrorBadInput.Error() + "\n",
+		out:     customErrors.ErrorBadInput.Error() + "\n",
 		status:  http.StatusBadRequest,
 		name:    `no id`,
 	},
 	{
 		inQuery: "id=10",
-		out:     person.ErrorInternalServer.Error() + "\n",
+		out:     customErrors.ErrorInternalServer.Error() + "\n",
 		status:  http.StatusInternalServerError,
 		name:    `overshoot`,
 	},
@@ -77,8 +77,11 @@ func TestGetPersonFailure(t *testing.T) {
 	apiPath := "/api/person/getPerson?"
 	for i, test := range testTableGetPersonFailure {
 		mock := mock2.NewMockPersonUsecase(ctrl)
+		if i == 0 {
+			mock.EXPECT().GetPerson(uint64(0)).Times(1).Return(domain.PersonPage{}, customErrors.ErrorBadInput)
+		}
 		if i == 1 {
-			mock.EXPECT().GetPerson(uint64(10)).Times(1).Return(domain.PersonPage{}, person.ErrorInternalServer)
+			mock.EXPECT().GetPerson(uint64(10)).Times(1).Return(domain.PersonPage{}, customErrors.ErrorInternalServer)
 		}
 		handler := PersonHandler{PersonUsecase: mock}
 		bodyReader := strings.NewReader("")
@@ -111,7 +114,7 @@ var testTableGetPersonFilmsSuccess = [...]testRow{
 var testTableGetPersonFilmsFailure = [...]testRow{
 	{
 		inQuery: "id=8&skip=-1&limit=10",
-		out:     person.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 		skip:    -1,
@@ -119,7 +122,7 @@ var testTableGetPersonFilmsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_reviews=11&limit=-2",
-		out:     person.ErrLimitMsg + "\n",
+		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 		skip:    11,
@@ -127,7 +130,7 @@ var testTableGetPersonFilmsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip=14&limit=1",
-		out:     person.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 		skip:    14,
@@ -161,7 +164,7 @@ func TestGetRecomFailure(t *testing.T) {
 	for i, test := range testTableGetPersonFilmsFailure {
 		mock := mock2.NewMockPersonUsecase(ctrl)
 		if i == 2 {
-			mock.EXPECT().GetFilms(uint64(8), test.skip, test.limit).Return(domain.FilmList{}, person.ErrorSkip)
+			mock.EXPECT().GetFilms(uint64(8), test.skip, test.limit).Return(domain.FilmList{}, customErrors.ErrorSkip)
 		}
 		handler := PersonHandler{PersonUsecase: mock}
 		bodyReader := strings.NewReader("")

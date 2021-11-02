@@ -1,10 +1,9 @@
 package repository
 
 import (
-	"2021_2_MAMBa/internal/pkg/collections"
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"encoding/binary"
 )
 
@@ -25,12 +24,12 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 
 	result, err := cr.dbm.Query(queryCountCollections)
 	if err != nil {
-		return domain.Collections{}, user.ErrorInternalServer
+		return domain.Collections{}, customErrors.ErrorInternalServer
 	}
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.Collections{}, collections.ErrorSkip
+		return domain.Collections{}, customErrors.ErrorSkip
 	}
 
 	moreAvailable := skip+limit < dbSize

@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	userErrors "2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/log"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -23,7 +23,7 @@ func (uc userUsecase) GetBasicInfo(id uint64) (domain.User, error) {
 	log.Info(string(passwordByte))
 	user.OmitPassword()
 	if err != nil {
-		return domain.User{}, userErrors.ErrorInternalServer
+		return domain.User{}, customErrors.ErrorInternalServer
 	}
 	return user, nil
 }
@@ -31,24 +31,24 @@ func (uc userUsecase) GetBasicInfo(id uint64) (domain.User, error) {
 func (uc userUsecase) Register(u *domain.User) (domain.User, error) {
 	if u.FirstName == "" || u.Surname == "" || u.Email == "" ||
 		u.Password == "" || u.Password != u.PasswordRepeat {
-		return domain.User{}, userErrors.ErrorBadInput
+		return domain.User{}, customErrors.ErrorBadInput
 	}
 	_, err := uc.userRepo.GetByEmail(u.Email)
 	if err == nil {
-		return domain.User{}, userErrors.ErrorAlreadyExists
+		return domain.User{}, customErrors.ErrorAlreadyExists
 	}
 
 	// соль пароль
 	passwordByte, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return domain.User{}, userErrors.ErrorInternalServer
+		return domain.User{}, customErrors.ErrorInternalServer
 	}
 	u.Password = string(passwordByte)
 	u.ProfilePic = domain.BasePicture
 
 	_, err = uc.userRepo.AddUser(u)
 	if err != nil {
-		return domain.User{}, userErrors.ErrorInternalServer
+		return domain.User{}, customErrors.ErrorInternalServer
 	}
 	u.OmitPassword()
 	return *u, nil
@@ -56,12 +56,12 @@ func (uc userUsecase) Register(u *domain.User) (domain.User, error) {
 
 func (uc userUsecase) Login(u *domain.UserToLogin) (domain.User, error) {
 	if u.Email == "" || u.Password == "" {
-		return domain.User{}, userErrors.ErrorBadInput
+		return domain.User{}, customErrors.ErrorBadInput
 	}
 	us, err := uc.userRepo.GetByEmail(u.Email)
 	errPassword := bcrypt.CompareHashAndPassword([]byte(us.Password), []byte(u.Password))
 	if err != nil || errPassword != nil {
-		return domain.User{}, userErrors.ErrorBadCredentials
+		return domain.User{}, customErrors.ErrorBadCredentials
 	}
 	us.OmitPassword()
 	return us, nil

@@ -2,7 +2,7 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
 	"github.com/golang/mock/gomock"
@@ -27,28 +27,28 @@ var testTableRegisterFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan","surname": "Ivanov","email": "ivan1@mail.ru","password": "123456","password_repeat": "123456"}`,
-		out:        user.ErrorAlreadyIn.Error() + "\n",
+		out:        customErrors.ErrorAlreadyIn.Error() + "\n",
 		status:     http.StatusConflict,
 		name:       "already in",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_nme": "Ivan",}`,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "bad fields",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan",}`,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "empty fields",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan12","surname": "Ivanov","email": "ivan131@mail.ru","password": "123455","password_repeat": "123456"}`,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "unmatching passwords",
 	},
@@ -85,7 +85,7 @@ func TestRegisterFailure(t *testing.T) {
 			mock.EXPECT().Register(&cl).Times(1).Return(ret, nil)
 		}
 		if i == 3 {
-			mock.EXPECT().Register(&cl).Times(1).Return(domain.User{}, user.ErrorBadInput)
+			mock.EXPECT().Register(&cl).Times(1).Return(domain.User{}, customErrors.ErrorBadInput)
 		}
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
@@ -111,35 +111,35 @@ var testTableLoginFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"email": "raddom@mail.su","password": "123456"}`,
-		out:        user.ErrorBadCredentials.Error() + "\n",
+		out:        customErrors.ErrorBadCredentials.Error() + "\n",
 		status:     http.StatusUnauthorized,
 		name:       "user not in base",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru","password": "122456"}`,
-		out:        user.ErrorBadCredentials.Error() + "\n",
+		out:        customErrors.ErrorBadCredentials.Error() + "\n",
 		status:     http.StatusUnauthorized,
 		name:       "wrong pass",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"password": "122456"}`,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "no email",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru"}`,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "no pass",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"emal": "iva21@mail.ru","password": "123456"}`,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "wrong json",
 	},
@@ -178,9 +178,9 @@ func TestLoginFailure (t *testing.T) {
 		_ = json.Unmarshal([]byte(test.out), &ret)
 		handler := UserHandler{UserUsecase: mock}
 		if i <= 1 {
-			mock.EXPECT().Login(&cl).Times(1).Return(domain.User{}, user.ErrorBadCredentials)
-		} else if i <= 3 {
-			mock.EXPECT().Login(&cl).Times(1).Return(domain.User{}, user.ErrorBadInput)
+			mock.EXPECT().Login(&cl).Times(1).Return(domain.User{}, customErrors.ErrorBadCredentials)
+		} else if i <= 4 {
+			mock.EXPECT().Login(&cl).Times(1).Return(domain.User{}, customErrors.ErrorBadInput)
 		}
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
@@ -195,7 +195,7 @@ var testTableLogoutFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru","password": "123456"}`,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusForbidden,
 		name:       "logout not logged in",
 	},

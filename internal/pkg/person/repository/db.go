@@ -3,7 +3,7 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/person"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"encoding/binary"
 	"github.com/jackc/pgx/pgtype"
 	"strings"
@@ -67,7 +67,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmList{}, person.ErrorSkip
+		return domain.FilmList{}, customErrors.ErrorSkip
 	}
 
 	result, err = pr.dbm.Query(queryGetPersonFilms, id, limit, skip)
@@ -103,7 +103,7 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmList{}, person.ErrorBadCredentials
+		return domain.FilmList{}, customErrors.ErrorBadCredentials
 	}
 
 	result, err = pr.dbm.Query(queryGetPersonFilmsPopular, id, limit, skip)

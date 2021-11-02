@@ -3,8 +3,7 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/film"
-	"2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"encoding/binary"
 	"github.com/jackc/pgx/pgtype"
 	"math"
@@ -133,12 +132,12 @@ func (fr *dbFilmRepository) GetFilm (id uint64) (domain.Film, error) {
 func (fr *dbFilmRepository) GetFilmReviews (id uint64, skip int, limit int) (domain.FilmReviews, error) {
 	result, err := fr.dbm.Query(queryCountFilmReviews, id)
 	if err != nil {
-		return domain.FilmReviews{}, user.ErrorInternalServer
+		return domain.FilmReviews{}, customErrors.ErrorInternalServer
 	}
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmReviews{}, film.ErrorSkip
+		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 	
 
@@ -175,12 +174,12 @@ func (fr *dbFilmRepository) GetFilmReviews (id uint64, skip int, limit int) (dom
 func (fr *dbFilmRepository) GetFilmRecommendations (id uint64, skip int, limit int) (domain.FilmRecommendations, error) {
 	result, err := fr.dbm.Query(queryCountFilmRecommendations, id)
 	if err != nil {
-		return domain.FilmRecommendations{}, user.ErrorInternalServer
+		return domain.FilmRecommendations{}, customErrors.ErrorInternalServer
 	}
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmRecommendations{}, film.ErrorSkip
+		return domain.FilmRecommendations{}, customErrors.ErrorSkip
 	}
 
 
@@ -235,7 +234,7 @@ func (fr *dbFilmRepository) GetMyReview (id uint64, author_id uint64) (domain.Re
 		return domain.Review{}, err
 	}
 	if len(result) == 0 {
-		return domain.Review{}, film.ErrorNoReviewForFilm
+		return domain.Review{}, customErrors.ErrorNoReviewForFilm
 	}
 	timeBuffer := pgtype.Timestamp{}
 	err =timeBuffer.DecodeBinary(nil, result[0][6])

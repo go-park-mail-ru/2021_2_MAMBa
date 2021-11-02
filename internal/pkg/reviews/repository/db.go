@@ -4,8 +4,7 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/film"
-	"2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"encoding/binary"
 	"github.com/jackc/pgx/pgtype"
 	"math"
@@ -69,17 +68,17 @@ func (rr *dbReviewRepository) GetReview (id uint64) (domain.Review, error) {
 func (rr *dbReviewRepository)  PostReview (review domain.Review) (uint64, error) {
 	result, err := rr.dbm.Query(querySearchReview, review.FilmId, review.AuthorId)
 	if err != nil {
-		return 0, user.ErrorInternalServer
+		return 0, customErrors.ErrorInternalServer
 	}
 	if len(result) == 0 {
 		result, err = rr.dbm.Query(queryInsertReview, review.FilmId, review.AuthorId, review.ReviewText, review.ReviewType, 0, time.Now())
 		if err != nil {
-			return 0, user.ErrorInternalServer
+			return 0, customErrors.ErrorInternalServer
 		}
 	} else {
 		result, err = rr.dbm.Query(queryUpdateReview, review.ReviewText, review.ReviewType, review.FilmId, review.AuthorId)
 		if err != nil {
-			return 0, user.ErrorInternalServer
+			return 0, customErrors.ErrorInternalServer
 		}
 	}
 	return binary.BigEndian.Uint64(result[0][0]), nil
@@ -88,12 +87,12 @@ func (rr *dbReviewRepository)  PostReview (review domain.Review) (uint64, error)
 func (rr *dbReviewRepository)  LoadReviewsExcept(id uint64, film_id uint64, skip int, limit int) (domain.FilmReviews, error) {
 	result, err := rr.dbm.Query(queryCountFilmReviews, film_id)
 	if err != nil {
-		return domain.FilmReviews{}, user.ErrorInternalServer
+		return domain.FilmReviews{}, customErrors.ErrorInternalServer
 	}
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmReviews{}, film.ErrorSkip
+		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 
 	moreAvailable := skip+limit < dbSize

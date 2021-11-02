@@ -1,46 +1,41 @@
 package http
 
 import (
-	"2021_2_MAMBa/internal/pkg/collections"
+	"2021_2_MAMBa/internal/pkg/domain/errors"
+	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
 	"net/http"
-	"strconv"
+)
+
+const (
+	defaultLimit = 10
+	defaultSkip = 0
 )
 
 func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http.Request) {
 	var err error
-	// default
-	limit, skip := 10, 0
-	skipString, isIn := r.URL.Query()["skip"]
-	if isIn {
-		skip, err = strconv.Atoi(skipString[0])
-		if err != nil || skip < 0 {
-			http.Error(w, collections.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	limitString, isIn := r.URL.Query()["limit"]
-	if isIn {
-		limit, err = strconv.Atoi(limitString[0])
-		if err != nil || limit <= 0 {
-			http.Error(w, collections.ErrLimitMsg, http.StatusBadRequest)
-			return
-		}
+	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		return
 	}
 
 	collectionsList, err := handler.CollectionsUsecase.GetCollections(skip, limit)
-	if err == collections.ErrorSkip {
-		http.Error(w, collections.ErrSkipMsg, http.StatusBadRequest)
+	if err == customErrors.ErrorSkip {
+		http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 		return
 	}
 	if err != nil {
-		http.Error(w, collections.ErrDBMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(collectionsList)
 	if err != nil {
-		http.Error(w, collections.ErrEncMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
 }
