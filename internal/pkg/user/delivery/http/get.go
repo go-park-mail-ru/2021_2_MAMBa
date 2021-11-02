@@ -2,11 +2,8 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/film"
-	"2021_2_MAMBa/internal/pkg/reviews"
-	"2021_2_MAMBa/internal/pkg/sessions"
-	"2021_2_MAMBa/internal/pkg/user"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	"2021_2_MAMBa/internal/pkg/sessions"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -47,30 +44,30 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	if isIn {
 		targetID, err = strconv.ParseUint(targetIDString[0], 10, 64)
 		if err != nil {
-			http.Error(w, reviews.ErrSkipMsg, http.StatusBadRequest)
+			http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 			return
 		}
 	}
 	clientID, err := sessions.CheckSession(r)
 	if err != nil && err != sessions.ErrUserNotLoggedIn {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 	us, err := handler.UserUsecase.GetProfileById(clientID, targetID)
 	if err != nil {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusNotFound)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusNotFound)
 		return
 	}
 	b, err := json.Marshal(us)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(b)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -78,33 +75,33 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	clientID, err := sessions.CheckSession(r)
 	if err != nil || err == sessions.ErrUserNotLoggedIn {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 	profileForm := domain.Profile{}
 	err = json.NewDecoder(r.Body).Decode(&profileForm)
 	if err != nil {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusBadRequest)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
 	profileForm.ID = clientID
 
 	us, err := handler.UserUsecase.UpdateProfile(profileForm)
 	if err != nil {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusNotFound)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusNotFound)
 		return
 	}
 
 	b, err := json.Marshal(us)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(b)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -112,32 +109,32 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
 	clientID, err := sessions.CheckSession(r)
 	if err != nil || err == sessions.ErrUserNotLoggedIn {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 	profileForm := domain.Profile{}
 	err = json.NewDecoder(r.Body).Decode(&profileForm)
 	if err != nil {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusBadRequest)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
 
 	us, err := handler.UserUsecase.CreateSubscription(clientID, profileForm.ID)
 	if err != nil {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusNotFound)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusNotFound)
 		return
 	}
 
 	b, err := json.Marshal(us)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(b)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -150,7 +147,7 @@ func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Reque
 	if isIn {
 		id, err = strconv.ParseUint(idString[0], 10, 64)
 		if err != nil || id <= 0 {
-			http.Error(w, reviews.ErrSkipMsg, http.StatusBadRequest)
+			http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 			return
 		}
 	}
@@ -158,7 +155,7 @@ func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Reque
 	if isIn {
 		skip, err = strconv.Atoi(skipString[0])
 		if err != nil || skip  < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
+			http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 			return
 		}
 	}
@@ -166,19 +163,19 @@ func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Reque
 	if isIn {
 		limit, err = strconv.Atoi(limitString[0])
 		if err != nil || limit <= 0 {
-			http.Error(w, film.ErrLimitMsg, http.StatusBadRequest)
+			http.Error(w, customErrors.ErrLimitMsg, http.StatusBadRequest)
 			return
 		}
 	}
 	review, err := handler.UserUsecase.LoadUserReviews(id, skip, limit)
 	if err != nil {
-		http.Error(w, reviews.ErrDBMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(review)
 	if err != nil {
-		http.Error(w, reviews.ErrEncMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
 }

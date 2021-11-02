@@ -3,14 +3,11 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/film"
-	"2021_2_MAMBa/internal/pkg/user"
-	"encoding/binary"
-	"github.com/jackc/pgx/pgtype"
-	"golang.org/x/crypto/bcrypt"
-	"math"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
+	"encoding/binary"
+	"github.com/jackc/pgx/pgtype"
+	"math"
 )
 
 type dbUserRepository struct {
@@ -94,7 +91,7 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 		return domain.Profile{}, err
 	}
 	if len(result) == 0 {
-		return domain.Profile{}, user.ErrorNoUser
+		return domain.Profile{}, customErrors.ErrorNoUser
 	}
 
 	rawRow := result[0]
@@ -147,7 +144,7 @@ func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 	} else if count == 1 {
 		return true, nil
 	} else {
-		return false, user.ErrorInternalServer
+		return false, customErrors.ErrorInternalServer
 	}
 }
 
@@ -191,12 +188,12 @@ func (ur *dbUserRepository) CreateSubscription(src, dst uint64) (domain.Profile,
 func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (domain.FilmReviews, error) {
 	result, err := ur.dbm.Query(queryCountFilmReviews, id)
 	if err != nil {
-		return domain.FilmReviews{}, user.ErrorInternalServer
+		return domain.FilmReviews{}, customErrors.ErrorInternalServer
 	}
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmReviews{}, film.ErrorSkip
+		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 
 	moreAvailable := skip+limit < dbSize

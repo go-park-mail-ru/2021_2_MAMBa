@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	userErrors "2021_2_MAMBa/internal/pkg/user"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"golang.org/x/crypto/bcrypt"
 )
