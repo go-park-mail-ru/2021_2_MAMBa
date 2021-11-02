@@ -57,7 +57,7 @@ func EndSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 
 func CheckSession(r *http.Request) (uint64, error) {
 	session, err := store.Get(r, sessionName)
-	if err != nil {
+	if err != nil && !session.IsNew {
 		return 0, err
 	}
 	id, isIn := session.Values["id"]

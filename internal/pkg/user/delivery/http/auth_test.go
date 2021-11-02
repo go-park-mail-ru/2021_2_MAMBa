@@ -1,25 +1,18 @@
-package user
+package http
 
 import (
-	"2021_2_MAMBa/internal/pkg/database"
-	"fmt"
-	"github.com/gorilla/mux"
+	"2021_2_MAMBa/internal/pkg/domain"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	mock2 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
+	"encoding/json"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 )
-
-type testRow struct {
-	inQuery    string
-	bodyString string
-	out        string
-	status     int
-	name       string
-}
 
 var testTableRegisterSuccess = [...]testRow{
 	{
@@ -34,155 +27,72 @@ var testTableRegisterFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan","surname": "Ivanov","email": "ivan1@mail.ru","password": "123456","password_repeat": "123456"}`,
-		out:        errorAlreadyIn + "\n",
+		out:        customErrors.ErrorAlreadyIn.Error() + "\n",
 		status:     http.StatusConflict,
 		name:       "already in",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_nme": "Ivan",}`,
-		out:        errorBadInput + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "bad fields",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan",}`,
-		out:        errorBadInput + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "empty fields",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan12","surname": "Ivanov","email": "ivan131@mail.ru","password": "123455","password_repeat": "123456"}`,
-		out:        errorBadInput + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "unmatching passwords",
 	},
 }
 
 func TestRegisterSuccess(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	for _, test := range testTableRegisterSuccess {
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+		mock := mock2.NewMockUserUsecase(ctrl)
+		var cl, ret domain.User
+		_ = json.Unmarshal([]byte(test.bodyString), &cl)
+		_ = json.Unmarshal([]byte(test.out), &ret)
+		handler := UserHandler{UserUsecase: mock}
+		mock.EXPECT().Register(&cl).Times(1).Return(ret, nil)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
-		Register(w, r)
+		handler.Register(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
-
 func TestRegisterFailure(t *testing.T) {
-	db.AddUser(&database.User{
-		FirstName:  "Ivan",
-		Surname:    "Ivanov",
-		Password:   "123456",
-		Email:      "ivan1@mail.ru",
-		ProfilePic: "/pic/1.jpg",
-	})
-	apiPath := "/api/user/register"
-	for _, test := range testTableRegisterFailure {
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
-		bodyReader := strings.NewReader(test.bodyString)
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-		Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
-	}
-}
-
-func fillMockDB() {
-	db = database.UserMockDatabase{}
-	db.AddUser(&database.User{
-		FirstName:  "Ivan",
-		Surname:    "Ivanov",
-		Password:   "123456",
-		Email:      "ivan@mail.ru",
-		ProfilePic: "/pic/1.jpg",
-	})
-	db.AddUser(&database.User{
-		FirstName:  "Ivan",
-		Surname:    "Ivanov",
-		Password:   "123456",
-		Email:      "iva21@mail.ru",
-		ProfilePic: "/pic/1.jpg",
-	})
-}
-
-var testTableGetSuccess = [...]testRow{
-	{
-		inQuery:    "2",
-		bodyString: ``,
-		out:        `{"id":2,"first_name":"Ivan","surname":"Ivanov","email":"iva21@mail.ru","profile_pic":"/pic/1.jpg"}`,
-		status:     http.StatusOK,
-		name:       "find user",
-	},
-}
-
-var testTableGetFailure = [...]testRow{
-	{
-		inQuery:    "3",
-		bodyString: ``,
-		out:        errorBadInput + "\n",
-		status:     http.StatusNotFound,
-		name:       "out of index",
-	},
-	{
-		inQuery:    "a",
-		bodyString: ``,
-		out:        errorBadInput + "\n",
-		status:     http.StatusBadRequest,
-		name:       "no uinteger",
-	},
-	{
-		inQuery:    "",
-		bodyString: ``,
-		out:        errorBadInput + "\n",
-		status:     http.StatusBadRequest,
-		name:       "empty",
-	},
-}
-
-func TestGetBasicInfoSuccess(t *testing.T) {
-	fillMockDB()
-	for _, test := range testTableGetSuccess {
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
-		bodyReader := strings.NewReader(test.bodyString)
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
-		// Hack to try to fake gorilla/mux vars
-		vars := map[string]string{
-			"id": test.inQuery,
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	for i, test := range testTableRegisterSuccess {
+		mock := mock2.NewMockUserUsecase(ctrl)
+		var cl, ret domain.User
+		_ = json.Unmarshal([]byte(test.bodyString), &cl)
+		_ = json.Unmarshal([]byte(test.out), &ret)
+		handler := UserHandler{UserUsecase: mock}
+		if i == 0 {
+			mock.EXPECT().Register(&cl).Times(1).Return(ret, nil)
 		}
-		r = mux.SetURLVars(r, vars)
-		GetBasicInfo(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
-	}
-}
-
-func TestGetBasicInfoFailure(t *testing.T) {
-	fillMockDB()
-	apiPath := "/api/user/get/"
-	for _, test := range testTableGetFailure {
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+		if i == 3 {
+			mock.EXPECT().Register(&cl).Times(1).Return(domain.User{}, customErrors.ErrorBadInput)
+		}
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-		// Hack to try to fake gorilla/mux vars
-		vars := map[string]string{
-			"id": test.inQuery,
-		}
-		r = mux.SetURLVars(r, vars)
-		GetBasicInfo(w, r)
+		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
+		handler.Register(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
@@ -200,67 +110,83 @@ var testTableLoginFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"email": "raddom@mail.su","password": "123456"}`,
-		out:        errorBadCredentials + "\n",
+		out:        customErrors.ErrorBadCredentials.Error() + "\n",
 		status:     http.StatusUnauthorized,
 		name:       "user not in base",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru","password": "122456"}`,
-		out:        errorBadCredentials + "\n",
+		out:        customErrors.ErrorBadCredentials.Error() + "\n",
 		status:     http.StatusUnauthorized,
 		name:       "wrong pass",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"password": "122456"}`,
-		out:        errorBadInput + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "no email",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru"}`,
-		out:        errorBadInput + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "no pass",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"emal": "iva21@mail.ru","password": "123456"}`,
-		out:        errorBadInput + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "wrong json",
 	},
 }
 
 func TestLoginSuccess(t *testing.T) {
-	fillMockDB()
 	apiPath := "/api/user/login"
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	for _, test := range testTableLoginSuccess {
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+		mock := mock2.NewMockUserUsecase(ctrl)
+		var cl domain.UserToLogin
+		var ret domain.User
+		_ = json.Unmarshal([]byte(test.bodyString), &cl)
+		_ = json.Unmarshal([]byte(test.out), &ret)
+		handler := UserHandler{UserUsecase: mock}
+		mock.EXPECT().Login(&cl).Times(1).Return(ret, nil)
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-		Login(w, r)
+		handler.Login(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
 func TestLoginFailure(t *testing.T) {
-	fillMockDB()
 	apiPath := "/api/user/login"
-	for _, test := range testTableLoginFailure {
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	for i, test := range testTableLoginFailure {
+		mock := mock2.NewMockUserUsecase(ctrl)
+		var cl domain.UserToLogin
+		var ret domain.User
+		_ = json.Unmarshal([]byte(test.bodyString), &cl)
+		_ = json.Unmarshal([]byte(test.out), &ret)
+		handler := UserHandler{UserUsecase: mock}
+		if i <= 1 {
+			mock.EXPECT().Login(&cl).Times(1).Return(domain.User{}, customErrors.ErrorBadCredentials)
+		} else if i <= 4 {
+			mock.EXPECT().Login(&cl).Times(1).Return(domain.User{}, customErrors.ErrorBadInput)
+		}
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-		Login(w, r)
+		handler.Login(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
@@ -268,33 +194,42 @@ var testTableLogoutFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru","password": "123456"}`,
-		out:        errorBadInput + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusForbidden,
 		name:       "logout not logged in",
 	},
 }
 
 func TestLogoutFailure(t *testing.T) {
-	fillMockDB()
 	apiPath := "/api/user/logout"
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	for _, test := range testTableLogoutFailure {
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+		mock := mock2.NewMockUserUsecase(ctrl)
+		handler := UserHandler{UserUsecase: mock}
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-		Logout(w, r)
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
+		handler.Logout(w, r)
 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
 func TestLogoutSuccess(t *testing.T) {
-	fillMockDB()
+	ctrl := gomock.NewController(t)
+	test := testTableLoginSuccess[0]
+	mock := mock2.NewMockUserUsecase(ctrl)
+	var cl domain.UserToLogin
+	var ret domain.User
+	_ = json.Unmarshal([]byte(test.bodyString), &cl)
+	_ = json.Unmarshal([]byte(test.out), &ret)
+	handler := UserHandler{UserUsecase: mock}
+	mock.EXPECT().Login(&cl).Times(1).Return(ret, nil)
 	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	Login(w, r)
+	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
 
 	r = httptest.NewRequest("GET", "/api/user/logout", bodyReader)
@@ -303,17 +238,24 @@ func TestLogoutSuccess(t *testing.T) {
 		r.AddCookie(cookie)
 	}
 	w = httptest.NewRecorder()
-	Logout(w, r)
+	handler.Logout(w, r)
 	assert.Equal(t, http.StatusOK, w.Code, "Test: Logout OK")
-
 }
 
 func TestCheckAuthSuccess(t *testing.T) {
-	fillMockDB()
+	ctrl := gomock.NewController(t)
+	test := testTableLoginSuccess[0]
+	mock := mock2.NewMockUserUsecase(ctrl)
+	var cl domain.UserToLogin
+	var ret domain.User
+	_ = json.Unmarshal([]byte(test.bodyString), &cl)
+	_ = json.Unmarshal([]byte(test.out), &ret)
+	handler := UserHandler{UserUsecase: mock}
+	mock.EXPECT().Login(&cl).Times(1).Return(ret, nil)
 	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	Login(w, r)
+	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
 
 	r = httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
@@ -322,15 +264,18 @@ func TestCheckAuthSuccess(t *testing.T) {
 		r.AddCookie(cookie)
 	}
 	w = httptest.NewRecorder()
-	CheckAuth(w, r)
-	assert.Equal(t, http.StatusOK, w.Code, "Test: Logout OK")
+	mock.EXPECT().CheckAuth(uint64(2)).Return(ret, nil)
+	handler.CheckAuth(w, r)
+	assert.Equal(t, http.StatusOK, w.Code, "Test: CheckAuth ok")
 }
 
 func TestCheckAuthFailure(t *testing.T) {
-	fillMockDB()
+	ctrl := gomock.NewController(t)
+	mock := mock2.NewMockUserUsecase(ctrl)
+	handler := UserHandler{UserUsecase: mock}
 	bodyReader := strings.NewReader("")
 	r := httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
 	w := httptest.NewRecorder()
-	CheckAuth(w, r)
-	assert.Equal(t, http.StatusBadRequest, w.Code, "Test: Logout OK")
+	handler.CheckAuth(w, r)
+	assert.Equal(t, http.StatusBadRequest, w.Code, "Test: CheckAuth FL")
 }

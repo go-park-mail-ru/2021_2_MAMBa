@@ -2,9 +2,12 @@
  Kino4U
 
  ## Деплой
-
  
  https://film4u.club/
+
+## API
+
+https://app.swaggerhub.com/apis/MAMBa/Film4U-API
  
  
  ## Авторы
