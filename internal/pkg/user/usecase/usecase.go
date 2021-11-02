@@ -3,7 +3,6 @@ package usecase
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	userErrors "2021_2_MAMBa/internal/pkg/user"
-	"2021_2_MAMBa/internal/pkg/utils/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,8 +18,6 @@ func NewUserUsecase(u domain.UserRepository) domain.UserUsecase {
 
 func (uc userUsecase) GetBasicInfo(id uint64) (domain.User, error) {
 	user, err := uc.userRepo.GetUserById(id)
-	passwordByte, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	log.Info(string(passwordByte))
 	user.OmitPassword()
 	if err != nil {
 		return domain.User{}, userErrors.ErrorInternalServer
@@ -62,4 +59,36 @@ func (uc userUsecase) Login(u *domain.UserToLogin) (domain.User, error) {
 func (uc userUsecase) CheckAuth(id uint64) (domain.User, error) {
 	us := domain.User{ID: id}
 	return us, nil
+}
+
+func (uc userUsecase) GetProfileById(whoAskID, id uint64) (domain.Profile, error) {
+	us, err := uc.userRepo.GetProfileById(whoAskID, id)
+	if err != nil {
+		return domain.Profile{}, err
+	}
+	return us, nil
+}
+
+func (uc userUsecase) UpdateProfile(profile domain.Profile) (domain.Profile, error) {
+	us, err := uc.userRepo.UpdateProfile(profile)
+	if err != nil {
+		return domain.Profile{}, err
+	}
+	return us, nil
+}
+
+func (uc userUsecase) CreateSubscription(src, dst uint64) (domain.Profile, error) {
+	us, err := uc.userRepo.CreateSubscription(src, dst)
+	if err != nil {
+		return domain.Profile{}, err
+	}
+	return us, nil
+}
+
+func (uc userUsecase) LoadUserReviews(id uint64, skip int, limit int) (domain.FilmReviews, error) {
+	reviews, err := uc.userRepo.LoadUserReviews(id, skip, limit)
+	if err != nil {
+		return domain.FilmReviews{}, err
+	}
+	return reviews, nil
 }

@@ -12,9 +12,9 @@ type Profile struct {
 	Email         string    `json:"email,omitempty"`
 	Gender        string    `json:"gender,omitempty"`
 	RegisterDate  time.Time `json:"register_date,omitempty"`
-	SubCount      int       `json:"sub_count,omitempty"`
-	BookmarkCount int       `json:"bookmark_count,omitempty"`
-	AmSubscribed  bool      `json:"am_subscribed,omitempty"`
+	SubCount      int       `json:"sub_count"`
+	BookmarkCount int       `json:"bookmark_count"`
+	AmSubscribed  bool      `json:"am_subscribed"`
 }
 
 type User struct {
@@ -44,6 +44,10 @@ type UserRepository interface {
 }
 
 type UserUsecase interface {
+	GetProfileById(whoAskID, id uint64) (Profile, error)
+	UpdateProfile(profile Profile) (Profile, error)
+	CreateSubscription(src, dst uint64) (Profile, error)
+	LoadUserReviews(id uint64, skip int, limit int) (FilmReviews, error)
 	GetBasicInfo(id uint64) (User, error)
 	Register(u *User) (User, error)
 	Login(u *UserToLogin) (User, error)

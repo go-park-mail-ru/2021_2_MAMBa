@@ -25,7 +25,7 @@ const (
 	queryAddUser              = "INSERT INTO Profile(first_name, surname, email, password, picture_url, register_date) VALUES ($1, $2, $3, $4, $5, current_timestamp) RETURNING User_ID"
 	queryCountBookmarksById   = "SELECT COUNT(*) FROM bookmark WHERE user_id = $1"
 	queryCountSubscribersById = "SELECT COUNT(*) FROM subscription WHERE author_id = $1"
-	queryCheckSubscription    = "SELECT COUNT(1) FROM bookmark WHERE subscriber_id = $1 AND author_id = $2;"
+	queryCheckSubscription    = "SELECT COUNT(1) FROM subscription WHERE subscriber_id = $1 AND author_id = $2;"
 	queryUpdProfile           = "UPDATE Profile SET first_name = $2, surname = $3, picture_url = $4, email = $5, gender = $6 WHERE user_id = $1"
 	querySubscribe            = "INSERT INTO subscription VALUES ($1, $2) ON CONFLICT DO NOTHING"
 	queryGetAuthorName        = "SELECT first_name, surname, picture_url FROM profile WHERE user_id = $1"
@@ -143,7 +143,7 @@ func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 		return false, err
 	}
 
-	count := int(binary.BigEndian.Uint32(result[0][0]))
+	var count = int(binary.BigEndian.Uint32(result[0][0]))
 	if count == 0 {
 		return false, nil
 	} else if count == 1 {
