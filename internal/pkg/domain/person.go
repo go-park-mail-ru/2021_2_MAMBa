@@ -37,6 +37,7 @@ type PersonRepository interface {
 	GetFilmsPopular(id uint64, skip int, limit int) (FilmList, error)
 }
 
+//go:generate mockgen -destination=../person/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain PersonUsecase
 type PersonUsecase interface {
 	GetPerson(id uint64) (PersonPage, error)
 	GetFilms(id uint64, skip int, limit int) (FilmList, error)

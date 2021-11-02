@@ -6,6 +6,4 @@ CREATE DATABASE Film4U
     WITH
     OWNER = dev
     ENCODING = 'UTF8'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1;
 

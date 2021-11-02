@@ -22,7 +22,7 @@ type ReviewRepository interface {
 	PostReview(review Review) (uint64, error)
 	LoadReviewsExcept(id uint64, film_id uint64, skip int, limit int) (FilmReviews, error)
 }
-
+//go:generate mockgen -destination=../reviews/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain ReviewUsecase
 type ReviewUsecase interface {
 	GetReview(id uint64) (Review, error)
 	PostReview(review Review) (Review, error)

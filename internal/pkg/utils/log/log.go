@@ -23,6 +23,7 @@ func init() {
 		if err != nil {
 			fmt.Println("Switched logging to Stdout because of log file open error")
 			SetOutput(os.Stdout)
+			return
 		}
 		SetOutput(outputFile)
 	}

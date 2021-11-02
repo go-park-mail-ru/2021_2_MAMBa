@@ -37,7 +37,7 @@ func (uc *FilmUsecase) GetFilm(id uint64, skipReviews int, limitReviews int, ski
 func (uc *FilmUsecase) PostRating (id uint64, authorId uint64, rating float64) (float64, error) {
 	rating, err := uc.FilmRepo.PostRating(id, authorId, rating)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	return rating, nil
 }

@@ -43,7 +43,7 @@ type UserRepository interface {
 	AddUser(user *User) (uint64, error)
 	UpdateAvatar(id uint64, url string) (Profile, error)
 }
-
+//go:generate mockgen -destination=../user/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain UserUsecase
 type UserUsecase interface {
 	GetProfileById(whoAskID, id uint64) (Profile, error)
 	UpdateProfile(profile Profile) (Profile, error)

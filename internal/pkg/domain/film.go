@@ -66,7 +66,7 @@ type FilmRepository interface {
 	PostRating (id uint64, authorId uint64, rating float64) (float64, error)
 	GetMyReview (id uint64, authorId uint64) (Review, error)
 }
-
+//go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
 type FilmUsecase interface {
 	GetFilm(id uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (FilmPageInfo, error)
 	PostRating(id uint64, authorId uint64, rating float64) (float64, error)

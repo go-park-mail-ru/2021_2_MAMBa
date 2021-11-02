@@ -2,225 +2,175 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/film"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/sessions"
+	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
+	"errors"
 	"net/http"
-	"strconv"
+)
+
+const (
+	defaultLimit = 10
+	defaultSkip = 0
 )
 
 func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 	var err error
 	// default
-	id, limitReview, skipReview, limitRecom, skipRecom := 0, 10, 0, 10, 0
-	idString, isIn := r.URL.Query()["id"]
-	if isIn {
-		id, err = strconv.Atoi(idString[0])
-		if err != nil || id < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	skipString, isIn := r.URL.Query()["skip_reviews"]
-	if isIn {
-		skipReview, err = strconv.Atoi(skipString[0])
-		if err != nil || skipReview < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	skipReview, err := queryChecker.CheckIsIn(w,r, "skip_reviews", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	limitString, isIn := r.URL.Query()["limit_reviews"]
-	if isIn {
-		limitReview, err = strconv.Atoi(limitString[0])
-		if err != nil || limitReview <= 0 {
-			http.Error(w, film.ErrLimitMsg, http.StatusBadRequest)
-			return
-		}
+	limitReview, err := queryChecker.CheckIsIn(w, r, "limit_reviews", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		return
 	}
-	skipString, isIn = r.URL.Query()["skip_recommnd"]
-	if isIn {
-		skipRecom, err = strconv.Atoi(skipString[0])
-		if err != nil || skipRecom < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	skipRecom, err := queryChecker.CheckIsIn(w,r, "skip_recommend", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	limitString, isIn = r.URL.Query()["limit_recommend"]
-	if isIn {
-		limitRecom, err = strconv.Atoi(limitString[0])
-		if err != nil || limitRecom <= 0 {
-			http.Error(w, film.ErrLimitMsg, http.StatusBadRequest)
-			return
-		}
+	limitRecom, err := queryChecker.CheckIsIn(w, r, "limit_recommend", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		return
 	}
 
 	filmList, err := handler.FilmUsecase.GetFilm(uint64(id),skipReview,limitReview,skipRecom,limitRecom)
-	if err == film.ErrorSkip {
-		http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
+	if err == customErrors.ErrorSkip {
+		http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 		return
 	}
 	if err != nil {
-		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(filmList)
 	if err != nil {
-		http.Error(w, film.ErrEncMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
 }
 
 func (handler *FilmHandler) PostRating (w http.ResponseWriter, r *http.Request) {
-	var id uint64
-	var rating float64
 	authId, err := sessions.CheckSession(r)
 	if err != nil {
-		http.Error(w, film.ErrDBMsg, http.StatusBadRequest)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusBadRequest)
 		return
 	}
-	rating = -1
-	idString, isIn := r.URL.Query()["id"]
-	if isIn {
-		id, err = strconv.ParseUint(idString[0], 10, 64)
-		if err != nil || id <= 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	ratingString, isIn := r.URL.Query()["rating"]
-	if isIn {
-		rating, err = strconv.ParseFloat(ratingString[0], 64)
-		if err != nil || rating < 0 {
-			http.Error(w, film.ErrEncMsg, http.StatusBadRequest)
-			return
-		}
+	rating, err := queryChecker.CheckIsInFloat64(w, r, "rating", 0, errors.New(customErrors.ErrEncMsg))
+	if err != nil {
+		return
 	}
 
 	newRating, err := handler.FilmUsecase.PostRating(id, authId, rating)
 	if err != nil {
-		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(domain.NewRate{Rating: newRating})
 	if err != nil {
-		http.Error(w, film.ErrEncMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
 }
 
 func (handler *FilmHandler) LoadMyRv (w http.ResponseWriter, r *http.Request) {
-	var id uint64
 	authId, err := sessions.CheckSession(r)
 	if err != nil {
-		http.Error(w, film.ErrDBMsg, http.StatusBadRequest)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusBadRequest)
 		return
 	}
-	idString, isIn := r.URL.Query()["id"]
-	if isIn {
-		id, err = strconv.ParseUint(idString[0], 10, 64)
-		if err != nil || id <= 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
 
 	review, err := handler.FilmUsecase.LoadMyReview(id, authId)
-	if err == film.ErrorNoReviewForFilm {
-		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
+	if err == customErrors.ErrorNoReviewForFilm {
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	if err != nil {
-		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(review)
 	if err != nil {
-		http.Error(w, film.ErrEncMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
 }
 
 func (handler *FilmHandler) loadFilmReviews (w http.ResponseWriter, r *http.Request) {
-	limit, skip := 10, 0
 	var err error
-	var id uint64
-	idString, isIn := r.URL.Query()["id"]
-	if isIn {
-		id, err = strconv.ParseUint(idString[0], 10, 64)
-		if err != nil || id < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
-	}
-	skipString, isIn := r.URL.Query()["skip"]
-	if isIn {
-		skip, err = strconv.Atoi(skipString[0])
-		if err != nil || skip  < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
-	}
-	limitString, isIn := r.URL.Query()["limit"]
-	if isIn {
-		limit, err = strconv.Atoi(limitString[0])
-		if err != nil || limit <= 0 {
-			http.Error(w, film.ErrLimitMsg, http.StatusBadRequest)
-			return
-		}
-	}
-	reviews, err := handler.FilmUsecase.LoadFilmReviews(id, skip, limit)
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
-		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
+		return
+	}
+	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		return
+	}
+	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		return
+	}
+
+	reviews, err := handler.FilmUsecase.LoadFilmReviews(id, skip, limit)
+	if err == customErrors.ErrorSkip {
+		http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
+		return
+	}
+	if err != nil {
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(reviews)
 	if err != nil {
-		http.Error(w, film.ErrEncMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
 }
 
 func (handler *FilmHandler) loadFilmRecommendations (w http.ResponseWriter, r *http.Request) {
-	limit, skip := 10, 0
 	var err error
-	var id uint64
-	idString, isIn := r.URL.Query()["id"]
-	if isIn {
-		id, err = strconv.ParseUint(idString[0], 10, 64)
-		if err != nil || id < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	skipString, isIn := r.URL.Query()["skip"]
-	if isIn {
-		skip, err = strconv.Atoi(skipString[0])
-		if err != nil || skip  < 0 {
-			http.Error(w, film.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	limitString, isIn := r.URL.Query()["limit"]
-	if isIn {
-		limit, err = strconv.Atoi(limitString[0])
-		if err != nil || limit <= 0 {
-			http.Error(w, film.ErrLimitMsg, http.StatusBadRequest)
-			return
-		}
+	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		return
 	}
 	recommendations, err := handler.FilmUsecase.LoadFilmRecommendations(id, skip, limit)
+	if err == customErrors.ErrorSkip {
+		http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
-		http.Error(w, film.ErrDBMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(recommendations)
 	if err != nil {
-		http.Error(w, film.ErrEncMsg, http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
 }
