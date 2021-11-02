@@ -83,8 +83,6 @@ func (ur *dbUserRepository) AddUser(us *domain.User) (uint64, error) {
 	return us.ID, nil
 }
 
-// here
-
 func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile, error) {
 	result, err := ur.dbm.Query(queryGetById, id)
 	if err != nil {
@@ -131,10 +129,14 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 	return found, nil
 }
 
+
 func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 	result, err := ur.dbm.Query(queryCheckSubscription, src, dst)
 	if err != nil {
 		return false, err
+	}
+	if len(result) == 0 {
+		return false, nil
 	}
 
 	count := cast.ToUint64(result[0][0])
@@ -147,8 +149,10 @@ func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 	}
 }
 
+//
+
 func (ur *dbUserRepository) UpdateProfile(profile domain.Profile) (domain.Profile, error) {
-	_, err := ur.dbm.Query(queryUpdProfile, profile.ID, profile.FirstName,
+	err := ur.dbm.Execute(queryUpdProfile, profile.ID, profile.FirstName,
 		profile.Surname, profile.PictureUrl, profile.Email, profile.Gender)
 	if err != nil {
 		return domain.Profile{}, err
@@ -183,6 +187,8 @@ func (ur *dbUserRepository) CreateSubscription(src, dst uint64) (domain.Profile,
 	}
 	return updated, err
 }
+
+//
 
 func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (domain.FilmReviews, error) {
 	result, err := ur.dbm.Query(queryCountFilmReviews, id)
