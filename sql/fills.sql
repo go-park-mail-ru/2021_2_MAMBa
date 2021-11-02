@@ -171,21 +171,3 @@ INSERT INTO recommended VALUES
     (7, 8),
     (8, 6),
     (8, 7);
-           /*
-SELECT film.*, p.person_id,p.name_en,p.name_rus,p.picture_url,p.career, p1.person_id,p1.name_en,p1.name_rus,p1.picture_url,p1.career FROM film JOIN person p on film.director = p.person_id JOIN person p1 on film.screenwriter = p1.person_id WHERE film_id = 7
-SELECT country.country_name FROM country JOIN countryproduction c ON country.country_id = c.country_id WHERE c.Film_ID = 7;
-SELECT genre.* FROM genre JOIN filmgenres f on genre.genre_id = f.genre_id WHERE f.film_id = 7;
-SELECT p.person_id,p.name_en,p.name_rus,p.picture_url,p.career  FROM person p JOIN filmcast f on p.person_id = f.person_id WHERE f.film_id = 7;
-SELECT * FROM review
-SELECT COUNT(*) FROM Review WHERE Film_ID = 6   ;
-SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 6 LIMIT 10 OFFSET 0
-SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = 7
-SELECT * FROM review where film_id = 2                           ;
-SELECT AVG(stars) FROM review WHERE film_id =4 AND (NOT type = 0);
-
-SELECT review.* FROM review JOIN  WHERE film_id = 1 AND author_id = 1;
-            */
-
-SELECT review.*, p.first_name, p.surname FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10 OFFSET 0
-SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = 8 AND (NOT type = 0) LIMIT 10;
-select * from review
