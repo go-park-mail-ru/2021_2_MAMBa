@@ -92,3 +92,11 @@ func (uc userUsecase) LoadUserReviews(id uint64, skip int, limit int) (domain.Fi
 	}
 	return reviews, nil
 }
+
+func (uc userUsecase) UpdateAvatar(clientID uint64, url string) (domain.Profile, error) {
+	us, err := uc.userRepo.UpdateAvatar(clientID, url)
+	if err != nil {
+		return domain.Profile{}, err
+	}
+	return us, nil
+}

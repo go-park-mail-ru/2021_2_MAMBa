@@ -2,11 +2,11 @@ package domain
 
 import "time"
 
-const BasePicture = "/pic/1.jpg"
+const BasePicture = "/static/media/img/users/base.jpg"
 
 type Profile struct {
-	ID        uint64 `json:"id"`
-	FirstName string `json:"first_name,omitempty"`
+	ID            uint64    `json:"id"`
+	FirstName     string    `json:"first_name,omitempty"`
 	Surname       string    `json:"surname,omitempty"`
 	PictureUrl    string    `json:"picture_url,omitempty"`
 	Email         string    `json:"email,omitempty"`
@@ -41,6 +41,7 @@ type UserRepository interface {
 	GetUserById(id uint64) (User, error)
 	GetUserByEmail(email string) (User, error)
 	AddUser(user *User) (uint64, error)
+	UpdateAvatar(id uint64, url string) (Profile, error)
 }
 
 type UserUsecase interface {
@@ -52,6 +53,7 @@ type UserUsecase interface {
 	Register(u *User) (User, error)
 	Login(u *UserToLogin) (User, error)
 	CheckAuth(id uint64) (User, error)
+	UpdateAvatar(id uint64, url string) (Profile, error)
 }
 
 func (us *User) OmitPassword() {

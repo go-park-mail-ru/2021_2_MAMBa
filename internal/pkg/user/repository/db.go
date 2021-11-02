@@ -20,18 +20,19 @@ func NewUserRepository(manager *database.DBManager) domain.UserRepository {
 }
 
 const (
-	queryGetById              = "SELECT * FROM Profile WHERE User_ID = $1"
-	queryGetByEmail           = "SELECT * FROM Profile WHERE email = $1"
-	queryAddUser              = "INSERT INTO Profile(first_name, surname, email, password, picture_url, register_date) VALUES ($1, $2, $3, $4, $5, current_timestamp) RETURNING User_ID"
+	queryGetById              = "SELECT * FROM profile WHERE user_ID = $1"
+	queryGetByEmail           = "SELECT * FROM profile WHERE email = $1"
+	queryAddUser              = "INSERT INTO profile(first_name, surname, email, password, picture_url, register_date) VALUES ($1, $2, $3, $4, $5, current_timestamp) RETURNING user_ID"
 	queryCountBookmarksById   = "SELECT COUNT(*) FROM bookmark WHERE user_id = $1"
 	queryCountSubscribersById = "SELECT COUNT(*) FROM subscription WHERE author_id = $1"
 	queryCheckSubscription    = "SELECT COUNT(1) FROM subscription WHERE subscriber_id = $1 AND author_id = $2;"
-	queryUpdProfile           = "UPDATE Profile SET first_name = $2, surname = $3, picture_url = $4, email = $5, gender = $6 WHERE user_id = $1"
+	queryUpdProfile           = "UPDATE profile SET first_name = $2, surname = $3, picture_url = $4, email = $5, gender = $6 WHERE user_id = $1"
 	querySubscribe            = "INSERT INTO subscription VALUES ($1, $2) ON CONFLICT DO NOTHING"
 	queryGetAuthorName        = "SELECT first_name, surname, picture_url FROM profile WHERE user_id = $1"
-	queryGetFilmShort         = "SELECT title, title_original, poster_url FROM FILM WHERE Film_ID = $1"
-	queryCountFilmReviews     = "SELECT COUNT(*) FROM Review WHERE author_id = $1 AND (NOT type = 0)"
-	queryGetReviewByUserID    = "SELECT * FROM review WHERE author_id = $1 AND (NOT type = 0) LIMIT $2 OFFSET $3"
+	queryGetFilmShort         = "SELECT title, title_original, poster_url FROM FILM WHERE film_ID = $1"
+	queryCountFilmReviews     = "SELECT COUNT(*) FROM review WHERE author_id = $1"
+	queryGetReviewByUserID    = "SELECT * FROM review WHERE author_id = $1 LIMIT $2 OFFSET $3"
+	queryUpdAvatarByUsID      = "UPDATE profile SET picture_url = $2 WHERE user_id = $1"
 )
 
 func (ur *dbUserRepository) GetUserByEmail(email string) (domain.User, error) {
@@ -130,8 +131,8 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 		Email:         string(rawRow[3]),
 		Gender:        string(rawRow[6]),
 		RegisterDate:  timeBuffer.Time,
-		SubCount:      int(binary.BigEndian.Uint32(resultSubscribers[0][0])),
-		BookmarkCount: int(binary.BigEndian.Uint32(resultBookmarks[0][0])),
+		SubCount:      int(binary.BigEndian.Uint64(resultSubscribers[0][0])),
+		BookmarkCount: int(binary.BigEndian.Uint64(resultBookmarks[0][0])),
 		AmSubscribed:  amSubscribed,
 	}
 	return found, nil
@@ -143,7 +144,7 @@ func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 		return false, err
 	}
 
-	var count = int(binary.BigEndian.Uint32(result[0][0]))
+	count := binary.BigEndian.Uint64(result[0][0])
 	if count == 0 {
 		return false, nil
 	} else if count == 1 {
@@ -160,6 +161,18 @@ func (ur *dbUserRepository) UpdateProfile(profile domain.Profile) (domain.Profil
 		return domain.Profile{}, err
 	}
 	updated, err := ur.GetProfileById(profile.ID, profile.ID)
+	if err != nil {
+		return domain.Profile{}, err
+	}
+	return updated, err
+}
+
+func (ur *dbUserRepository) UpdateAvatar(clientID uint64, url string) (domain.Profile, error) {
+	_, err := ur.dbm.Query(queryUpdAvatarByUsID, clientID, url)
+	if err != nil {
+		return domain.Profile{}, err
+	}
+	updated, err := ur.GetProfileById(clientID, clientID)
 	if err != nil {
 		return domain.Profile{}, err
 	}
