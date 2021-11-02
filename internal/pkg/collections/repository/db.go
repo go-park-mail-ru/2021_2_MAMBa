@@ -4,7 +4,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"encoding/binary"
+	"2021_2_MAMBa/internal/pkg/utils/cast"
 )
 
 type dbCollectionsRepository struct {
@@ -21,13 +21,11 @@ const (
 )
 
 func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.Collections, error) {
-
 	result, err := cr.dbm.Query(queryCountCollections)
 	if err != nil {
 		return domain.Collections{}, customErrors.ErrorInternalServer
 	}
-	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
-	dbSize := int(dbSizeRaw)
+	dbSize := int(cast.ToUint64(result[0][0]))
 	if skip >= dbSize {
 		return domain.Collections{}, customErrors.ErrorSkip
 	}
@@ -38,9 +36,9 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 	previews := make([]domain.CollectionPreview, 0)
 	for i := range result {
 		previewBuffer := domain.CollectionPreview{
-			Id:         binary.BigEndian.Uint64(result[i][0]),
-			Title:      string(result[i][1]),
-			PictureUrl: string(result[i][2]),
+			Id:         cast.ToUint64(result[i][0]),
+			Title:      cast.ToString(result[i][1]),
+			PictureUrl: cast.ToString(result[i][2]),
 		}
 		previews = append(previews, previewBuffer)
 	}
