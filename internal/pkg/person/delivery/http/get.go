@@ -18,16 +18,19 @@ func (handler *PersonHandler) GetPerson (w http.ResponseWriter, r *http.Request)
 			http.Error(w, person.ErrSkipMsg, http.StatusBadRequest)
 			return
 		}
+	} else {
+		http.Error(w, person.ErrorBadInput.Error(), http.StatusBadRequest)
+		return
 	}
 	page, err := handler.PersonUsecase.GetPerson(id)
 	if err != nil {
-		http.Error(w, person.ErrSkipMsg, http.StatusInternalServerError)
+		http.Error(w, person.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(page)
 	if err != nil {
-		http.Error(w, person.ErrSkipMsg, http.StatusInternalServerError)
+		http.Error(w, person.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -61,6 +64,10 @@ func (handler *PersonHandler) GetPersonFilms (w http.ResponseWriter, r *http.Req
 		}
 	}
 	films, err := handler.PersonUsecase.GetFilms(id,skip, limit)
+	if err == person.ErrorSkip {
+		http.Error(w, person.ErrorSkip.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, person.ErrSkipMsg, http.StatusInternalServerError)
 		return

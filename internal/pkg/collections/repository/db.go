@@ -39,7 +39,7 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 	previews := make([]domain.CollectionPreview, 0)
 	for i := range result {
 		previewBuffer := domain.CollectionPreview{
-			Id:         uint(binary.BigEndian.Uint64(result[i][0])),
+			Id:         binary.BigEndian.Uint64(result[i][0]),
 			Title:      string(result[i][1]),
 			PictureUrl: string(result[i][2]),
 		}

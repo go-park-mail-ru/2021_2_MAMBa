@@ -3,7 +3,9 @@ package person
 import "errors"
 
 var (
-	ErrSkipMsg  = "incorrect skip"
+	ErrSkipMsg          = "incorrect skip"
+	ErrLimitMsg         = "incorrect limit"
+	ErrorSkip           = errors.New(ErrSkipMsg)
 	ErrorBadInput       = errors.New("error - bad input")
 	ErrorAlreadyIn      = errors.New("error - already in")
 	ErrorAlreadyExists  = errors.New("error - already exists")

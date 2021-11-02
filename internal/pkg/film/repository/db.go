@@ -130,7 +130,6 @@ func (fr *dbFilmRepository) GetFilm (id uint64) (domain.Film, error) {
 	film.Cast = bufferCast
 	return film, nil
 }
-
 func (fr *dbFilmRepository) GetFilmReviews (id uint64, skip int, limit int) (domain.FilmReviews, error) {
 	result, err := fr.dbm.Query(queryCountFilmReviews, id)
 	if err != nil {

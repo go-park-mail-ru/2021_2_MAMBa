@@ -113,78 +113,7 @@ package user
 // 	})
 // }
 //
-// var testTableGetSuccess = [...]testRow{
-// 	{
-// 		inQuery:    "2",
-// 		bodyString: ``,
-// 		out:        `{"id":2,"first_name":"Ivan","surname":"Ivanov","email":"iva21@mail.ru","profile_pic":"/pic/1.jpg"}`,
-// 		status:     http.StatusOK,
-// 		name:       "find user",
-// 	},
-// }
-//
-// var testTableGetFailure = [...]testRow{
-// 	{
-// 		inQuery:    "3",
-// 		bodyString: ``,
-// 		out:        errorBadInput + "\n",
-// 		status:     http.StatusNotFound,
-// 		name:       "out of index",
-// 	},
-// 	{
-// 		inQuery:    "a",
-// 		bodyString: ``,
-// 		out:        errorBadInput + "\n",
-// 		status:     http.StatusBadRequest,
-// 		name:       "no uinteger",
-// 	},
-// 	{
-// 		inQuery:    "",
-// 		bodyString: ``,
-// 		out:        errorBadInput + "\n",
-// 		status:     http.StatusBadRequest,
-// 		name:       "empty",
-// 	},
-// }
-//
-// func TestGetBasicInfoSuccess(t *testing.T) {
-// 	fillMockDB()
-// 	for _, test := range testTableGetSuccess {
-// 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
-// 		bodyReader := strings.NewReader(test.bodyString)
-// 		w := httptest.NewRecorder()
-// 		r := httptest.NewRequest("POST", "/api/user/get/"+test.inQuery, bodyReader)
-// 		// Hack to try to fake gorilla/mux vars
-// 		vars := map[string]string{
-// 			"id": test.inQuery,
-// 		}
-// 		r = mux.SetURLVars(r, vars)
-// 		GetBasicInfo(w, r)
-// 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-// 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-// 		fmt.Fprintf(os.Stdout, " done\n")
-// 	}
-// }
-//
-// func TestGetBasicInfoFailure(t *testing.T) {
-// 	fillMockDB()
-// 	apiPath := "/api/user/get/"
-// 	for _, test := range testTableGetFailure {
-// 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
-// 		bodyReader := strings.NewReader(test.bodyString)
-// 		w := httptest.NewRecorder()
-// 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-// 		// Hack to try to fake gorilla/mux vars
-// 		vars := map[string]string{
-// 			"id": test.inQuery,
-// 		}
-// 		r = mux.SetURLVars(r, vars)
-// 		GetBasicInfo(w, r)
-// 		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-// 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-// 		fmt.Fprintf(os.Stdout, " done\n")
-// 	}
-// }
+
 //
 // var testTableLoginSuccess = [...]testRow{
 // 	{

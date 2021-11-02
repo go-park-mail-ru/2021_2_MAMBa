@@ -22,6 +22,10 @@ func (handler *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 	review, err := handler.ReiviewUsecase.GetReview(id)
+	if err == reviews.ErrorSkip {
+		http.Error(w, reviews.ErrSkipMsg, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, reviews.ErrDBMsg, http.StatusInternalServerError)
 		return
@@ -94,6 +98,10 @@ func (handler *ReviewHandler) LoadExcept (w http.ResponseWriter, r *http.Request
 		}
 	}
 	review, err := handler.ReiviewUsecase.LoadReviewsExcept(id, filmId, skip, limit)
+	if err == reviews.ErrorSkip {
+		http.Error(w, reviews.ErrSkipMsg, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, reviews.ErrDBMsg, http.StatusInternalServerError)
 		return

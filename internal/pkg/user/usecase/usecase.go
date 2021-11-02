@@ -38,6 +38,14 @@ func (uc userUsecase) Register(u *domain.User) (domain.User, error) {
 		return domain.User{}, userErrors.ErrorAlreadyExists
 	}
 
+	// соль пароль
+	passwordByte, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return domain.User{}, userErrors.ErrorInternalServer
+	}
+	u.Password = string(passwordByte)
+	u.ProfilePic = domain.BasePicture
+
 	_, err = uc.userRepo.AddUser(u)
 	if err != nil {
 		return domain.User{}, userErrors.ErrorInternalServer

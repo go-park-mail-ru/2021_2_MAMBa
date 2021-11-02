@@ -54,6 +54,14 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	us, err := handler.UserUsecase.Login(userForm)
+	if err == user.ErrorBadInput {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if err == user.ErrorBadCredentials {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

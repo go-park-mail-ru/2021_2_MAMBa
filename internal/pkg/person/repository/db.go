@@ -67,7 +67,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
-		return domain.FilmList{}, person.ErrorBadCredentials
+		return domain.FilmList{}, person.ErrorSkip
 	}
 
 	result, err = pr.dbm.Query(queryGetPersonFilms, id, limit, skip)
@@ -88,7 +88,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: false,
+		MoreAvaliable: skip + limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,
@@ -124,7 +124,7 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: false,
+		MoreAvaliable: skip + limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,
