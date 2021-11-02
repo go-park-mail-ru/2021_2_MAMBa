@@ -5,6 +5,7 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
+	"2021_2_MAMBa/internal/pkg/utils/xss"
 	"encoding/json"
 	"net/http"
 )
@@ -45,6 +46,8 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
+	xss.SanitizeReview(&reviewForm)
+
 	authId, err := sessions.CheckSession(r)
 	if err != nil {
 		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
