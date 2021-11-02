@@ -4,6 +4,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/sessions"
+	"2021_2_MAMBa/internal/pkg/utils/xss"
 	"encoding/json"
 	"net/http"
 )
@@ -16,6 +17,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
+	xss.SanitizeUser(userForm)
 
 	us, err := handler.UserUsecase.Register(userForm)
 	if err != nil {
