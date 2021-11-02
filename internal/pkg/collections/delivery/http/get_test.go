@@ -31,24 +31,24 @@ var testTableSuccess = [...]testRow{
 		out:     `{"collections_list":[{"id":1,"title":"Для ценителей Хогвартса","picture_url":"server/images/collections1.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":1}` + "\n",
 		status:  http.StatusOK,
 		name:    `limit works`,
-		skip: 0,
-		limit: 1,
+		skip:    0,
+		limit:   1,
 	},
 	{
 		inQuery: "skip=10&limit=1",
 		out:     `{"collections_list":[{"id":11,"title":"Про петлю времени","picture_url":"server/images/collections11.png"}],"more_available":true,"collection_total":12,"current_sort":"","current_limit":1,"current_skip":11}` + "\n",
 		status:  http.StatusOK,
 		name:    `skip works`,
-		skip: 10,
-		limit: 1,
+		skip:    10,
+		limit:   1,
 	},
 	{
 		inQuery: "skip=11&limit=10",
 		out:     `{"collections_list":[{"id":12,"title":"Классика на века","picture_url":"server/images/collections12.jpg"}],"more_available":false,"collection_total":12,"current_sort":"","current_limit":10,"current_skip":21}` + "\n",
 		status:  http.StatusOK,
 		name:    `does not overflow`,
-		skip: 11,
-		limit: 10,
+		skip:    11,
+		limit:   10,
 	},
 }
 var testTableFailure = [...]testRow{
@@ -57,27 +57,26 @@ var testTableFailure = [...]testRow{
 		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
-		skip: -1,
-		limit: 10,
+		skip:    -1,
+		limit:   10,
 	},
 	{
 		inQuery: "skip=11&limit=-2",
 		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
-		skip: 11,
-		limit: -2,
+		skip:    11,
+		limit:   -2,
 	},
 	{
 		inQuery: "skip=14&limit=1",
 		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
-		skip: 14,
-		limit: 1,
+		skip:    14,
+		limit:   1,
 	},
 }
-
 
 func TestGetCollectionSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)

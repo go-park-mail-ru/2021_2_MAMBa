@@ -154,7 +154,7 @@ func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Reque
 	skipString, isIn := r.URL.Query()["skip"]
 	if isIn {
 		skip, err = strconv.Atoi(skipString[0])
-		if err != nil || skip  < 0 {
+		if err != nil || skip < 0 {
 			http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 			return
 		}

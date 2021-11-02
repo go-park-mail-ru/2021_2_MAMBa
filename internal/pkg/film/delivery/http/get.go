@@ -12,7 +12,7 @@ import (
 
 const (
 	defaultLimit = 10
-	defaultSkip = 0
+	defaultSkip  = 0
 )
 
 func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +22,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	skipReview, err := queryChecker.CheckIsIn(w,r, "skip_reviews", defaultSkip, customErrors.ErrorSkip)
+	skipReview, err := queryChecker.CheckIsIn(w, r, "skip_reviews", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
@@ -30,7 +30,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	skipRecom, err := queryChecker.CheckIsIn(w,r, "skip_recommend", defaultSkip, customErrors.ErrorSkip)
+	skipRecom, err := queryChecker.CheckIsIn(w, r, "skip_recommend", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
@@ -39,7 +39,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filmList, err := handler.FilmUsecase.GetFilm(uint64(id),skipReview,limitReview,skipRecom,limitRecom)
+	filmList, err := handler.FilmUsecase.GetFilm(uint64(id), skipReview, limitReview, skipRecom, limitRecom)
 	if err == customErrors.ErrorSkip {
 		http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 		return
@@ -56,7 +56,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *FilmHandler) PostRating (w http.ResponseWriter, r *http.Request) {
+func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 	authId, err := sessions.CheckSession(r)
 	if err != nil {
 		http.Error(w, customErrors.ErrDBMsg, http.StatusBadRequest)
@@ -84,7 +84,7 @@ func (handler *FilmHandler) PostRating (w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (handler *FilmHandler) LoadMyRv (w http.ResponseWriter, r *http.Request) {
+func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
 	authId, err := sessions.CheckSession(r)
 	if err != nil {
 		http.Error(w, customErrors.ErrDBMsg, http.StatusBadRequest)
@@ -112,13 +112,13 @@ func (handler *FilmHandler) LoadMyRv (w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *FilmHandler) loadFilmReviews (w http.ResponseWriter, r *http.Request) {
+func (handler *FilmHandler) loadFilmReviews(w http.ResponseWriter, r *http.Request) {
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
-	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
@@ -144,13 +144,13 @@ func (handler *FilmHandler) loadFilmReviews (w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func (handler *FilmHandler) loadFilmRecommendations (w http.ResponseWriter, r *http.Request) {
+func (handler *FilmHandler) loadFilmRecommendations(w http.ResponseWriter, r *http.Request) {
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
-	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}
@@ -174,4 +174,3 @@ func (handler *FilmHandler) loadFilmRecommendations (w http.ResponseWriter, r *h
 		return
 	}
 }
-

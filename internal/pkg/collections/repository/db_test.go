@@ -42,7 +42,7 @@ func TestGetSuccess(t *testing.T) {
 	repository := NewCollectionsRepository(mdb)
 	defer pool.Close()
 	mockCollections := domain.Collections{
-		CollArray:       []domain.CollectionPreview{{
+		CollArray: []domain.CollectionPreview{{
 			Id:         1,
 			Title:      "example",
 			PictureUrl: "/111/a.webp",
@@ -59,18 +59,16 @@ func TestGetSuccess(t *testing.T) {
 	idByte := make([]uint8, 8)
 	binary.BigEndian.PutUint64(idByte, mockCollections.CollArray[0].Id)
 	rowsCount := pgxmock.NewRows([]string{"count"}).AddRow(countByte)
-	rowsColl := pgxmock.NewRows([]string{"id","name","url"}).AddRow(idByte, []uint8(mockCollections.CollArray[0].Title), []uint8(mockCollections.CollArray[0].PictureUrl))
+	rowsColl := pgxmock.NewRows([]string{"id", "name", "url"}).AddRow(idByte, []uint8(mockCollections.CollArray[0].Title), []uint8(mockCollections.CollArray[0].PictureUrl))
 
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryCountCollections)).WithArgs().WillReturnRows(rowsCount)
 	pool.ExpectCommit()
 	pool.ExpectBegin()
-	pool.ExpectQuery(regexp.QuoteMeta(queryGetCollections)).WithArgs(10,0).WillReturnRows(rowsColl)
+	pool.ExpectQuery(regexp.QuoteMeta(queryGetCollections)).WithArgs(10, 0).WillReturnRows(rowsColl)
 	pool.ExpectCommit()
 
 	actual, err := repository.GetCollections(0, 10)
 	assert.NoError(t, err)
 	assert.Equal(t, mockCollections, actual)
 }
-
-

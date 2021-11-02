@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	dbUser="dev"
-	dbPassword="1234"
-	dbHost="localhost"
-	dbPport=5432
-	dbName="film4u"
+	dbUser     = "dev"
+	dbPassword = "1234"
+	dbHost     = "localhost"
+	dbPport    = 5432
+	dbName     = "film4u"
 )
 
 type ConnectionPool interface {
@@ -26,7 +26,7 @@ type DBManager struct {
 }
 
 func Connect() *DBManager {
-	connString := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s", dbUser,dbPassword, dbHost, dbPport, dbName)
+	connString := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s", dbUser, dbPassword, dbHost, dbPport, dbName)
 	pool, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
 		mylog.Warn("Postgres error")

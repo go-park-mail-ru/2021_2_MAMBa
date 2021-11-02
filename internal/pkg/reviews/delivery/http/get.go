@@ -11,7 +11,7 @@ import (
 
 const (
 	defaultLimit = 10
-	defaultSkip = 0
+	defaultSkip  = 0
 )
 
 func (handler *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +60,7 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (handler *ReviewHandler) LoadExcept (w http.ResponseWriter, r *http.Request) {
+func (handler *ReviewHandler) LoadExcept(w http.ResponseWriter, r *http.Request) {
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
@@ -70,7 +70,7 @@ func (handler *ReviewHandler) LoadExcept (w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return
 	}
-	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		return
 	}

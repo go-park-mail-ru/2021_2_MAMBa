@@ -4,7 +4,6 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 )
 
-
 type ReviewUsecase struct {
 	reviewRepo domain.ReviewRepository
 }
@@ -15,14 +14,14 @@ func NewReviewUsecase(r domain.ReviewRepository) domain.ReviewUsecase {
 	}
 }
 
-func (uc *ReviewUsecase) GetReview (id uint64) (domain.Review, error) {
+func (uc *ReviewUsecase) GetReview(id uint64) (domain.Review, error) {
 	review, err := uc.reviewRepo.GetReview(id)
 	if err != nil {
 		return domain.Review{}, err
 	}
 	return review, nil
 }
-func (uc *ReviewUsecase) PostReview (review domain.Review) (domain.Review, error) {
+func (uc *ReviewUsecase) PostReview(review domain.Review) (domain.Review, error) {
 	id, err := uc.reviewRepo.PostReview(review)
 	if err != nil {
 		return domain.Review{}, err

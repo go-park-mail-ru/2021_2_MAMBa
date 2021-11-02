@@ -92,13 +92,13 @@ func TestGetReviewFailure(t *testing.T) {
 	}
 }
 
-var testTablePostRatingSuccess = [...]testRow {
+var testTablePostRatingSuccess = [...]testRow{
 	{
-		inQuery: "",
-		out:     `{"id":7,"film_id":7,"film_title_ru":"Гарри Поттер и Тайная комната","film_title_original":"Harry Potter and the Chamber of Secrets","film_picture_url":"server/images/harry2.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"и так тоже","review_type":2,"stars":8,"date":"2021-10-31T00:00:00Z"}`+"\n",
+		inQuery:    "",
+		out:        `{"id":7,"film_id":7,"film_title_ru":"Гарри Поттер и Тайная комната","film_title_original":"Harry Potter and the Chamber of Secrets","film_picture_url":"server/images/harry2.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"и так тоже","review_type":2,"stars":8,"date":"2021-10-31T00:00:00Z"}` + "\n",
 		bodyString: `{"film_id":7,"review_text":"и так тоже","review_type":2}`,
-		status:  http.StatusOK,
-		name:    `normal`,
+		status:     http.StatusOK,
+		name:       `normal`,
 	},
 }
 

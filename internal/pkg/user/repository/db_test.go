@@ -133,7 +133,7 @@ func TestGetEmailFailure(t *testing.T) {
 	assert.Equal(t, domain.User{}, actual)
 }
 
-func TestAddSuccess (t *testing.T) {
+func TestAddSuccess(t *testing.T) {
 	mdb, pool, err := MockDatabase()
 	assert.Equal(t, nil, err, "create a mock")
 	repository := NewUserRepository(mdb)
