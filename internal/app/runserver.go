@@ -20,7 +20,6 @@ import (
 	userUsecase "2021_2_MAMBa/internal/pkg/user/usecase"
 	"2021_2_MAMBa/internal/pkg/utils/log"
 	"fmt"
-	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -30,14 +29,10 @@ func RunServer(addr string) {
 	api := r.PathPrefix("/api").Subrouter()
 
 	// middleware
-	csrfMiddleware := csrf.Protect(
-		[]byte("32-byte-long-auth-key"),
-		csrf.Path("/"),
-		csrf.Secure(false)) // TODO: Сделать Secure в продакшн
 	api.Use(middlewares.PanicRecovery)
 	api.Use(middlewares.Logger)
 	api.Use(middlewares.CORS)
-	api.Use(csrfMiddleware)
+	api.Use(middlewares.CSRF)
 
 	// database
 	db := database.Connect()
