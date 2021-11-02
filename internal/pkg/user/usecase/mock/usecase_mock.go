@@ -49,6 +49,21 @@ func (mr *MockUserUsecaseMockRecorder) CheckAuth(arg0 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAuth", reflect.TypeOf((*MockUserUsecase)(nil).CheckAuth), arg0)
 }
 
+// CreateSubscription mocks base method.
+func (m *MockUserUsecase) CreateSubscription(arg0, arg1 uint64) (domain.Profile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSubscription", arg0, arg1)
+	ret0, _ := ret[0].(domain.Profile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateSubscription indicates an expected call of CreateSubscription.
+func (mr *MockUserUsecaseMockRecorder) CreateSubscription(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSubscription", reflect.TypeOf((*MockUserUsecase)(nil).CreateSubscription), arg0, arg1)
+}
+
 // GetBasicInfo mocks base method.
 func (m *MockUserUsecase) GetBasicInfo(arg0 uint64) (domain.User, error) {
 	m.ctrl.T.Helper()
@@ -62,6 +77,36 @@ func (m *MockUserUsecase) GetBasicInfo(arg0 uint64) (domain.User, error) {
 func (mr *MockUserUsecaseMockRecorder) GetBasicInfo(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBasicInfo", reflect.TypeOf((*MockUserUsecase)(nil).GetBasicInfo), arg0)
+}
+
+// GetProfileById mocks base method.
+func (m *MockUserUsecase) GetProfileById(arg0, arg1 uint64) (domain.Profile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProfileById", arg0, arg1)
+	ret0, _ := ret[0].(domain.Profile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProfileById indicates an expected call of GetProfileById.
+func (mr *MockUserUsecaseMockRecorder) GetProfileById(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfileById", reflect.TypeOf((*MockUserUsecase)(nil).GetProfileById), arg0, arg1)
+}
+
+// LoadUserReviews mocks base method.
+func (m *MockUserUsecase) LoadUserReviews(arg0 uint64, arg1, arg2 int) (domain.FilmReviews, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadUserReviews", arg0, arg1, arg2)
+	ret0, _ := ret[0].(domain.FilmReviews)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadUserReviews indicates an expected call of LoadUserReviews.
+func (mr *MockUserUsecaseMockRecorder) LoadUserReviews(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadUserReviews", reflect.TypeOf((*MockUserUsecase)(nil).LoadUserReviews), arg0, arg1, arg2)
 }
 
 // Login mocks base method.
@@ -92,4 +137,34 @@ func (m *MockUserUsecase) Register(arg0 *domain.User) (domain.User, error) {
 func (mr *MockUserUsecaseMockRecorder) Register(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockUserUsecase)(nil).Register), arg0)
+}
+
+// UpdateAvatar mocks base method.
+func (m *MockUserUsecase) UpdateAvatar(arg0 uint64, arg1 string) (domain.Profile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAvatar", arg0, arg1)
+	ret0, _ := ret[0].(domain.Profile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateAvatar indicates an expected call of UpdateAvatar.
+func (mr *MockUserUsecaseMockRecorder) UpdateAvatar(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAvatar", reflect.TypeOf((*MockUserUsecase)(nil).UpdateAvatar), arg0, arg1)
+}
+
+// UpdateProfile mocks base method.
+func (m *MockUserUsecase) UpdateProfile(arg0 domain.Profile) (domain.Profile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProfile", arg0)
+	ret0, _ := ret[0].(domain.Profile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateProfile indicates an expected call of UpdateProfile.
+func (mr *MockUserUsecaseMockRecorder) UpdateProfile(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProfile", reflect.TypeOf((*MockUserUsecase)(nil).UpdateProfile), arg0)
 }

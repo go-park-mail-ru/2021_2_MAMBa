@@ -54,7 +54,7 @@ func TestGetSuccess(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetById)).WithArgs(mu.ID).WillReturnRows(rows)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetById(mu.ID)
+	actual, err := repository.GetUserById(mu.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, mu, actual)
 }
@@ -76,7 +76,7 @@ func TestGetFailure(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetById)).WithArgs(mu.ID).WillReturnRows(rows)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetById(mu.ID)
+	actual, err := repository.GetUserById(mu.ID)
 	assert.Equal(t, customErrors.ErrorNoUser, err)
 	assert.Equal(t, domain.User{}, actual)
 }
@@ -105,7 +105,7 @@ func TestGetEmailSuccess(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetByEmail)).WithArgs(mu.Email).WillReturnRows(rows)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetByEmail(mu.Email)
+	actual, err := repository.GetUserByEmail(mu.Email)
 	assert.NoError(t, err)
 	assert.Equal(t, mu, actual)
 }
@@ -128,7 +128,7 @@ func TestGetEmailFailure(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetByEmail)).WithArgs(mu.Email).WillReturnRows(rows)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetByEmail(mu.Email)
+	actual, err := repository.GetUserByEmail(mu.Email)
 	assert.Equal(t, customErrors.ErrorNoUser, err)
 	assert.Equal(t, domain.User{}, actual)
 }
