@@ -4,10 +4,16 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/sessions"
+	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+)
+
+const (
+	defaultLimit = 10
+	defaultSkip = 0
 )
 
 func (handler *UserHandler) GetBasicInfo(w http.ResponseWriter, r *http.Request) {
@@ -37,16 +43,9 @@ func (handler *UserHandler) GetBasicInfo(w http.ResponseWriter, r *http.Request)
 }
 
 func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
-
-	targetIDString, isIn := r.URL.Query()["id"]
-	var targetID uint64
-	var err error
-	if isIn {
-		targetID, err = strconv.ParseUint(targetIDString[0], 10, 64)
-		if err != nil {
-			http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	targetID, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
 	clientID, err := sessions.CheckSession(r)
 	if err != nil && err != sessions.ErrUserNotLoggedIn {
@@ -140,34 +139,24 @@ func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Re
 }
 
 func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Request) {
-	var id uint64
-	skip, limit := 0, 10
 	var err error
-	idString, isIn := r.URL.Query()["id"]
-	if isIn {
-		id, err = strconv.ParseUint(idString[0], 10, 64)
-		if err != nil || id <= 0 {
-			http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	skipString, isIn := r.URL.Query()["skip"]
-	if isIn {
-		skip, err = strconv.Atoi(skipString[0])
-		if err != nil || skip  < 0 {
-			http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
-			return
-		}
+	skip, err := queryChecker.CheckIsIn(w,r, "skip", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		return
 	}
-	limitString, isIn := r.URL.Query()["limit"]
-	if isIn {
-		limit, err = strconv.Atoi(limitString[0])
-		if err != nil || limit <= 0 {
-			http.Error(w, customErrors.ErrLimitMsg, http.StatusBadRequest)
-			return
-		}
+	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		return
 	}
 	review, err := handler.UserUsecase.LoadUserReviews(id, skip, limit)
+	if err == customErrors.ErrorSkip {
+		http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
 		return

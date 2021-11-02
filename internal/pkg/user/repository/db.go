@@ -5,9 +5,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
-	"encoding/binary"
 	"github.com/jackc/pgx/pgtype"
-	"math"
 )
 
 type dbUserRepository struct {
@@ -85,6 +83,8 @@ func (ur *dbUserRepository) AddUser(us *domain.User) (uint64, error) {
 	return us.ID, nil
 }
 
+// here
+
 func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile, error) {
 	result, err := ur.dbm.Query(queryGetById, id)
 	if err != nil {
@@ -95,7 +95,6 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 	}
 
 	rawRow := result[0]
-
 	timeBuffer := pgtype.Timestamp{}
 	err = timeBuffer.DecodeBinary(nil, result[0][7])
 	if err != nil {
@@ -118,15 +117,15 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 	}
 
 	found := domain.Profile{
-		ID:            binary.BigEndian.Uint64(rawRow[0]),
-		FirstName:     string(rawRow[1]),
-		Surname:       string(rawRow[2]),
-		PictureUrl:    string(rawRow[5]),
-		Email:         string(rawRow[3]),
-		Gender:        string(rawRow[6]),
+		ID:            cast.ToUint64(rawRow[0]),
+		FirstName:     cast.ToString(rawRow[1]),
+		Surname:       cast.ToString(rawRow[2]),
+		PictureUrl:    cast.ToString(rawRow[5]),
+		Email:         cast.ToString(rawRow[3]),
+		Gender:        cast.ToString(rawRow[6]),
 		RegisterDate:  timeBuffer.Time,
-		SubCount:      int(binary.BigEndian.Uint64(resultSubscribers[0][0])),
-		BookmarkCount: int(binary.BigEndian.Uint64(resultBookmarks[0][0])),
+		SubCount:      int(cast.ToUint64(resultSubscribers[0][0])),
+		BookmarkCount: int(cast.ToUint64(resultBookmarks[0][0])),
 		AmSubscribed:  amSubscribed,
 	}
 	return found, nil
@@ -138,7 +137,7 @@ func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 		return false, err
 	}
 
-	count := binary.BigEndian.Uint64(result[0][0])
+	count := cast.ToUint64(result[0][0])
 	if count == 0 {
 		return false, nil
 	} else if count == 1 {
@@ -190,7 +189,7 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 	if err != nil {
 		return domain.FilmReviews{}, customErrors.ErrorInternalServer
 	}
-	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
+	dbSizeRaw := cast.ToUint64(result[0][0])
 	dbSize := int(dbSizeRaw)
 	if skip >= dbSize {
 		return domain.FilmReviews{}, customErrors.ErrorSkip
@@ -210,28 +209,28 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 			return domain.FilmReviews{}, err
 		}
 		review := domain.Review{
-			Id:         binary.BigEndian.Uint64(result[i][0]),
-			FilmId:     binary.BigEndian.Uint64(result[i][1]),
-			ReviewText: string(result[i][3]),
-			ReviewType: int(binary.BigEndian.Uint32(result[i][4])),
-			Stars:      math.Float64frombits(binary.BigEndian.Uint64(result[i][5])),
+			Id:         cast.ToUint64(result[i][0]),
+			FilmId:     cast.ToUint64(result[i][1]),
+			ReviewText: cast.ToString(result[i][3]),
+			ReviewType: int(cast.ToUint32(result[i][4])),
+			Stars:      cast.ToFloat64(result[i][5]),
 			Date:       timeBuffer.Time,
 		}
-		filmId := binary.BigEndian.Uint64(result[i][1])
-		authId := binary.BigEndian.Uint64(result[i][2])
+		filmId := cast.ToUint64(result[i][1])
+		authId := cast.ToUint64(result[i][2])
 		result1, err := ur.dbm.Query(queryGetAuthorName, authId)
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
-		review.AuthorName = string(result1[0][0]) + " " + string(result1[0][1])
-		review.AuthorPictureUrl = string(result1[0][2])
+		review.AuthorName = cast.ToString(result1[0][0]) + " " + cast.ToString(result1[0][1])
+		review.AuthorPictureUrl = cast.ToString(result1[0][2])
 		result1, err = ur.dbm.Query(queryGetFilmShort, filmId)
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
-		review.FilmTitleRu = string(result1[0][0])
-		review.FilmTitleOriginal = string(result1[0][1])
-		review.FilmPictureUrl = string(result1[0][2])
+		review.FilmTitleRu = cast.ToString(result1[0][0])
+		review.FilmTitleOriginal = cast.ToString(result1[0][1])
+		review.FilmPictureUrl = cast.ToString(result1[0][2])
 		reviewList = append(reviewList, review)
 	}
 	reviews := domain.FilmReviews{
