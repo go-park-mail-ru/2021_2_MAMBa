@@ -2,7 +2,7 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/reviews"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/reviews/usecase/mock"
 	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
@@ -40,15 +40,15 @@ var testTableGetReviewSuccess = [...]testRow{
 var testTableGetReviewFailure = [...]testRow{
 	{
 		inQuery: "id=10",
-		out:     reviews.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `overshoot`,
 	},
 	{
 		inQuery: "id=-2",
-		out:     reviews.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
-		name:    `overshoot`,
+		name:    `neg skip`,
 	},
 }
 
@@ -80,7 +80,7 @@ func TestGetReviewFailure(t *testing.T) {
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockReviewUsecase(ctrl)
 		if i == 0 {
-			mock.EXPECT().GetReview(uint64(10)).Times(1).Return(domain.Review{}, reviews.ErrorSkip)
+			mock.EXPECT().GetReview(uint64(10)).Times(1).Return(domain.Review{}, customErrors.ErrorSkip)
 		}
 		handler := ReviewHandler{ReiviewUsecase: mock}
 		bodyReader := strings.NewReader("")
@@ -168,7 +168,7 @@ var testTableGetReviewsSuccess = [...]testRow{
 var testTableGetReviewsFailure = [...]testRow{
 	{
 		inQuery: "id=13&film_id=8&skip=-1&limit=10",
-		out:     reviews.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 		skip:    -1,
@@ -176,7 +176,7 @@ var testTableGetReviewsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=13&film_id=8&skip_reviews=11&limit=-2",
-		out:     reviews.ErrLimitMsg + "\n",
+		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 		skip:    11,
@@ -184,7 +184,7 @@ var testTableGetReviewsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=13&film_id=8&skip=14&limit=1",
-		out:     reviews.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 		skip:    14,
@@ -218,7 +218,7 @@ func TestGetReviewsFailure(t *testing.T) {
 	for i, test := range testTableGetReviewsFailure {
 		mock := mock2.NewMockReviewUsecase(ctrl)
 		if i == 2 {
-			mock.EXPECT().LoadReviewsExcept(uint64(13), uint64(8), test.skip, test.limit).Return(domain.FilmReviews{}, reviews.ErrorSkip)
+			mock.EXPECT().LoadReviewsExcept(uint64(13), uint64(8), test.skip, test.limit).Return(domain.FilmReviews{}, customErrors.ErrorSkip)
 		}
 		handler := ReviewHandler{ReiviewUsecase: mock}
 		bodyReader := strings.NewReader("")

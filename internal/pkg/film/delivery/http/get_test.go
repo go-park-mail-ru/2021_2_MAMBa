@@ -2,7 +2,7 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/film"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/film/usecase/mock"
 	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
@@ -55,7 +55,7 @@ var testTableGetFilmSuccess = [...]testRow{
 var testTableGetFilmFailure = [...]testRow{
 	{
 		inQuery: "id=8&skip_reviews=-1&limit_reviews=10",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 		skip:    -1,
@@ -65,7 +65,7 @@ var testTableGetFilmFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_reviews=11&limit_reviews=-2",
-		out:     film.ErrLimitMsg + "\n",
+		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 		skip:    11,
@@ -75,7 +75,7 @@ var testTableGetFilmFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_reviews=14&limit_reviews=1",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 		skip:    14,
@@ -85,7 +85,7 @@ var testTableGetFilmFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_recommend=-1&limit_recommend=10",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 		skip1:    -1,
@@ -95,7 +95,7 @@ var testTableGetFilmFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_recommend=11&limit_recommend=-2",
-		out:     film.ErrLimitMsg + "\n",
+		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 		skip1:    11,
@@ -105,7 +105,7 @@ var testTableGetFilmFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_recommend=14&limit_recommend=1",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 		skip1:    14,
@@ -145,7 +145,7 @@ func TestGetFilmFailure(t *testing.T) {
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockFilmUsecase(ctrl)
 		if (i == 2 || i == 5) {
-			mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, film.ErrorSkip)
+			mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, customErrors.ErrorSkip)
 		}
 		handler := FilmHandler{FilmUsecase: mock}
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)
@@ -282,7 +282,7 @@ var testTableGetReviewsSuccess = [...]testRow{
 var testTableGetReviewsFailure = [...]testRow{
 	{
 		inQuery: "id=8&skip=-1&limit=10",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 		skip:    -1,
@@ -290,7 +290,7 @@ var testTableGetReviewsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_reviews=11&limit=-2",
-		out:     film.ErrLimitMsg + "\n",
+		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 		skip:    11,
@@ -298,7 +298,7 @@ var testTableGetReviewsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip=14&limit=1",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 		skip:    14,
@@ -332,7 +332,7 @@ func TestGetReviewsFailure(t *testing.T) {
 	for i, test := range testTableGetReviewsFailure {
 		mock := mock2.NewMockFilmUsecase(ctrl)
 		if i == 2 {
-			mock.EXPECT().LoadFilmReviews(uint64(8), test.skip, test.limit).Return(domain.FilmReviews{}, film.ErrorSkip)
+			mock.EXPECT().LoadFilmReviews(uint64(8), test.skip, test.limit).Return(domain.FilmReviews{}, customErrors.ErrorSkip)
 		}
 		handler := FilmHandler{FilmUsecase: mock}
 		bodyReader := strings.NewReader("")
@@ -365,7 +365,7 @@ var testTableGetRecomSuccess = [...]testRow{
 var testTableGetRecomsFailure = [...]testRow{
 	{
 		inQuery: "id=8&skip=-1&limit=10",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 		skip:    -1,
@@ -373,7 +373,7 @@ var testTableGetRecomsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip_reviews=11&limit=-2",
-		out:     film.ErrLimitMsg + "\n",
+		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 		skip:    11,
@@ -381,7 +381,7 @@ var testTableGetRecomsFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=8&skip=14&limit=1",
-		out:     film.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 		skip:    14,
@@ -415,7 +415,7 @@ func TestGetRecomFailure(t *testing.T) {
 	for i, test := range testTableGetRecomsFailure {
 		mock := mock2.NewMockFilmUsecase(ctrl)
 		if i == 2 {
-			mock.EXPECT().LoadFilmRecommendations(uint64(8), test.skip, test.limit).Return(domain.FilmRecommendations{}, film.ErrorSkip)
+			mock.EXPECT().LoadFilmRecommendations(uint64(8), test.skip, test.limit).Return(domain.FilmRecommendations{}, customErrors.ErrorSkip)
 		}
 		handler := FilmHandler{FilmUsecase: mock}
 		bodyReader := strings.NewReader("")

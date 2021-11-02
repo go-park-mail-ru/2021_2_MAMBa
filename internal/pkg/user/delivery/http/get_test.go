@@ -2,7 +2,7 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/user"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
 	"github.com/golang/mock/gomock"
@@ -40,21 +40,21 @@ var testTableGetFailure = [...]testRow{
 	{
 		inQuery:    "3",
 		bodyString: ``,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusNotFound,
 		name:       "out of index",
 	},
 	{
 		inQuery:    "a",
 		bodyString: ``,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "no uinteger",
 	},
 	{
 		inQuery:    "",
 		bodyString: ``,
-		out:        user.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error() + "\n",
 		status:     http.StatusBadRequest,
 		name:       "empty",
 	},
@@ -92,7 +92,7 @@ func TestGetBasicInfoFailure(t *testing.T) {
 		_ = json.Unmarshal([]byte(test.out), &cl)
 		handler := UserHandler{UserUsecase: mock}
 		if i==0 {
-			mock.EXPECT().GetBasicInfo(uint64(3)).Times(1).Return(domain.User{}, user.ErrorNoUser)
+			mock.EXPECT().GetBasicInfo(uint64(3)).Times(1).Return(domain.User{}, customErrors.ErrorNoUser)
 		}
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()

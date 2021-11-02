@@ -1,14 +1,10 @@
 package repository
 
-
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/film"
-	"2021_2_MAMBa/internal/pkg/user"
-	"encoding/binary"
-	"github.com/jackc/pgx/pgtype"
-	"math"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"time"
 )
 
@@ -35,65 +31,63 @@ func (rr *dbReviewRepository) GetReview (id uint64) (domain.Review, error) {
 	if err != nil {
 		return domain.Review{}, err
 	}
-	timeBuffer := pgtype.Timestamp{}
-	err =timeBuffer.DecodeBinary(nil, result[0][6])
+	timestamp, err := cast.ToTime(result[0][6])
 	if err != nil {
 		return domain.Review{}, err
 	}
 	review := domain.Review{
-		Id:                binary.BigEndian.Uint64(result[0][0]),
-		FilmId:            binary.BigEndian.Uint64(result[0][1]),
-		ReviewText:        string(result[0][3]),
-		ReviewType:        int(binary.BigEndian.Uint32(result[0][4])),
-		Stars:             math.Float64frombits(binary.BigEndian.Uint64(result[0][5])),
-		Date:              timeBuffer.Time,
+		Id:                cast.ToUint64(result[0][0]),
+		FilmId:            cast.ToUint64(result[0][1]),
+		ReviewText:        cast.ToString(result[0][3]),
+		ReviewType:        int(cast.ToUint32(result[0][4])),
+		Stars:             cast.ToFloat64(result[0][5]),
+		Date:              timestamp,
 	}
-	filmId := binary.BigEndian.Uint64(result[0][1])
-	authId := binary.BigEndian.Uint64(result[0][2])
+	filmId := cast.ToUint64(result[0][1])
+	authId := cast.ToUint64(result[0][2])
 	result, err = rr.dbm.Query(queryGetAuthorName, authId)
 	if err != nil {
 		return domain.Review{}, err
 	}
-	review.AuthorName = string(result[0][0]) +" "+ string(result[0][1])
-	review.AuthorPictureUrl = string(result[0][2])
+	review.AuthorName = cast.ToString(result[0][0]) +" "+ cast.ToString(result[0][1])
+	review.AuthorPictureUrl = cast.ToString(result[0][2])
 	result, err = rr.dbm.Query(queryGetFilmShort, filmId)
 	if err != nil {
 		return domain.Review{}, err
 	}
-	review.FilmTitleRu = string(result[0][0])
-	review.FilmTitleOriginal = string(result[0][1])
-	review.FilmPictureUrl = string(result[0][2])
+	review.FilmTitleRu = cast.ToString(result[0][0])
+	review.FilmTitleOriginal = cast.ToString(result[0][1])
+	review.FilmPictureUrl = cast.ToString(result[0][2])
 	return review, nil
 }
 
 func (rr *dbReviewRepository)  PostReview (review domain.Review) (uint64, error) {
 	result, err := rr.dbm.Query(querySearchReview, review.FilmId, review.AuthorId)
 	if err != nil {
-		return 0, user.ErrorInternalServer
+		return 0, customErrors.ErrorInternalServer
 	}
 	if len(result) == 0 {
 		result, err = rr.dbm.Query(queryInsertReview, review.FilmId, review.AuthorId, review.ReviewText, review.ReviewType, 0, time.Now())
 		if err != nil {
-			return 0, user.ErrorInternalServer
+			return 0, customErrors.ErrorInternalServer
 		}
 	} else {
 		result, err = rr.dbm.Query(queryUpdateReview, review.ReviewText, review.ReviewType, review.FilmId, review.AuthorId)
 		if err != nil {
-			return 0, user.ErrorInternalServer
+			return 0, customErrors.ErrorInternalServer
 		}
 	}
-	return binary.BigEndian.Uint64(result[0][0]), nil
+	return cast.ToUint64(result[0][0]), nil
 }
 
 func (rr *dbReviewRepository)  LoadReviewsExcept(id uint64, film_id uint64, skip int, limit int) (domain.FilmReviews, error) {
 	result, err := rr.dbm.Query(queryCountFilmReviews, film_id)
 	if err != nil {
-		return domain.FilmReviews{}, user.ErrorInternalServer
+		return domain.FilmReviews{}, customErrors.ErrorInternalServer
 	}
-	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
-	dbSize := int(dbSizeRaw)
+	dbSize := int(cast.ToUint64(result[0][0]))
 	if skip >= dbSize {
-		return domain.FilmReviews{}, film.ErrorSkip
+		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 
 	moreAvailable := skip+limit < dbSize
@@ -104,34 +98,33 @@ func (rr *dbReviewRepository)  LoadReviewsExcept(id uint64, film_id uint64, skip
 	}
 	reviewList := make([]domain.Review, 0)
 	for i := range result{
-		timeBuffer := pgtype.Timestamp{}
-		err =timeBuffer.DecodeBinary(nil, result[i][6])
+		timestamp, err := cast.ToTime(result[i][6])
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
 		review := domain.Review{
-			Id:                binary.BigEndian.Uint64(result[i][0]),
-			FilmId:            binary.BigEndian.Uint64(result[i][1]),
-			ReviewText:        string(result[i][3]),
-			ReviewType:        int(binary.BigEndian.Uint32(result[i][4])),
-			Stars:             math.Float64frombits(binary.BigEndian.Uint64(result[i][5])),
-			Date:              timeBuffer.Time,
+			Id:                cast.ToUint64(result[i][0]),
+			FilmId:            cast.ToUint64(result[i][1]),
+			ReviewText:        cast.ToString(result[i][3]),
+			ReviewType:        int(cast.ToUint32(result[i][4])),
+			Stars:             cast.ToFloat64(result[i][5]),
+			Date:              timestamp,
 		}
-		filmId := binary.BigEndian.Uint64(result[i][1])
-		authId := binary.BigEndian.Uint64(result[i][2])
+		filmId := cast.ToUint64(result[i][1])
+		authId := cast.ToUint64(result[i][2])
 		result1, err := rr.dbm.Query(queryGetAuthorName, authId)
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
-		review.AuthorName = string(result1[0][0]) + " " + string(result1[0][1])
-		review.AuthorPictureUrl = string(result1[0][2])
+		review.AuthorName = cast.ToString(result1[0][0]) + " " + cast.ToString(result1[0][1])
+		review.AuthorPictureUrl = cast.ToString(result1[0][2])
 		result1, err = rr.dbm.Query(queryGetFilmShort, filmId)
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
-		review.FilmTitleRu = string(result1[0][0])
-		review.FilmTitleOriginal = string(result1[0][1])
-		review.FilmPictureUrl = string(result1[0][2])
+		review.FilmTitleRu = cast.ToString(result1[0][0])
+		review.FilmTitleOriginal = cast.ToString(result1[0][1])
+		review.FilmPictureUrl = cast.ToString(result1[0][2])
 		reviewList = append(reviewList, review)
 	}
 	reviews := domain.FilmReviews{

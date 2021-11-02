@@ -3,8 +3,8 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/user"
-	"encoding/binary"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	"2021_2_MAMBa/internal/pkg/utils/cast"
 )
 
 type dbUserRepository struct {
@@ -24,20 +24,20 @@ const (
 func (ur *dbUserRepository) GetByEmail(email string) (domain.User, error) {
 	result, err := ur.dbm.Query(queryGetByEmail, email)
 	if err != nil {
-		return domain.User{}, user.ErrorInternalServer
+		return domain.User{}, customErrors.ErrorInternalServer
 	}
 	if len(result) == 0 {
-		return domain.User{}, user.ErrorNoUser
+		return domain.User{}, customErrors.ErrorNoUser
 	}
 	raw := result[0]
 	found := domain.User{
-		ID:             binary.BigEndian.Uint64(raw[0]),
-		FirstName:      string(raw[1]),
-		Surname:        string(raw[2]),
-		Email:          string(raw[3]),
-		Password:       string(raw[4]),
+		ID:             cast.ToUint64(raw[0]),
+		FirstName:      cast.ToString(raw[1]),
+		Surname:        cast.ToString(raw[2]),
+		Email:          cast.ToString(raw[3]),
+		Password:       cast.ToString(raw[4]),
 		PasswordRepeat: "",
-		ProfilePic:     string(raw[5]),
+		ProfilePic:     cast.ToString(raw[5]),
 	}
 	return found, nil
 }
@@ -45,20 +45,20 @@ func (ur *dbUserRepository) GetByEmail(email string) (domain.User, error) {
 func (ur *dbUserRepository) GetById(id uint64) (domain.User, error) {
 	result, err := ur.dbm.Query(queryGetById, id)
 	if err != nil {
-		return domain.User{}, user.ErrorInternalServer
+		return domain.User{}, customErrors.ErrorInternalServer
 	}
 	if len(result) == 0 {
-		return domain.User{}, user.ErrorNoUser
+		return domain.User{}, customErrors.ErrorNoUser
 	}
 	raw := result[0]
 	found := domain.User{
-		ID:             binary.BigEndian.Uint64(raw[0]),
-		FirstName:      string(raw[1]),
-		Surname:        string(raw[2]),
-		Email:          string(raw[3]),
-		Password:       string(raw[4]),
+		ID:             cast.ToUint64(raw[0]),
+		FirstName:      cast.ToString(raw[1]),
+		Surname:        cast.ToString(raw[2]),
+		Email:          cast.ToString(raw[3]),
+		Password:       cast.ToString(raw[4]),
 		PasswordRepeat: "",
-		ProfilePic:     string(raw[5]),
+		ProfilePic:     cast.ToString(raw[5]),
 	}
 	return found, nil
 }
@@ -68,6 +68,6 @@ func (ur *dbUserRepository) AddUser(us *domain.User) (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
-	us.ID = binary.BigEndian.Uint64(result[0][0])
+	us.ID = cast.ToUint64(result[0][0])
 	return us.ID, nil
 }

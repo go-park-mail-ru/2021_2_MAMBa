@@ -1,9 +1,9 @@
 package http
 
 import (
-	"2021_2_MAMBa/internal/pkg/collections"
 	mock2 "2021_2_MAMBa/internal/pkg/collections/usecase/mock"
 	"2021_2_MAMBa/internal/pkg/domain"
+	"2021_2_MAMBa/internal/pkg/domain/errors"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/mock/gomock"
@@ -54,7 +54,7 @@ var testTableSuccess = [...]testRow{
 var testTableFailure = [...]testRow{
 	{
 		inQuery: "skip=-1&limit=10",
-		out:     collections.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative skip`,
 		skip: -1,
@@ -62,7 +62,7 @@ var testTableFailure = [...]testRow{
 	},
 	{
 		inQuery: "skip=11&limit=-2",
-		out:     collections.ErrLimitMsg + "\n",
+		out:     customErrors.ErrLimitMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `negative limit`,
 		skip: 11,
@@ -70,7 +70,7 @@ var testTableFailure = [...]testRow{
 	},
 	{
 		inQuery: "skip=14&limit=1",
-		out:     collections.ErrSkipMsg + "\n",
+		out:     customErrors.ErrSkipMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `skip overshoot`,
 		skip: 14,
@@ -109,7 +109,7 @@ func TestGetCollectionError(t *testing.T) {
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockCollectionsUsecase(ctrl)
 		if i == 2 {
-			mock.EXPECT().GetCollections(test.skip, test.limit).Times(1).Return(domain.Collections{}, collections.ErrorSkip)
+			mock.EXPECT().GetCollections(test.skip, test.limit).Times(1).Return(domain.Collections{}, customErrors.ErrorSkip)
 		}
 		handler := CollectionsHandler{CollectionsUsecase: mock}
 		fmt.Fprintf(os.Stdout, "Test:"+test.name)

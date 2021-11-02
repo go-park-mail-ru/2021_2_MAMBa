@@ -3,9 +3,8 @@ package repository
 import (
 	"2021_2_MAMBa/internal/pkg/database"
 	"2021_2_MAMBa/internal/pkg/domain"
-	"2021_2_MAMBa/internal/pkg/person"
-	"encoding/binary"
-	"github.com/jackc/pgx/pgtype"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"strings"
 )
 
@@ -29,34 +28,31 @@ func (pr *dbPersonRepository) GetPerson(id uint64) (domain.Person, error) {
 	if err != nil {
 		return domain.Person{}, err
 	}
-	intheight := int(binary.BigEndian.Uint32(result[0][5]))
-	height := float64(intheight)
+	height := float64(int(cast.ToUint32(result[0][5])))
 	person := domain.Person{
-		Id:           binary.BigEndian.Uint64(result[0][0]),
-		NameEn:       string(result[0][1]),
-		NameRus:      string(result[0][2]),
-		PictureUrl:   string(result[0][3]),
-		Career:       strings.Split(string(result[0][4]), ","),
+		Id:           cast.ToUint64(result[0][0]),
+		NameEn:       cast.ToString(result[0][1]),
+		NameRus:      cast.ToString(result[0][2]),
+		PictureUrl:   cast.ToString(result[0][3]),
+		Career:       strings.Split(cast.ToString(result[0][4]), ","),
 		Height:       height,
-		Age:          int(binary.BigEndian.Uint32(result[0][6])),
-		BirthPlace:   string(result[0][9]),
-		DeathPlace:   string(result[0][10]),
-		Gender:       string(result[0][11]),
-		FamilyStatus: string(result[0][12]),
-		FilmNumber:   string(result[0][13]),
+		Age:          int(cast.ToUint32(result[0][6])),
+		BirthPlace:   cast.ToString(result[0][9]),
+		DeathPlace:   cast.ToString(result[0][10]),
+		Gender:       cast.ToString(result[0][11]),
+		FamilyStatus: cast.ToString(result[0][12]),
+		FilmNumber:   cast.ToString(result[0][13]),
 	}
-	timeBuffer1 := pgtype.Timestamp{}
-	err = timeBuffer1.DecodeBinary(nil, result[0][7])
+	timestamp, err := cast.ToTime(result[0][7])
 	if err != nil {
 		return domain.Person{}, err
 	}
-	timeBuffer2 := pgtype.Timestamp{}
-	err = timeBuffer2.DecodeBinary(nil, result[0][8])
+	timestamp2, err := cast.ToTime(result[0][8])
 	if err != nil {
 		return domain.Person{}, err
 	}
-	person.Birthday = timeBuffer1.Time.String()
-	person.Death = timeBuffer2.Time.String()
+	person.Birthday = timestamp.String()
+	person.Death = timestamp2.String()
 	return person, nil
 }
 func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.FilmList, error) {
@@ -64,10 +60,9 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 	if err != nil {
 		return domain.FilmList{}, err
 	}
-	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
-	dbSize := int(dbSizeRaw)
+	dbSize := int(cast.ToUint64(result[0][0]))
 	if skip >= dbSize {
-		return domain.FilmList{}, person.ErrorSkip
+		return domain.FilmList{}, customErrors.ErrorSkip
 	}
 
 	result, err = pr.dbm.Query(queryGetPersonFilms, id, limit, skip)
@@ -77,11 +72,11 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 	filmList := make([]domain.Film, 0)
 	for i := range result {
 		film := domain.Film{
-			Id:          binary.BigEndian.Uint64(result[i][0]),
-			Title:       string(result[i][1]),
-			Description: string(result[i][2]),
-			ReleaseYear: int(binary.BigEndian.Uint32(result[i][3])),
-			PosterUrl:   string(result[i][4]),
+			Id:          cast.ToUint64(result[i][0]),
+			Title:       cast.ToString(result[i][1]),
+			Description: cast.ToString(result[i][2]),
+			ReleaseYear: int(cast.ToUint32(result[i][3])),
+			PosterUrl:   cast.ToString(result[i][4]),
 		}
 		filmList = append(filmList, film)
 	}
@@ -100,10 +95,9 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 	if err != nil {
 		return domain.FilmList{}, err
 	}
-	dbSizeRaw := binary.BigEndian.Uint64(result[0][0])
-	dbSize := int(dbSizeRaw)
+	dbSize := int(cast.ToUint64(result[0][0]))
 	if skip >= dbSize {
-		return domain.FilmList{}, person.ErrorBadCredentials
+		return domain.FilmList{}, customErrors.ErrorBadCredentials
 	}
 
 	result, err = pr.dbm.Query(queryGetPersonFilmsPopular, id, limit, skip)
@@ -113,11 +107,11 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 	filmList := make([]domain.Film, 0)
 	for i := range result {
 		film := domain.Film{
-			Id:          binary.BigEndian.Uint64(result[i][0]),
-			Title:       string(result[i][1]),
-			Description: string(result[i][2]),
-			ReleaseYear: int(binary.BigEndian.Uint32(result[i][3])),
-			PosterUrl:   string(result[i][4]),
+			Id:          cast.ToUint64(result[i][0]),
+			Title:       cast.ToString(result[i][1]),
+			Description: cast.ToString(result[i][2]),
+			ReleaseYear: int(cast.ToUint32(result[i][3])),
+			PosterUrl:   cast.ToString(result[i][4]),
 		}
 		filmList = append(filmList, film)
 	}

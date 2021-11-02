@@ -1,6 +1,9 @@
 package usecase
 
-import "2021_2_MAMBa/internal/pkg/domain"
+import (
+	"2021_2_MAMBa/internal/pkg/domain"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+)
 
 type PersonUsecase struct {
 	PersonRepo domain.PersonRepository
@@ -13,6 +16,9 @@ func NewPersonUsecase(u domain.PersonRepository) domain.PersonUsecase {
 }
 
 func (uc *PersonUsecase) GetPerson(id uint64) (domain.PersonPage, error) {
+	if id == 0 {
+		return domain.PersonPage{}, customErrors.ErrorBadInput
+	}
 	person, err := uc.PersonRepo.GetPerson(id)
 	if err != nil {
 		return domain.PersonPage{}, err

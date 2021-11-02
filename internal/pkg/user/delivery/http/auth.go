@@ -2,8 +2,8 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/sessions"
-	"2021_2_MAMBa/internal/pkg/user"
 	"encoding/json"
 	"net/http"
 )
@@ -13,7 +13,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	userForm := new(domain.User)
 	err := json.NewDecoder(r.Body).Decode(&userForm)
 	if err != nil {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusBadRequest)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -25,13 +25,13 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	err = sessions.StartSession(w, r, us.ID)
 	if err != nil && us.ID != 0 {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	b, err := json.Marshal(us)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -43,22 +43,22 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	userForm := new(domain.UserToLogin)
 	err := json.NewDecoder(r.Body).Decode(&userForm)
 	if err != nil {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusBadRequest)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
 
 	_, err = sessions.CheckSession(r)
 	if err != sessions.ErrUserNotLoggedIn {
-		http.Error(w, user.ErrorAlreadyIn.Error(), http.StatusBadRequest)
+		http.Error(w, customErrors.ErrorAlreadyIn.Error(), http.StatusBadRequest)
 		return
 	}
 
 	us, err := handler.UserUsecase.Login(userForm)
-	if err == user.ErrorBadInput {
+	if err == customErrors.ErrorBadInput {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err == user.ErrorBadCredentials {
+	if err == customErrors.ErrorBadCredentials {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -69,13 +69,13 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	b, err := json.Marshal(us)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = sessions.StartSession(w, r, us.ID)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -86,12 +86,12 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	id, err := sessions.CheckSession(r)
 	if err == sessions.ErrUserNotLoggedIn {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusForbidden)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusForbidden)
 		return
 	}
 	err = sessions.EndSession(w, r, id)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -100,7 +100,7 @@ func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	userID, err := sessions.CheckSession(r)
 	if err == sessions.ErrUserNotLoggedIn {
-		http.Error(w, user.ErrorBadInput.Error(), http.StatusBadRequest)
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
 	if err != nil {
@@ -116,7 +116,7 @@ func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 
 	b, err := json.Marshal(us)
 	if err != nil {
-		http.Error(w, user.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
