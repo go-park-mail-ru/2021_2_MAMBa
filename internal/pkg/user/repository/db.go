@@ -149,8 +149,6 @@ func (ur *dbUserRepository) CheckSubscription(src, dst uint64) (bool, error) {
 	}
 }
 
-//
-
 func (ur *dbUserRepository) UpdateProfile(profile domain.Profile) (domain.Profile, error) {
 	err := ur.dbm.Execute(queryUpdProfile, profile.ID, profile.FirstName,
 		profile.Surname, profile.PictureUrl, profile.Email, profile.Gender)
@@ -187,8 +185,6 @@ func (ur *dbUserRepository) CreateSubscription(src, dst uint64) (domain.Profile,
 	}
 	return updated, err
 }
-
-//
 
 func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (domain.FilmReviews, error) {
 	result, err := ur.dbm.Query(queryCountFilmReviews, id)

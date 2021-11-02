@@ -32,6 +32,7 @@ type UserToLogin struct {
 	Password string `json:"password"`
 }
 
+//go:generate mockgen -destination=../user/repository/mock/repository_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain UserRepository
 type UserRepository interface {
 	GetProfileById(whoAskID, id uint64) (Profile, error)
 	UpdateProfile(profile Profile) (Profile, error)
