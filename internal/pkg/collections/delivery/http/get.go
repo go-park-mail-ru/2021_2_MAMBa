@@ -39,3 +39,24 @@ func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http
 		return
 	}
 }
+
+
+func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *http.Request) {
+	var err error
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		return
+	}
+
+	collectionFilms, err := handler.CollectionsUsecase.GetCollectionPage(id)
+	if err != nil {
+		http.Error(w, customErrors.ErrDBMsg, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(collectionFilms)
+	if err != nil {
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
+		return
+	}
+}

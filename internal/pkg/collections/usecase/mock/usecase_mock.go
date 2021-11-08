@@ -34,6 +34,21 @@ func (m *MockCollectionsUsecase) EXPECT() *MockCollectionsUsecaseMockRecorder {
 	return m.recorder
 }
 
+// GetCollectionPage mocks base method.
+func (m *MockCollectionsUsecase) GetCollectionPage(arg0 uint64) (domain.CollectionPage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCollectionPage", arg0)
+	ret0, _ := ret[0].(domain.CollectionPage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCollectionPage indicates an expected call of GetCollectionPage.
+func (mr *MockCollectionsUsecaseMockRecorder) GetCollectionPage(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollectionPage", reflect.TypeOf((*MockCollectionsUsecase)(nil).GetCollectionPage), arg0)
+}
+
 // GetCollections mocks base method.
 func (m *MockCollectionsUsecase) GetCollections(arg0, arg1 int) (domain.Collections, error) {
 	m.ctrl.T.Helper()

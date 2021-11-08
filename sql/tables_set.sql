@@ -70,7 +70,7 @@ CREATE TABLE Collection
     Collection_ID   BIGSERIAL NOT NULL PRIMARY KEY,
     Author_ID       BIGINT,
     collection_name varchar(60),
-    description     varchar(200),
+    description     varchar(600),
     creation_time   timestamp,
     picture_url     varchar(100),
     CONSTRAINT to_author FOREIGN KEY (Author_ID) REFERENCES Profile (User_ID) ON DELETE CASCADE
