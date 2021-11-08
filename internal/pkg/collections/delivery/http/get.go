@@ -45,6 +45,7 @@ func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
+		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}
 
