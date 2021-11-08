@@ -57,6 +57,8 @@ type NewRate struct {
 	Rating float64 `json:"rating,omitempty"`
 }
 
+
+
 type FilmRepository interface {
 	GetFilm(id uint64) (Film, error)
 	GetFilmReviews(id uint64, skip int, limit int) (FilmReviews, error)

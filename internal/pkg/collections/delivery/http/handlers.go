@@ -15,4 +15,5 @@ func NewHandlers(router *mux.Router, uc domain.CollectionsUsecase) {
 	}
 
 	router.HandleFunc("/collections/getCollections", handler.GetCollections).Methods("GET", "OPTIONS")
+	router.HandleFunc("/collections/getCollectionFilms", handler.GetCollectionFilms).Methods("GET", "OPTIONS")
 }
