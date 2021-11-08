@@ -2,7 +2,7 @@ package cast
 
 import (
 	"encoding/binary"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"math"
 	"time"
 )
@@ -25,6 +25,12 @@ func ToUint32(src []byte) uint32 {
 
 func ToTime(src []byte) (time.Time, error) {
 	timeBuffer := pgtype.Timestamp{}
+	err := timeBuffer.DecodeBinary(nil, src)
+	return timeBuffer.Time, err
+}
+
+func ToDate(src []byte) (time.Time, error) {
+	timeBuffer := pgtype.Date{}
 	err := timeBuffer.DecodeBinary(nil, src)
 	return timeBuffer.Time, err
 }

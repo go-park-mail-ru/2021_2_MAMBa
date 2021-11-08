@@ -7,7 +7,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 	"math"

@@ -43,11 +43,11 @@ func (pr *dbPersonRepository) GetPerson(id uint64) (domain.Person, error) {
 		FamilyStatus: cast.ToString(result[0][12]),
 		FilmNumber:   cast.ToString(result[0][13]),
 	}
-	timestamp, err := cast.ToTime(result[0][7])
+	timestamp, err := cast.ToDate(result[0][7])
 	if err != nil {
 		return domain.Person{}, err
 	}
-	timestamp2, err := cast.ToTime(result[0][8])
+	timestamp2, err := cast.ToDate(result[0][8])
 	if err != nil {
 		return domain.Person{}, err
 	}

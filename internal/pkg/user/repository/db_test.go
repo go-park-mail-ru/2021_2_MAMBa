@@ -5,7 +5,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"math"
 	"time"
 

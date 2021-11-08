@@ -6,7 +6,7 @@ import (
 	mylog "2021_2_MAMBa/internal/pkg/utils/log"
 	"encoding/binary"
 	"errors"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 	"math"
