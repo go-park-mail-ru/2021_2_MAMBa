@@ -7,7 +7,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"time"
 )
 
 type testRow struct {
@@ -176,7 +175,7 @@ var targetProfile = domain.Profile{
 	PictureUrl:    "/1.pic",
 	Email:         "gmail@me.com",
 	Gender:        "male",
-	RegisterDate:  time.Time{},
+	RegisterDate:  "",
 	SubCount:      0,
 	BookmarkCount: 0,
 	AmSubscribed:  true,
@@ -216,7 +215,7 @@ func TestUserUsecase_CreateSubscription(t *testing.T) {
 
 var filmList = domain.FilmReviews{
 	ReviewList:    nil,
-	MoreAvaliable: false,
+	MoreAvailable: false,
 	ReviewTotal:   0,
 	CurrentSort:   "",
 	CurrentLimit:  10,

@@ -32,7 +32,7 @@ func (rr *dbReviewRepository) GetReview(id uint64) (domain.Review, error) {
 	if err != nil {
 		return domain.Review{}, err
 	}
-	timestamp, err := cast.ToTime(result[0][6])
+	timestamp, err := cast.TimestampToString(result[0][6])
 	if err != nil {
 		return domain.Review{}, err
 	}
@@ -99,7 +99,7 @@ func (rr *dbReviewRepository) LoadReviewsExcept(id uint64, film_id uint64, skip 
 	}
 	reviewList := make([]domain.Review, 0)
 	for i := range result {
-		timestamp, err := cast.ToTime(result[i][6])
+		timestamp, err := cast.TimestampToString(result[i][6])
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
@@ -130,7 +130,7 @@ func (rr *dbReviewRepository) LoadReviewsExcept(id uint64, film_id uint64, skip 
 	}
 	reviews := domain.FilmReviews{
 		ReviewList:    reviewList,
-		MoreAvaliable: moreAvailable,
+		MoreAvailable: moreAvailable,
 		ReviewTotal:   dbSize,
 		CurrentSort:   "",
 		CurrentLimit:  limit,
