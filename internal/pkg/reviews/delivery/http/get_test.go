@@ -150,7 +150,7 @@ func TestPostReviewSuccess(t *testing.T) {
 var testTableGetReviewsSuccess = [...]testRow{
 	{
 		inQuery: "id=13&film_id=8&skips=0&limits=10",
-		out:     `{"review_list":[{"id":8,"film_id":8,"film_title_ru":"Гарри Поттер и узник Азкабана","film_title_original":"Harry Potter and the Prisoner of Azkaban","film_picture_url":"server/images/harry3.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"}],"more_avaliable":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		out:     `{"review_list":[{"id":8,"film_id":8,"film_title_ru":"Гарри Поттер и узник Азкабана","film_title_original":"Harry Potter and the Prisoner of Azkaban","film_picture_url":"server/images/harry3.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `full works`,
 		skip:    0,
@@ -158,7 +158,7 @@ var testTableGetReviewsSuccess = [...]testRow{
 	},
 	{
 		inQuery: "id=13&film_id=8",
-		out:     `{"review_list":[{"id":8,"film_id":8,"film_title_ru":"Гарри Поттер и узник Азкабана","film_title_original":"Harry Potter and the Prisoner of Azkaban","film_picture_url":"server/images/harry3.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"}],"more_avaliable":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		out:     `{"review_list":[{"id":8,"film_id":8,"film_title_ru":"Гарри Поттер и узник Азкабана","film_title_original":"Harry Potter and the Prisoner of Azkaban","film_picture_url":"server/images/harry3.webp","author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `empty works`,
 		skip:    0,

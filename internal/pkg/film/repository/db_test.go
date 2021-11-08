@@ -7,7 +7,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 	"math"
@@ -121,7 +121,7 @@ func TestGetFilmRecommendationsSucess(t *testing.T) {
 			Id:        1,
 			Title:     "Test_film",
 			PosterUrl: "/pic/TestPoster.webp"}},
-		MoreAvaliable:       false,
+		MoreAvailable:       false,
 		RecommendationTotal: 1,
 		CurrentLimit:        10,
 		CurrentSkip:         10,
@@ -155,7 +155,7 @@ func TestGetFilmReviewsSucess(t *testing.T) {
 	timeBuffer := pgtype.Timestamp{}
 	timeBuffer.Time = time.Now()
 	reviews := domain.FilmReviews{
-		ReviewList: []domain.Review{domain.Review{
+		ReviewList: []domain.Review{{
 			Id:               1,
 			FilmId:           1,
 			AuthorName:       "Ivan Ivanovich",
@@ -163,9 +163,9 @@ func TestGetFilmReviewsSucess(t *testing.T) {
 			AuthorPictureUrl: "pic1.jopeg",
 			ReviewType:       3,
 			Stars:            4.0,
-			Date:             time.Time{},
-		}},
-		MoreAvaliable: false,
+			Date:             "",
+				}},
+		MoreAvailable: false,
 		ReviewTotal:   1,
 		CurrentLimit:  10,
 		CurrentSkip:   10,

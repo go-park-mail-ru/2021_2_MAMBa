@@ -31,6 +31,7 @@ func CORS(h http.Handler) http.Handler {
 			log.Warn(fmt.Sprintf("unknown origin: \"%s\"", origin))
 			http.Error(w, "Access denied", http.StatusForbidden)
 		}
+		w.Header().Add("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")

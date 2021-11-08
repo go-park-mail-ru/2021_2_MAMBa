@@ -138,7 +138,7 @@ func (fr *dbFilmRepository) GetFilmReviews(id uint64, skip int, limit int) (doma
 	}
 	reviews := make([]domain.Review, 0)
 	for i := range result {
-		timestamp, err := cast.ToTime(result[i][6])
+		timestamp, err := cast.TimestampToString(result[i][6])
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
@@ -155,7 +155,7 @@ func (fr *dbFilmRepository) GetFilmReviews(id uint64, skip int, limit int) (doma
 	}
 	reviewsList := domain.FilmReviews{
 		ReviewList:    reviews,
-		MoreAvaliable: moreAvailable,
+		MoreAvailable: moreAvailable,
 		ReviewTotal:   dbSize,
 		CurrentSort:   "",
 		CurrentLimit:  limit,
@@ -186,7 +186,7 @@ func (fr *dbFilmRepository) GetFilmRecommendations(id uint64, skip int, limit in
 	}
 	reviewsList := domain.FilmRecommendations{
 		RecommendationList:  reviews,
-		MoreAvaliable:       moreAvailable,
+		MoreAvailable:       moreAvailable,
 		RecommendationTotal: dbSize,
 		CurrentLimit:        limit,
 		CurrentSkip:         skip + limit,
@@ -226,7 +226,7 @@ func (fr *dbFilmRepository) GetMyReview(id uint64, author_id uint64) (domain.Rev
 	if len(result) == 0 {
 		return domain.Review{}, customErrors.ErrorNoReviewForFilm
 	}
-	timestamp, err := cast.ToTime(result[0][6])
+	timestamp, err := cast.TimestampToString(result[0][6])
 	urtype := cast.ToUint32(result[0][4])
 	rtype := int(urtype)
 	if err != nil {

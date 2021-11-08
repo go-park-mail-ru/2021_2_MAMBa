@@ -14,12 +14,12 @@ type Person struct {
 	DeathPlace   string   `json:"death_place,omitempty"`
 	Gender       string   `json:"gender,omitempty"`
 	FamilyStatus string   `json:"family_status,omitempty"`
-	FilmNumber   string   ` json:"film_number,omitempty"`
+	FilmNumber   int      `json:"film_number,omitempty"`
 }
 
 type FilmList struct {
 	FilmList      []Film `json:"film_list"`
-	MoreAvaliable bool   `json:"more_avaliable"`
+	MoreAvailable bool   `json:"more_available"`
 	FilmTotal     int    `json:"film_total"`
 	CurrentLimit  int    `json:"current_limit"`
 	CurrentSkip   int    `json:"current_skip"`

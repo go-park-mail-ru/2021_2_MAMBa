@@ -31,7 +31,7 @@ type Film struct {
 
 type FilmRecommendations struct {
 	RecommendationList  []Film `json:"recommendation_list"`
-	MoreAvaliable       bool   `json:"more_avaliable"`
+	MoreAvailable       bool   `json:"more_available"`
 	RecommendationTotal int    `json:"recommendation_total"`
 	CurrentLimit        int    `json:"current_limit"`
 	CurrentSkip         int    `json:"current_skip"`
@@ -39,7 +39,7 @@ type FilmRecommendations struct {
 
 type FilmReviews struct {
 	ReviewList    []Review `json:"review_list"`
-	MoreAvaliable bool     `json:"more_avaliable"`
+	MoreAvailable bool     `json:"more_available"`
 	ReviewTotal   int      `json:"review_total"`
 	CurrentSort   string   `json:"current_sort"`
 	CurrentLimit  int      `json:"current_limit"`

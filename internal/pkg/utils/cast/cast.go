@@ -2,9 +2,8 @@ package cast
 
 import (
 	"encoding/binary"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"math"
-	"time"
 )
 
 func ToString(src []byte) string {
@@ -23,8 +22,22 @@ func ToUint32(src []byte) uint32 {
 	return binary.BigEndian.Uint32(src)
 }
 
-func ToTime(src []byte) (time.Time, error) {
+func TimestampToString(src []byte) (string, error) {
 	timeBuffer := pgtype.Timestamp{}
 	err := timeBuffer.DecodeBinary(nil, src)
-	return timeBuffer.Time, err
+	timeString := timeBuffer.Time.Format("02.01.2006")
+	if timeString == "01.01.0001" {
+		return "", err
+	}
+	return timeString, err
+}
+
+func DateToString(src []byte) (string, error) {
+	timeBuffer := pgtype.Date{}
+	err := timeBuffer.DecodeBinary(nil, src)
+	timeString := timeBuffer.Time.Format("02.01.2006")
+	if timeString == "01.01.0001" {
+		return "", err
+	}
+	return timeString, err
 }

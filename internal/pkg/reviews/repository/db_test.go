@@ -6,13 +6,12 @@ import (
 	mylog "2021_2_MAMBa/internal/pkg/utils/log"
 	"encoding/binary"
 	"errors"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 	"math"
 	"regexp"
 	"testing"
-	"time"
 )
 
 func MockDatabase() (*database.DBManager, pgxmock.PgxPoolIface, error) {
@@ -40,7 +39,7 @@ func TestGetSuccess(t *testing.T) {
 		ReviewText:        "sdknldsnvlksnlbdlsnbljD;ABSIFBLASN",
 		ReviewType:        3,
 		Stars:             0,
-		Date:              time.Time{},
+		Date:              "",
 	}
 
 	byteId := make([]uint8, 8)
@@ -90,7 +89,7 @@ func TestPostSuccess(t *testing.T) {
 		ReviewText:        "sdknldsnvlksnlbdlsnbljD;ABSIFBLASN",
 		ReviewType:        3,
 		Stars:             0,
-		Date:              time.Time{},
+		Date:              "",
 	}
 
 	byteId := make([]uint8, 8)
@@ -135,12 +134,12 @@ func TestGetExceptSuccess(t *testing.T) {
 		ReviewText:        "sdknldsnvlksnlbdlsnbljD;ABSIFBLASN",
 		ReviewType:        3,
 		Stars:             0,
-		Date:              time.Time{},
+		Date:              "",
 	}
 
 	rlist := domain.FilmReviews{
 		ReviewList:    []domain.Review{r},
-		MoreAvaliable: false,
+		MoreAvailable: false,
 		ReviewTotal:   2,
 		CurrentLimit:  10,
 		CurrentSkip:   10,
