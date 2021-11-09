@@ -93,7 +93,7 @@ func TestRegisterFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
 		handler.Register(w, r)
-		result:= `{"error":"`+test.out+`","status":`+fmt.Sprint(test.status)+"}\n"
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -188,7 +188,7 @@ func TestLoginFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		handler.Login(w, r)
-		result:= `{"error":"`+test.out+`","status":`+fmt.Sprint(test.status)+"}\n"
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -214,7 +214,7 @@ func TestLogoutFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.Logout(w, r)
-		result:= `{"error":"`+test.out+`","status":`+fmt.Sprint(test.status)+"}\n"
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -283,6 +283,6 @@ func TestCheckAuthFailure(t *testing.T) {
 	r := httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
 	w := httptest.NewRecorder()
 	handler.CheckAuth(w, r)
-	result:= `{"error":"`+test.out+`","status":`+fmt.Sprint(test.status)+"}\n"
+	result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
 	assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 }

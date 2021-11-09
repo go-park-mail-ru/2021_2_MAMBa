@@ -106,7 +106,7 @@ func TestGetBasicInfoFailure(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		handler.GetBasicInfo(w, r)
-		result:= `{"error":"`+test.out+`","status":`+fmt.Sprint(test.status)+"}\n"
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -230,7 +230,7 @@ func TestUpdateProfileInfoFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
 		handler.UpdateProfile(w, r)
-		result:= `{"error":"`+testCase.out+`","status":`+fmt.Sprint(testCase.status)+"}\n"
+		result:= `{"body":{"error":"`+testCase.out+`"},"status":`+fmt.Sprint(testCase.status)+"}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+testCase.name)
 	}
 }
@@ -300,7 +300,7 @@ func TestSubscribeFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
 		handler.CreateSubscription(w, r)
-		result:= `{"error":"`+testCase.out+`","status":`+fmt.Sprint(testCase.status)+"}\n"
+		result:= `{"body":{"error":"`+testCase.out+`"},"status":`+fmt.Sprint(testCase.status)+"}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+testCase.name)
 	}
 }
@@ -384,7 +384,7 @@ func TestGetReviewsFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.LoadUserReviews(w, r)
-		result:= `{"error":"`+test.out+`","status":`+fmt.Sprint(test.status)+"}\n"
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
