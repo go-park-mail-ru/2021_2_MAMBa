@@ -2,6 +2,7 @@ package cast
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"github.com/jackc/pgtype"
 	"math"
 )
@@ -40,4 +41,9 @@ func DateToString(src []byte) (string, error) {
 		return "", err
 	}
 	return timeString, err
+}
+
+func StringToJson(src string) []byte {
+	res, _ := json.Marshal(src)
+	return res
 }

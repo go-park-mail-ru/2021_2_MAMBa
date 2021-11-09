@@ -9,6 +9,7 @@ var (
 	ErrLimitMsg          = "incorrect limit"
 	ErrDBMsg             = "DB error"
 	ErrEncMsg            = "Encoding error"
+	ErrIdMsg             = "no such id"
 	ErrorSkip            = errors.New(ErrSkipMsg)
 	ErrorLimit           = errors.New(ErrLimitMsg)
 	ErrorNoReviewForFilm = errors.New("error - no review")
