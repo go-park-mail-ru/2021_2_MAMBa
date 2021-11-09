@@ -7,6 +7,7 @@ import (
 	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
+	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -46,7 +47,7 @@ var testTableGetReviewFailure = [...]testRow{
 	},
 	{
 		inQuery: "id=-2",
-		out:     customErrors.ErrSkipMsg + "\n",
+		out:     customErrors.ErrIdMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `neg skip`,
 	},
@@ -66,7 +67,8 @@ func TestGetReviewSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetReview(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -87,8 +89,8 @@ func TestGetReviewFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetReview(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"error":"`+test.out[:len(test.out)-1]+`","status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
@@ -142,7 +144,8 @@ func TestPostReviewSuccess(t *testing.T) {
 		}
 		w = httptest.NewRecorder()
 		handler2.PostReview(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -206,7 +209,8 @@ func TestGetReviewsSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.LoadExcept(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -225,7 +229,7 @@ func TestGetReviewsFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.LoadExcept(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"error":"`+test.out[:len(test.out)-1]+`","status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
