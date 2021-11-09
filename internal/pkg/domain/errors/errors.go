@@ -21,6 +21,6 @@ var (
 	ErrorBadCredentials  = errors.New("error - bad credentials")
 	ErrorInternalServer  = errors.New("error - internal server")
 	ErrorNoUser          = errors.New("error - no user")
-	ErrUserNotLoggedIn   = errors.New("user not logged in")
-	ErrUint64Cast        = errors.New("id uint64 cast error")
+	ErrorUserNotLoggedIn = errors.New("user not logged in")
+	ErrorUint64Cast      = errors.New("id uint64 cast error")
 )

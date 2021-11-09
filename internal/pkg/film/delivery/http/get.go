@@ -71,8 +71,8 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 
 func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 	authId, err := sessions.CheckSession(r)
-	if err == customErrors.ErrUserNotLoggedIn {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
+	if err == customErrors.ErrorUserNotLoggedIn {
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
 	}
@@ -110,8 +110,8 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 
 func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
 	authId, err := sessions.CheckSession(r)
-	if err == customErrors.ErrUserNotLoggedIn {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
+	if err == customErrors.ErrorUserNotLoggedIn {
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
 	}

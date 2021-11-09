@@ -56,7 +56,7 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 
 	authId, err := sessions.CheckSession(r)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
 	}

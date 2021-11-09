@@ -59,11 +59,11 @@ func CheckSession(r *http.Request) (uint64, error) {
 	}
 	id, isIn := session.Values["id"]
 	if !isIn || session.IsNew {
-		return 0, customErrors.ErrUserNotLoggedIn
+		return 0, customErrors.ErrorUserNotLoggedIn
 	}
 	idCasted, ok := id.(uint64)
 	if !ok {
-		return 0, customErrors.ErrUint64Cast
+		return 0, customErrors.ErrorUint64Cast
 	}
 	return idCasted, nil
 }
