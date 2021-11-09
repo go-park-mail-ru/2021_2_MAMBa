@@ -50,10 +50,6 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	x, err := json.Marshal(filmPageInfo)
-	if x != nil {
-
-	}
 	err = json.NewEncoder(w).Encode(filmPageInfo)
 	if err != nil {
 		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
