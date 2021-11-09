@@ -23,7 +23,7 @@ const (
 	queryGetFilmShort            = "SELECT title, title_original, poster_url FROM FILM WHERE Film_ID = $1"
 	queryGetReviewByFilmIDEXCEPT = "SELECT * FROM review WHERE film_id = $1 AND (NOT review_id = $2) AND (NOT type = 0) LIMIT $3 OFFSET $4"
 	querySearchReview            = "SELECT * FROM review WHERE film_id = $1 AND author_id = $2"
-	queryInsertReview            = "INSERT INTO review VALUES (DEFAULT, $1, $2, $3, $4, $5, $6) RETURNING review_id"
+	queryInsertReview            = "INSERT INTO review (review_id, film_id, author_id, review_text, type, stars, review_date) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6) RETURNING review_id"
 	queryUpdateReview            = "UPDATE review SET review_text = $1, type = $2 WHERE film_id = $3 AND author_id = $4 RETURNING review_id"
 )
 

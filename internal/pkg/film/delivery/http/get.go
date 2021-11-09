@@ -7,6 +7,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -39,7 +40,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filmList, err := handler.FilmUsecase.GetFilm(uint64(id), skipReview, limitReview, skipRecom, limitRecom)
+	filmPageInfo, err := handler.FilmUsecase.GetFilm(uint64(id), skipReview, limitReview, skipRecom, limitRecom)
 	if err == customErrors.ErrorSkip {
 		http.Error(w, customErrors.ErrSkipMsg, http.StatusBadRequest)
 		return
@@ -49,7 +50,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(filmList)
+	err = json.NewEncoder(w).Encode(filmPageInfo)
 	if err != nil {
 		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
@@ -77,7 +78,7 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(domain.NewRate{Rating: newRating})
+	err = json.NewEncoder(w).Encode(domain.NewRate{Rating: json.Number(fmt.Sprintf("%.1f", newRating))})
 	if err != nil {
 		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return

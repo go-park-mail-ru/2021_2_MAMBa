@@ -27,7 +27,7 @@ const (
 	queryGetFilmReviews           = "SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 AND (NOT type = 0) LIMIT $2 OFFSET $3"
 	queryGetFilmRecommendations   = "SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = $1 LIMIT $2 OFFSET $3"
 	queryGetFilmRating            = "SELECT AVG(stars) FROM review WHERE film_id = $1AND (NOT stars = 0)"
-	queryPostRating               = "INSERT INTO  review VALUES (DEFAULT, $1, $2, '', $3, $4, $5)"
+	queryPostRating               = "INSERT INTO  review (review_id, film_id, author_id, review_text, type, stars, review_date) VALUES (DEFAULT, $1, $2, '', $3, $4, $5)"
 	queryGetReviewByAuthor        = "SELECT * FROM review WHERE film_id = $1 AND author_id = $2"
 	queryUpdateRating             = "UPDATE review SET stars = $1 WHERE film_id = $2 AND author_id = $3"
 	queryGetAuthorName            = "SELECT first_name, surname, picture_url FROM profile WHERE user_id = $1"

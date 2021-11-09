@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"encoding/json"
+	"strconv"
+)
+
 type Country struct {
 	Id          uint64
 	CountryName string
@@ -29,6 +34,51 @@ type Film struct {
 	Genres          []Genre  `json:"genres,omitempty"`
 }
 
+type FilmJson struct {
+	Id              uint64   `json:"id,omitempty"`
+	Title           string   `json:"title,omitempty"`
+	TitleOriginal   string   `json:"title_original,omitempty"`
+	Rating          json.Number  `json:"rating,omitempty"`
+	Description     string   `json:"description,omitempty"`
+	TotalRevenue    string   `json:"total_revenue,omitempty"`
+	PosterUrl       string   `json:"poster_url,omitempty"`
+	TrailerUrl      string   `json:"trailer_url,omitempty"`
+	ContentType     string   `json:"content_type,omitempty"`
+	ReleaseYear     int      `json:"release_year,omitempty"`
+	Duration        int      `json:"duration,omitempty"`
+	OriginCountries []string `json:"origin_countries,omitempty"`
+	Cast            []Person `json:"cast,omitempty"`
+	Director        Person   `json:"director,omitempty"`
+	Screenwriter    Person   `json:"screenwriter,omitempty"`
+	Genres          []Genre  `json:"genres,omitempty"`
+}
+
+func (film *Film) toJsonNum () FilmJson {
+	s := json.Number(strconv.FormatFloat(film.Rating, 'f', 1, 64))
+	return FilmJson{
+		Id:              film.Id,
+		Title:           film.Title,
+		TitleOriginal:   film.TitleOriginal,
+		Rating:          s,
+		Description:     film.Description,
+		TotalRevenue:    film.TotalRevenue,
+		PosterUrl:       film.PosterUrl,
+		TrailerUrl:      film.TrailerUrl,
+		ContentType:     film.ContentType,
+		ReleaseYear:     film.ReleaseYear,
+		Duration:        film.Duration,
+		OriginCountries: film.OriginCountries,
+		Cast:            film.Cast,
+		Director:        film.Director,
+		Screenwriter:    film.Screenwriter,
+		Genres:          film.Genres,
+	}
+}
+
+func (film *Film) MarshalJSON() ([]byte, error) {
+	return json.Marshal(film.toJsonNum())
+}
+
 type FilmRecommendations struct {
 	RecommendationList  []Film `json:"recommendation_list"`
 	MoreAvailable       bool   `json:"more_available"`
@@ -47,14 +97,30 @@ type FilmReviews struct {
 }
 
 type FilmPageInfo struct {
-	Film            Film                `json:"film"`
+	FilmMain            *Film                `json:"film"`
 	Reviews         FilmReviews         `json:"reviews"`
 	Recommendations FilmRecommendations `json:"recommendations"`
 	MyRating        float64             `json:"my_rating"`
 }
 
+type FilmPageInfoJson struct {
+	FilmMain            FilmJson                `json:"film"`
+	Reviews         FilmReviews         `json:"reviews"`
+	Recommendations FilmRecommendations `json:"recommendations"`
+	MyRating        float64             `json:"my_rating"`
+}
+
+func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
+	return json.Marshal(FilmPageInfoJson{
+		FilmMain:        filmPage.FilmMain.toJsonNum(),
+		Reviews:         filmPage.Reviews,
+		Recommendations: filmPage.Recommendations,
+		MyRating:        filmPage.MyRating,
+	})
+}
+
 type NewRate struct {
-	Rating float64 `json:"rating,omitempty"`
+	Rating json.Number `json:"rating,omitempty"`
 }
 
 
