@@ -8,6 +8,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -50,7 +51,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filmList, err := handler.FilmUsecase.GetFilm(uint64(id), skipReview, limitReview, skipRecom, limitRecom)
+	filmPageInfo, err := handler.FilmUsecase.GetFilm(uint64(id), skipReview, limitReview, skipRecom, limitRecom)
 	if err == customErrors.ErrorSkip {
 		resp := domain.Response{Body: cast.ErrorToJson(err.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -65,7 +66,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 	resp:= domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
-	}
+  }
 	resp.Write(w)
 }
 
@@ -104,7 +105,7 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 	resp:= domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
-	}
+  }
 	resp.Write(w)
 }
 

@@ -26,7 +26,7 @@ func (uc *FilmUsecase) GetFilm(id uint64, skipReviews int, limitReviews int, ski
 		return domain.FilmPageInfo{}, err
 	}
 	result := domain.FilmPageInfo{
-		Film:            film,
+		FilmMain:            &film,
 		Reviews:         Reviews,
 		Recommendations: Recommended,
 		MyRating:        -1,
