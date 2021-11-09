@@ -2,9 +2,14 @@ package cast
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"github.com/jackc/pgtype"
 	"math"
 )
+
+type JsonErr struct {
+	Error string `json:"error"`
+}
 
 func ToString(src []byte) string {
 	return string(src)
@@ -40,4 +45,14 @@ func DateToString(src []byte) (string, error) {
 		return "", err
 	}
 	return timeString, err
+}
+
+func StringToJson(src string) []byte {
+	res, _ := json.Marshal(src)
+	return res
+}
+
+func ErrorToJson (src string) []byte {
+	res, _ := json.Marshal(JsonErr{Error: src})
+	return res
 }

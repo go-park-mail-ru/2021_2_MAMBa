@@ -1,14 +1,11 @@
 package sessions
 
 import (
-	"errors"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"net/http"
 )
-
-var ErrUserNotLoggedIn = errors.New("user not logged in")
-var errUint64Cast = errors.New("id uint64 cast error")
 
 var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
 var sessionName = "session-name"
@@ -62,11 +59,11 @@ func CheckSession(r *http.Request) (uint64, error) {
 	}
 	id, isIn := session.Values["id"]
 	if !isIn || session.IsNew {
-		return 0, ErrUserNotLoggedIn
+		return 0, customErrors.ErrorUserNotLoggedIn
 	}
 	idCasted, ok := id.(uint64)
 	if !ok {
-		return 0, errUint64Cast
+		return 0, customErrors.ErrorUint64Cast
 	}
 	return idCasted, nil
 }

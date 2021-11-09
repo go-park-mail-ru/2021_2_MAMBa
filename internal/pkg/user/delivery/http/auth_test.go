@@ -5,6 +5,7 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
+	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,28 +28,28 @@ var testTableRegisterFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan","surname": "Ivanov","email": "ivan1@mail.ru","password": "123456","password_repeat": "123456"}`,
-		out:        customErrors.ErrorAlreadyIn.Error() + "\n",
+		out:        customErrors.ErrorAlreadyExists.Error(),
 		status:     http.StatusConflict,
 		name:       "already in",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_nme": "Ivan",}`,
-		out:        customErrors.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error(),
 		status:     http.StatusBadRequest,
 		name:       "bad fields",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan",}`,
-		out:        customErrors.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error(),
 		status:     http.StatusBadRequest,
 		name:       "empty fields",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"first_name": "Ivan12","surname": "Ivanov","email": "ivan131@mail.ru","password": "123455","password_repeat": "123456"}`,
-		out:        customErrors.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error(),
 		status:     http.StatusBadRequest,
 		name:       "unmatching passwords",
 	},
@@ -68,21 +69,22 @@ func TestRegisterSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
 		handler.Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"body":`+test.out+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, 200, w.Code, "Test: "+test.name)
 	}
 }
 func TestRegisterFailure(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	for i, test := range testTableRegisterSuccess {
+	for i, test := range testTableRegisterFailure {
 		mock := mock2.NewMockUserUsecase(ctrl)
 		var cl, ret domain.User
 		_ = json.Unmarshal([]byte(test.bodyString), &cl)
 		_ = json.Unmarshal([]byte(test.out), &ret)
 		handler := UserHandler{UserUsecase: mock}
 		if i == 0 {
-			mock.EXPECT().Register(&cl).Times(1).Return(ret, nil)
+			mock.EXPECT().Register(&cl).Times(1).Return(ret, customErrors.ErrorAlreadyExists)
 		}
 		if i == 3 {
 			mock.EXPECT().Register(&cl).Times(1).Return(domain.User{}, customErrors.ErrorBadInput)
@@ -91,8 +93,8 @@ func TestRegisterFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/register"+test.inQuery, bodyReader)
 		handler.Register(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
@@ -110,35 +112,35 @@ var testTableLoginFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"email": "raddom@mail.su","password": "123456"}`,
-		out:        customErrors.ErrorBadCredentials.Error() + "\n",
+		out:        customErrors.ErrorBadCredentials.Error(),
 		status:     http.StatusUnauthorized,
 		name:       "user not in base",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru","password": "122456"}`,
-		out:        customErrors.ErrorBadCredentials.Error() + "\n",
+		out:        customErrors.ErrorBadCredentials.Error(),
 		status:     http.StatusUnauthorized,
 		name:       "wrong pass",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"password": "122456"}`,
-		out:        customErrors.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error(),
 		status:     http.StatusBadRequest,
 		name:       "no email",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru"}`,
-		out:        customErrors.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error(),
 		status:     http.StatusBadRequest,
 		name:       "no pass",
 	},
 	{
 		inQuery:    "",
 		bodyString: `{"emal": "iva21@mail.ru","password": "123456"}`,
-		out:        customErrors.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorBadInput.Error(),
 		status:     http.StatusBadRequest,
 		name:       "wrong json",
 	},
@@ -160,7 +162,8 @@ func TestLoginSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		handler.Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -185,8 +188,8 @@ func TestLoginFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		handler.Login(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
@@ -194,7 +197,7 @@ var testTableLogoutFailure = [...]testRow{
 	{
 		inQuery:    "",
 		bodyString: `{"email": "iva21@mail.ru","password": "123456"}`,
-		out:        customErrors.ErrorBadInput.Error() + "\n",
+		out:        customErrors.ErrorUserNotLoggedIn.Error(),
 		status:     http.StatusForbidden,
 		name:       "logout not logged in",
 	},
@@ -211,8 +214,8 @@ func TestLogoutFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.Logout(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
@@ -266,16 +269,20 @@ func TestCheckAuthSuccess(t *testing.T) {
 	w = httptest.NewRecorder()
 	mock.EXPECT().CheckAuth(uint64(2)).Return(ret, nil)
 	handler.CheckAuth(w, r)
+	result:= `{"body":`+test.out+`,"status":`+fmt.Sprint(test.status)+"}\n"
+	assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	assert.Equal(t, http.StatusOK, w.Code, "Test: CheckAuth ok")
 }
 
 func TestCheckAuthFailure(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mock := mock2.NewMockUserUsecase(ctrl)
+	test := testTableLogoutFailure[0]
 	handler := UserHandler{UserUsecase: mock}
 	bodyReader := strings.NewReader("")
 	r := httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
 	w := httptest.NewRecorder()
 	handler.CheckAuth(w, r)
-	assert.Equal(t, http.StatusBadRequest, w.Code, "Test: CheckAuth FL")
+	result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+	assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 }

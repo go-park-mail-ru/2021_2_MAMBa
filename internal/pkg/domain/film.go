@@ -1,9 +1,25 @@
 package domain
 
 import (
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"encoding/json"
-	"strconv"
+	"net/http"
 )
+
+type Response struct {
+	Body   json.RawMessage `json:"body,omitempty"`
+	Error  json.RawMessage `json:"error,omitempty"`
+	Status int             `json:"status"`
+}
+
+func (r *Response) Write(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusOK)
+	err := json.NewEncoder(w).Encode(r)
+	if err != nil {
+		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
+		return
+	}
+}
 
 type Country struct {
 	Id          uint64
@@ -122,8 +138,6 @@ func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
 type NewRate struct {
 	Rating json.Number `json:"rating,omitempty"`
 }
-
-
 
 type FilmRepository interface {
 	GetFilm(id uint64) (Film, error)

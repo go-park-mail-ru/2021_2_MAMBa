@@ -5,6 +5,7 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/person/usecase/mock"
 	"encoding/json"
+	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -40,13 +41,13 @@ var testTableGetPersonSuccess = [...]testRow{
 var testTableGetPersonFailure = [...]testRow{
 	{
 		inQuery: "",
-		out:     customErrors.ErrorBadInput.Error() + "\n",
+		out:     customErrors.ErrIdMsg + "\n",
 		status:  http.StatusBadRequest,
 		name:    `no id`,
 	},
 	{
 		inQuery: "id=10",
-		out:     customErrors.ErrorInternalServer.Error() + "\n",
+		out:     customErrors.ErrDBMsg + "\n",
 		status:  http.StatusInternalServerError,
 		name:    `overshoot`,
 	},
@@ -66,7 +67,8 @@ func TestGetPersonSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPerson(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -88,8 +90,8 @@ func TestGetPersonFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPerson(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"body":{"error":"`+test.out[:len(test.out)-1]+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
@@ -152,7 +154,8 @@ func TestGetRecomSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPersonFilms(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -171,7 +174,7 @@ func TestGetRecomFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPersonFilms(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"body":{"error":"`+test.out[:len(test.out)-1]+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
