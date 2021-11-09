@@ -18,7 +18,7 @@ const (
 
 func (handler *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	clientID, err := sessions.CheckSession(r)
-	if err != nil || err == sessions.ErrUserNotLoggedIn {
+	if err != nil || err == customErrors.ErrUserNotLoggedIn {
 		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}

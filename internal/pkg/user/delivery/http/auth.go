@@ -50,7 +50,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = sessions.CheckSession(r)
-	if err != sessions.ErrUserNotLoggedIn {
+	if err != customErrors.ErrUserNotLoggedIn {
 		http.Error(w, customErrors.ErrorAlreadyIn.Error(), http.StatusBadRequest)
 		return
 	}
@@ -87,7 +87,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	id, err := sessions.CheckSession(r)
-	if err == sessions.ErrUserNotLoggedIn {
+	if err == customErrors.ErrUserNotLoggedIn {
 		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusForbidden)
 		return
 	}
@@ -101,7 +101,7 @@ func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 
 func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	userID, err := sessions.CheckSession(r)
-	if err == sessions.ErrUserNotLoggedIn {
+	if err == customErrors.ErrUserNotLoggedIn {
 		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
 		return
 	}

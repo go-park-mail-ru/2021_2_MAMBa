@@ -13,7 +13,6 @@ import (
 
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 )
@@ -125,14 +124,13 @@ func TestGetFilmSuccess(t *testing.T) {
 		mock := mock2.NewMockFilmUsecase(ctrl)
 		mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(cl, nil)
 		handler := FilmHandler{FilmUsecase: mock}
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetFilm(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
@@ -148,14 +146,12 @@ func TestGetFilmFailure(t *testing.T) {
 			mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, customErrors.ErrorSkip)
 		}
 		handler := FilmHandler{FilmUsecase: mock}
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetFilm(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
+		result:= `{"error":"`+test.out[:len(test.out)-1]+`","status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
@@ -205,7 +201,8 @@ func TestPostReviewSuccess(t *testing.T) {
 		}
 		w = httptest.NewRecorder()
 		handler2.PostRating(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -256,7 +253,8 @@ func TestGetMySuccess(t *testing.T) {
 		}
 		w = httptest.NewRecorder()
 		handler2.LoadMyRv(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -320,7 +318,8 @@ func TestGetReviewsSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmReviews(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -339,8 +338,8 @@ func TestGetReviewsFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmReviews(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"error":"`+test.out[:len(test.out)-1]+`","status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
@@ -403,7 +402,8 @@ func TestGetRecomSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmRecommendations(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -422,7 +422,7 @@ func TestGetRecomFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmRecommendations(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result:= `{"error":"`+test.out[:len(test.out)-1]+`","status":`+fmt.Sprint(test.status)+"}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }

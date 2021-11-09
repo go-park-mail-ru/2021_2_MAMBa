@@ -10,7 +10,6 @@ func CheckIsIn(w http.ResponseWriter, r *http.Request, queryString string, defau
 	if isIn {
 		value, err := strconv.Atoi(valueString[0])
 		if err != nil || value < 0 {
-			http.Error(w, returnError.Error(), http.StatusBadRequest)
 			return defaultValue, returnError
 		}
 		return value, nil
@@ -23,7 +22,6 @@ func CheckIsIn64(w http.ResponseWriter, r *http.Request, queryString string, def
 	if isIn {
 		value, err := strconv.ParseUint(valueString[0], 10, 64)
 		if err != nil || value < 0 {
-			http.Error(w, returnError.Error(), http.StatusBadRequest)
 			return defaultValue, returnError
 		}
 		return value, nil
@@ -36,7 +34,6 @@ func CheckIsInFloat64(w http.ResponseWriter, r *http.Request, queryString string
 	if isIn {
 		value, err := strconv.ParseFloat(valueString[0], 64)
 		if err != nil || value < 0 {
-			http.Error(w, returnError.Error(), http.StatusBadRequest)
 			return defaultValue, returnError
 		}
 		return value, nil

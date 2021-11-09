@@ -7,11 +7,12 @@ import (
 )
 
 type Response struct {
-	Body   json.RawMessage `json:"body"`
-	Status int    `json:"status"`
+	Body   json.RawMessage `json:"body,omitempty"`
+	Error  json.RawMessage `json:"error,omitempty"`
+	Status int             `json:"status"`
 }
 
-func (r *Response) Write (w http.ResponseWriter)  {
+func (r *Response) Write(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusOK)
 	err := json.NewEncoder(w).Encode(r)
 	if err != nil {

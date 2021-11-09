@@ -49,7 +49,7 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	clientID, err := sessions.CheckSession(r)
-	if err != nil && err != sessions.ErrUserNotLoggedIn {
+	if err != nil && err != customErrors.ErrUserNotLoggedIn {
 		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -74,7 +74,7 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 
 func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	clientID, err := sessions.CheckSession(r)
-	if err != nil || err == sessions.ErrUserNotLoggedIn {
+	if err != nil || err == customErrors.ErrUserNotLoggedIn {
 		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -110,7 +110,7 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 
 func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
 	clientID, err := sessions.CheckSession(r)
-	if err != nil || err == sessions.ErrUserNotLoggedIn {
+	if err != nil || err == customErrors.ErrUserNotLoggedIn {
 		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
 		return
 	}
