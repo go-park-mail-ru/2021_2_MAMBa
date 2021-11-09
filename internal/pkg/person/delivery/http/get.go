@@ -1,7 +1,9 @@
 package http
 
 import (
+	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
 	"net/http"
@@ -16,52 +18,64 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
 		return
 	}
 	page, err := handler.PersonUsecase.GetPerson(id)
 	if err == customErrors.ErrorBadInput {
-		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusBadRequest)
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
 		return
 	}
 	if err != nil {
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(page)
-	if err != nil {
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
-		return
+	x, err := json.Marshal(page)
+	resp:= domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
 	}
+	resp.Write(w)
 }
 
 func (handler *PersonHandler) GetPersonFilms(w http.ResponseWriter, r *http.Request) {
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
 		return
 	}
 	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
 		return
 	}
 	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
 	if err != nil {
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrLimitMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
 		return
 	}
 	films, err := handler.PersonUsecase.GetFilms(id, skip, limit)
 	if err == customErrors.ErrorSkip {
-		http.Error(w, customErrors.ErrorSkip.Error(), http.StatusBadRequest)
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
 		return
 	}
 	if err != nil {
-		http.Error(w, customErrors.ErrSkipMsg, http.StatusInternalServerError)
+		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(films)
-	if err != nil {
-		http.Error(w, customErrors.ErrSkipMsg, http.StatusInternalServerError)
-		return
+	x, err := json.Marshal(films)
+	resp:= domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
 	}
+	resp.Write(w)
 }
