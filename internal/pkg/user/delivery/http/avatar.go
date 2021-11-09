@@ -1,8 +1,10 @@
 package http
 
 import (
+	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/sessions"
+	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/filesaver"
 	"2021_2_MAMBa/internal/pkg/utils/log"
 	"encoding/json"
@@ -19,45 +21,44 @@ const (
 func (handler *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	clientID, err := sessions.CheckSession(r)
 	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
+		resp.Write(w)
 		return
 	}
 
 	err = r.ParseMultipartForm(10 * 1024 * 1024) // лимит 10МБ
 	if err != nil {
 		log.Warn(fmt.Sprintf("parse multipart form error: %s", err))
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
+		resp.Write(w)
 		return
 	}
 	uploaded, header, err := r.FormFile("avatar")
 	if err != nil {
 		log.Warn(fmt.Sprintf("error while parsing file: %s", err))
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
+		resp.Write(w)
 	}
 	defer uploaded.Close()
 
 	filename, err := filesaver.UploadFile(uploaded, root, path, filepath.Ext(header.Filename))
 	if err != nil {
 		log.Error(err)
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
+		resp.Write(w)
 	}
 
 	us, err := handler.UserUsecase.UpdateAvatar(clientID, filename)
 	if err != nil {
-		http.Error(w, customErrors.ErrorBadInput.Error(), http.StatusNotFound)
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
+		resp.Write(w)
 		return
 	}
 
-	b, err := json.Marshal(us)
-	if err != nil {
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
-		return
+	x, err := json.Marshal(us)
+	resp:= domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
 	}
-
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(b)
-	if err != nil {
-		http.Error(w, customErrors.ErrorInternalServer.Error(), http.StatusInternalServerError)
-		return
-	}
+	resp.Write(w)
 }
