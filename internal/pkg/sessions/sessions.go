@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
+var store = sessions.NewFilesystemStore("",securecookie.GenerateRandomKey(32))
 var sessionName = "session-name"
 
 // MaxAge=0 means no Max-Age attribute specified and the cookie will be
@@ -20,7 +20,7 @@ func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 	session.Values["id"] = id
 	session.Options = &sessions.Options{
 		MaxAge:   100000, // ~27 hours
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
