@@ -62,7 +62,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(filmList)
+	x, err := json.Marshal(filmPageInfo)
 	resp:= domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -101,7 +101,8 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(domain.NewRate{Rating: newRating})
+	jsRate := json.Number(fmt.Sprintf("%.1f", newRating))
+	x, err := json.Marshal(domain.NewRate{Rating: jsRate})
 	resp:= domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
