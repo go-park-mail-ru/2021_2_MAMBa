@@ -61,7 +61,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 		return domain.FilmList{}, err
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmList{}, customErrors.ErrorSkip
 	}
 
@@ -96,7 +96,7 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 		return domain.FilmList{}, err
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmList{}, customErrors.ErrorBadCredentials
 	}
 

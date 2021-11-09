@@ -128,7 +128,7 @@ func (fr *dbFilmRepository) GetFilmReviews(id uint64, skip int, limit int) (doma
 		return domain.FilmReviews{}, customErrors.ErrorInternalServer
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 	moreAvailable := skip+limit < dbSize
@@ -170,7 +170,7 @@ func (fr *dbFilmRepository) GetFilmRecommendations(id uint64, skip int, limit in
 		return domain.FilmRecommendations{}, customErrors.ErrorInternalServer
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmRecommendations{}, customErrors.ErrorSkip
 	}
 

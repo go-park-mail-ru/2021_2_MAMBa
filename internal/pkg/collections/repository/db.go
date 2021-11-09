@@ -29,7 +29,7 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 		return domain.Collections{}, customErrors.ErrorInternalServer
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.Collections{}, customErrors.ErrorSkip
 	}
 

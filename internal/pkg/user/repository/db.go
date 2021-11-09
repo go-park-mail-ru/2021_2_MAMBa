@@ -190,7 +190,7 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 	}
 	dbSizeRaw := cast.ToUint64(result[0][0])
 	dbSize := int(dbSizeRaw)
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 
