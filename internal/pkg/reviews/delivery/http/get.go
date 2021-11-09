@@ -20,18 +20,18 @@ func (handler *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) 
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
 	review, err := handler.ReiviewUsecase.GetReview(id)
 	if err == customErrors.ErrorSkip {
-		resp := domain.Response{Error: cast.StringToJson(err.Error()), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(err.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
@@ -48,7 +48,7 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 	reviewForm := domain.Review{}
 	err := json.NewDecoder(r.Body).Decode(&reviewForm)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
@@ -56,7 +56,7 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 
 	authId, err := sessions.CheckSession(r)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
 	}
@@ -74,36 +74,36 @@ func (handler *ReviewHandler) LoadExcept(w http.ResponseWriter, r *http.Request)
 	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
 	filmId, err := queryChecker.CheckIsIn64(w, r, "film_id", 0, customErrors.ErrorSkip)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
 	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
 	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrLimitMsg), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrLimitMsg), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
 	review, err := handler.ReiviewUsecase.LoadReviewsExcept(id, filmId, skip, limit)
 	if err == customErrors.ErrorSkip {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
 		resp.Write(w)
 		return
 	}
 	if err != nil {
-		resp := domain.Response{Error: cast.StringToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
