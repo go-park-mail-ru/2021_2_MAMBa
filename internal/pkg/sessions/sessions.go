@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
+var store = sessions.NewFilesystemStore("",securecookie.GenerateRandomKey(32))
 var sessionName = "session-name"
 
 // MaxAge=0 means no Max-Age attribute specified and the cookie will be
