@@ -65,7 +65,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	_, err = sessions.CheckSession(r)
 	if err != customErrors.ErrorUserNotLoggedIn {
-		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorAlreadyIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
 	}
