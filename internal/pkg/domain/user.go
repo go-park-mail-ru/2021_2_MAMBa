@@ -6,7 +6,7 @@ type Profile struct {
 	ID            uint64 `json:"id"`
 	FirstName     string `json:"first_name,omitempty"`
 	Surname       string `json:"surname,omitempty"`
-	PictureUrl    string `json:"picture_url,omitempty"`
+	PictureUrl    string `json:"profile_pic,omitempty"`
 	Email         string `json:"email,omitempty"`
 	Gender        string `json:"gender,omitempty"`
 	RegisterDate  string `json:"register_date,omitempty"`
