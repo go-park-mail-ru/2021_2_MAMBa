@@ -18,9 +18,9 @@ func NewCollectionsRepository(manager *database.DBManager) domain.CollectionsRep
 const (
 	queryCountCollections = "SELECT COUNT(*) FROM Collection"
 	queryGetCollections   = "SELECT collection_id, collection_name, picture_url FROM Collection LIMIT $1 OFFSET $2 "
-	queryCountFilms = "SELECT COUNT(*) from film f join collectionconnection c on f.film_id = c.film_id WHERE collection_id = $1"
-	queryGetFilms = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url from film f join collectionconnection c on f.film_id = c.film_id WHERE collection_id = $1 ORDER BY f.film_id"
-	queryGetCollection = "SELECT * FROM collection WHERE collection_id = $1"
+	queryCountFilms       = "SELECT COUNT(*) from film f join collectionconnection c on f.film_id = c.film_id WHERE collection_id = $1"
+	queryGetFilms         = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url from film f join collectionconnection c on f.film_id = c.film_id WHERE collection_id = $1 ORDER BY f.film_id"
+	queryGetCollection    = "SELECT * FROM collection WHERE collection_id = $1"
 )
 
 func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.Collections, error) {
@@ -56,7 +56,7 @@ func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.C
 	return collect, nil
 }
 
-func (cr *dbCollectionsRepository) GetCollectionFilms (id uint64) ([]domain.Film, error) {
+func (cr *dbCollectionsRepository) GetCollectionFilms(id uint64) ([]domain.Film, error) {
 	result, err := cr.dbm.Query(queryCountFilms, id)
 	if err != nil {
 		return []domain.Film{}, err
@@ -83,8 +83,7 @@ func (cr *dbCollectionsRepository) GetCollectionFilms (id uint64) ([]domain.Film
 	return filmList, nil
 }
 
-
-func (cr *dbCollectionsRepository) GetCollectionInfo (id uint64) (domain.Collection, error) {
+func (cr *dbCollectionsRepository) GetCollectionInfo(id uint64) (domain.Collection, error) {
 	result, err := cr.dbm.Query(queryGetCollection, id)
 	if err != nil {
 		return domain.Collection{}, err

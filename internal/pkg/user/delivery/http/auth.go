@@ -32,7 +32,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	if err !=nil {
+	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
@@ -46,7 +46,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusCreated,
 	}
@@ -94,7 +94,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -138,7 +138,7 @@ func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}

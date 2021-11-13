@@ -20,7 +20,7 @@ const (
 func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 	var err error
 	// default
-	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	filmID, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -51,7 +51,9 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filmPageInfo, err := handler.FilmUsecase.GetFilm(uint64(id), skipReview, limitReview, skipRecom, limitRecom)
+	authId, err := sessions.CheckSession(r)
+
+	filmPageInfo, err := handler.FilmUsecase.GetFilm(authId, filmID, skipReview, limitReview, skipRecom, limitRecom)
 	if err == customErrors.ErrorSkip {
 		resp := domain.Response{Body: cast.ErrorToJson(err.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -63,10 +65,10 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	x, err := json.Marshal(filmPageInfo)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
-  }
+	}
 	resp.Write(w)
 }
 
@@ -103,10 +105,10 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 	}
 	jsRate := json.Number(fmt.Sprintf("%.1f", newRating))
 	x, err := json.Marshal(domain.NewRate{Rating: jsRate})
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
-  }
+	}
 	resp.Write(w)
 }
 
@@ -141,7 +143,7 @@ func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	x, err := json.Marshal(review)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -181,7 +183,7 @@ func (handler *FilmHandler) loadFilmReviews(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	x, err := json.Marshal(reviews)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -220,7 +222,7 @@ func (handler *FilmHandler) loadFilmRecommendations(w http.ResponseWriter, r *ht
 		return
 	}
 	x, err := json.Marshal(recommendations)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}

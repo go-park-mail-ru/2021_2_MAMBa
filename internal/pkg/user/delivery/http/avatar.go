@@ -56,7 +56,7 @@ func (handler *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request)
 	}
 
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}

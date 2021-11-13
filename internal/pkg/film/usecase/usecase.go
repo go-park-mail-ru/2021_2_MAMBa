@@ -12,24 +12,32 @@ func NewFilmUsecase(u domain.FilmRepository) domain.FilmUsecase {
 	}
 }
 
-func (uc *FilmUsecase) GetFilm(id uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (domain.FilmPageInfo, error) {
-	film, err := uc.FilmRepo.GetFilm(id)
+func (uc *FilmUsecase) GetFilm(userID, filmID uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (domain.FilmPageInfo, error) {
+	film, err := uc.FilmRepo.GetFilm(filmID)
 	if err != nil {
 		return domain.FilmPageInfo{}, err
 	}
-	Reviews, err := uc.FilmRepo.GetFilmReviews(id, skipReviews, limitReviews)
+	Reviews, err := uc.FilmRepo.GetFilmReviews(filmID, skipReviews, limitReviews)
 	if err != nil {
 		return domain.FilmPageInfo{}, err
 	}
-	Recommended, err := uc.FilmRepo.GetFilmRecommendations(id, skipReviews, limitRecommend)
+	Recommended, err := uc.FilmRepo.GetFilmRecommendations(filmID, skipReviews, limitRecommend)
 	if err != nil {
 		return domain.FilmPageInfo{}, err
+	}
+
+	myReview := domain.Review{}
+	if userID != 0 {
+		myReview, err = uc.FilmRepo.GetMyReview(filmID, userID)
+		if err != nil {
+			return domain.FilmPageInfo{}, err
+		}
 	}
 	result := domain.FilmPageInfo{
-		FilmMain:            &film,
+		FilmMain:        &film,
 		Reviews:         Reviews,
 		Recommendations: Recommended,
-		MyRating:        -1,
+		MyReview:        myReview,
 	}
 	return result, nil
 }

@@ -33,7 +33,7 @@ func (handler *UserHandler) GetBasicInfo(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -61,7 +61,7 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -94,7 +94,7 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 	}
 
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -124,7 +124,7 @@ func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Re
 	}
 
 	x, err := json.Marshal(us)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -164,10 +164,9 @@ func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	x, err := json.Marshal(review)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
 	resp.Write(w)
 }
-

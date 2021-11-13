@@ -25,18 +25,18 @@ type Collection struct {
 }
 
 type CollectionPage struct {
-	Films []Film `json:"films"`
-	Coll Collection `json:"collection"`
+	Films []Film     `json:"films"`
+	Coll  Collection `json:"collection"`
 }
 
 type CollectionsRepository interface {
-	GetCollections (skip int, limit int) (Collections, error)
-	GetCollectionFilms (id uint64) ([]Film, error)
-	GetCollectionInfo (id uint64) (Collection, error)
+	GetCollections(skip int, limit int) (Collections, error)
+	GetCollectionFilms(id uint64) ([]Film, error)
+	GetCollectionInfo(id uint64) (Collection, error)
 }
 
 //go:generate mockgen -destination=../collections/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain CollectionsUsecase
 type CollectionsUsecase interface {
-	GetCollections (skip int, limit int) (Collections, error)
-	GetCollectionPage (collId uint64) (CollectionPage, error)
+	GetCollections(skip int, limit int) (Collections, error)
+	GetCollectionPage(collId uint64) (CollectionPage, error)
 }

@@ -20,7 +20,7 @@ func (uc *collectionsUsecase) GetCollections(skip int, limit int) (domain.Collec
 	return colls, err
 }
 
-func (uc *collectionsUsecase) GetCollectionPage (collId uint64) (domain.CollectionPage, error) {
+func (uc *collectionsUsecase) GetCollectionPage(collId uint64) (domain.CollectionPage, error) {
 	films, err := uc.collectionsRepo.GetCollectionFilms(collId)
 	if err != nil {
 		return domain.CollectionPage{}, err

@@ -34,7 +34,7 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	x, err := json.Marshal(page)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -73,7 +73,7 @@ func (handler *PersonHandler) GetPersonFilms(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	x, err := json.Marshal(films)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}

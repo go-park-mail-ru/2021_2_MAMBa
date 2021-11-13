@@ -164,7 +164,7 @@ func TestGetFilmReviewsSucess(t *testing.T) {
 			ReviewType:       3,
 			Stars:            4.0,
 			Date:             "",
-				}},
+		}},
 		MoreAvailable: false,
 		ReviewTotal:   1,
 		CurrentLimit:  10,

@@ -128,7 +128,7 @@ func TestGetFilmSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetFilm(w, r)
-		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -150,7 +150,7 @@ func TestGetFilmFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetFilm(w, r)
-		result:= `{"body":{"error":"`+test.out[:len(test.out)-1]+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -201,7 +201,7 @@ func TestPostReviewSuccess(t *testing.T) {
 		}
 		w = httptest.NewRecorder()
 		handler2.PostRating(w, r)
-		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -253,7 +253,7 @@ func TestGetMySuccess(t *testing.T) {
 		}
 		w = httptest.NewRecorder()
 		handler2.LoadMyRv(w, r)
-		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -318,7 +318,7 @@ func TestGetReviewsSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmReviews(w, r)
-		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -338,7 +338,7 @@ func TestGetReviewsFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmReviews(w, r)
-		result:= `{"body":{"error":"`+test.out[:len(test.out)-1]+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -402,7 +402,7 @@ func TestGetRecomSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmRecommendations(w, r)
-		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -422,7 +422,7 @@ func TestGetRecomFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmRecommendations(w, r)
-		result:= `{"body":{"error":"`+test.out[:len(test.out)-1]+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }

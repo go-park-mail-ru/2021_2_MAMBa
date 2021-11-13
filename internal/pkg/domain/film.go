@@ -52,25 +52,25 @@ type Film struct {
 }
 
 type FilmJson struct {
-	Id              uint64   `json:"id,omitempty"`
-	Title           string   `json:"title,omitempty"`
-	TitleOriginal   string   `json:"title_original,omitempty"`
-	Rating          json.Number  `json:"rating,omitempty"`
-	Description     string   `json:"description,omitempty"`
-	TotalRevenue    string   `json:"total_revenue,omitempty"`
-	PosterUrl       string   `json:"poster_url,omitempty"`
-	TrailerUrl      string   `json:"trailer_url,omitempty"`
-	ContentType     string   `json:"content_type,omitempty"`
-	ReleaseYear     int      `json:"release_year,omitempty"`
-	Duration        int      `json:"duration,omitempty"`
-	OriginCountries []string `json:"origin_countries,omitempty"`
-	Cast            []Person `json:"cast,omitempty"`
-	Director        Person   `json:"director,omitempty"`
-	Screenwriter    Person   `json:"screenwriter,omitempty"`
-	Genres          []Genre  `json:"genres,omitempty"`
+	Id              uint64      `json:"id,omitempty"`
+	Title           string      `json:"title,omitempty"`
+	TitleOriginal   string      `json:"title_original,omitempty"`
+	Rating          json.Number `json:"rating,omitempty"`
+	Description     string      `json:"description,omitempty"`
+	TotalRevenue    string      `json:"total_revenue,omitempty"`
+	PosterUrl       string      `json:"poster_url,omitempty"`
+	TrailerUrl      string      `json:"trailer_url,omitempty"`
+	ContentType     string      `json:"content_type,omitempty"`
+	ReleaseYear     int         `json:"release_year,omitempty"`
+	Duration        int         `json:"duration,omitempty"`
+	OriginCountries []string    `json:"origin_countries,omitempty"`
+	Cast            []Person    `json:"cast,omitempty"`
+	Director        Person      `json:"director,omitempty"`
+	Screenwriter    Person      `json:"screenwriter,omitempty"`
+	Genres          []Genre     `json:"genres,omitempty"`
 }
 
-func (film *Film) toJsonNum () FilmJson {
+func (film *Film) toJsonNum() FilmJson {
 	s := json.Number(strconv.FormatFloat(film.Rating, 'f', 1, 64))
 	return FilmJson{
 		Id:              film.Id,
@@ -114,17 +114,17 @@ type FilmReviews struct {
 }
 
 type FilmPageInfo struct {
-	FilmMain            *Film                `json:"film"`
+	FilmMain        *Film               `json:"film"`
 	Reviews         FilmReviews         `json:"reviews"`
 	Recommendations FilmRecommendations `json:"recommendations"`
-	MyRating        float64             `json:"my_rating"`
+	MyReview        Review              `json:"my_review"`
 }
 
 type FilmPageInfoJson struct {
-	FilmMain            FilmJson                `json:"film"`
+	FilmMain        FilmJson            `json:"film"`
 	Reviews         FilmReviews         `json:"reviews"`
 	Recommendations FilmRecommendations `json:"recommendations"`
-	MyRating        float64             `json:"my_rating"`
+	MyReview        Review              `json:"my_review"`
 }
 
 func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
@@ -132,7 +132,7 @@ func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
 		FilmMain:        filmPage.FilmMain.toJsonNum(),
 		Reviews:         filmPage.Reviews,
 		Recommendations: filmPage.Recommendations,
-		MyRating:        filmPage.MyRating,
+		MyReview:        filmPage.MyReview,
 	})
 }
 
@@ -150,7 +150,7 @@ type FilmRepository interface {
 
 //go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
 type FilmUsecase interface {
-	GetFilm(id uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (FilmPageInfo, error)
+	GetFilm(userID, filmID uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (FilmPageInfo, error)
 	PostRating(id uint64, authorId uint64, rating float64) (float64, error)
 	LoadFilmReviews(id uint64, skip int, limit int) (FilmReviews, error)
 	LoadFilmRecommendations(id uint64, skip int, limit int) (FilmRecommendations, error)

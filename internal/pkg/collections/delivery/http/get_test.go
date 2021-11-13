@@ -93,7 +93,7 @@ func TestGetCollectionSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetCollections(w, r)
-		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 		fmt.Fprintf(os.Stdout, " done\n")
@@ -116,7 +116,7 @@ func TestGetCollectionError(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetCollections(w, r)
-		result:= `{"body":{"error":"`+test.out[:len(test.out)-1]+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }

@@ -8,7 +8,7 @@ var (
 	ErrSkipMsg           = "incorrect skip"
 	ErrLimitMsg          = "incorrect limit"
 	ErrDBMsg             = "DB error"
-	ErrEncMsg            = "Encoding error"
+	ErrEncMsg            = "encoding error"
 	ErrIdMsg             = "no such id"
 	ErrRateMsg           = "incorrect rating"
 	ErrNoReviewMsg       = "no review"

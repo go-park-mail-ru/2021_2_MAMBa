@@ -80,7 +80,7 @@ func TestGetBasicInfoSuccess(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		handler.GetBasicInfo(w, r)
-		result:= `{"body":`+test.out+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -106,7 +106,7 @@ func TestGetBasicInfoFailure(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		handler.GetBasicInfo(w, r)
-		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -159,7 +159,7 @@ func TestGetProfileInfoSuccess(t *testing.T) {
 		mock.EXPECT().GetProfileById(ret.ID, ret1.ID).Return(ret1, nil)
 		w = httptest.NewRecorder()
 		handler.GetProfile(w, r)
-		result:= `{"body":`+testCase.out+`,"status":`+fmt.Sprint(testCase.status)+"}\n"
+		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, testCase.status, w.Code, "Test: "+test.name)
 	}
@@ -214,7 +214,7 @@ func TestUpdateProfileInfoSuccess(t *testing.T) {
 		mock.EXPECT().UpdateProfile(in).Return(ret1, nil)
 		w = httptest.NewRecorder()
 		handler.UpdateProfile(w, r)
-		result:= `{"body":`+testCase.out+`,"status":`+fmt.Sprint(testCase.status)+"}\n"
+		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, testCase.status, w.Code, "Test: "+testCase.name)
 	}
@@ -230,7 +230,7 @@ func TestUpdateProfileInfoFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
 		handler.UpdateProfile(w, r)
-		result:= `{"body":{"error":"`+testCase.out+`"},"status":`+fmt.Sprint(testCase.status)+"}\n"
+		result := `{"body":{"error":"` + testCase.out + `"},"status":` + fmt.Sprint(testCase.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+testCase.name)
 	}
 }
@@ -284,7 +284,7 @@ func TestSubscribeSuccess(t *testing.T) {
 		mock.EXPECT().CreateSubscription(ret.ID, ret1.ID).Return(ret1, nil)
 		w = httptest.NewRecorder()
 		handler.CreateSubscription(w, r)
-		result:= `{"body":`+testCase.out+`,"status":`+fmt.Sprint(testCase.status)+"}\n"
+		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, testCase.status, w.Code, "Test: "+testCase.name)
 	}
@@ -300,7 +300,7 @@ func TestSubscribeFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
 		handler.CreateSubscription(w, r)
-		result:= `{"body":{"error":"`+testCase.out+`"},"status":`+fmt.Sprint(testCase.status)+"}\n"
+		result := `{"body":{"error":"` + testCase.out + `"},"status":` + fmt.Sprint(testCase.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+testCase.name)
 	}
 }
@@ -364,7 +364,7 @@ func TestGetReviewsSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.LoadUserReviews(w, r)
-		result:= `{"body":`+test.out[:len(test.out)-1]+`,"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -384,7 +384,7 @@ func TestGetReviewsFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.LoadUserReviews(w, r)
-		result:= `{"body":{"error":"`+test.out+`"},"status":`+fmt.Sprint(test.status)+"}\n"
+		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }

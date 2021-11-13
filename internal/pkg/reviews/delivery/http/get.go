@@ -36,7 +36,7 @@ func (handler *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	x, err := json.Marshal(review)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -63,7 +63,7 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 	reviewForm.AuthorId = authId
 	review, err := handler.ReiviewUsecase.PostReview(reviewForm)
 	x, err := json.Marshal(review)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
@@ -108,7 +108,7 @@ func (handler *ReviewHandler) LoadExcept(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	x, err := json.Marshal(review)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}

@@ -41,13 +41,12 @@ func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http
 		return
 	}
 	x, err := json.Marshal(collectionsList)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}
 	resp.Write(w)
 }
-
 
 func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -65,7 +64,7 @@ func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *
 		return
 	}
 	x, err := json.Marshal(collectionFilms)
-	resp:= domain.Response{
+	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
 	}

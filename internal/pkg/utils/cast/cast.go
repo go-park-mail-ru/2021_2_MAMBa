@@ -52,7 +52,7 @@ func StringToJson(src string) []byte {
 	return res
 }
 
-func ErrorToJson (src string) []byte {
+func ErrorToJson(src string) []byte {
 	res, _ := json.Marshal(JsonErr{Error: src})
 	return res
 }
