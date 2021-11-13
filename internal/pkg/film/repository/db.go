@@ -24,7 +24,7 @@ const (
 	queryGetFilmCountries         = "SELECT country.country_name FROM country JOIN countryproduction c ON country.country_id = c.country_id WHERE c.Film_ID = $1"
 	queryGetFilmGenres            = "SELECT genre.* FROM genre JOIN filmgenres f on genre.genre_id = f.genre_id WHERE f.film_id = $1"
 	queryGetFilmCast              = "SELECT p.person_id,p.name_en,p.name_rus,p.picture_url,p.career  FROM person p JOIN filmcast f on p.person_id = f.person_id WHERE f.film_id = $1"
-	queryGetFilmReviews           = "SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 AND (NOT type = 0) LIMIT $2 OFFSET $3"
+	queryGetFilmReviews           = "SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 AND (NOT type = 0) ORDER BY review.review_date DESC LIMIT $2 OFFSET $3"
 	queryGetFilmRecommendations   = "SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = $1 LIMIT $2 OFFSET $3"
 	queryGetFilmRating            = "SELECT AVG(stars) FROM review WHERE film_id = $1AND (NOT stars = 0)"
 	queryPostRating               = "INSERT INTO  review (review_id, film_id, author_id, review_text, type, stars, review_date) VALUES (DEFAULT, $1, $2, '', $3, $4, $5)"
