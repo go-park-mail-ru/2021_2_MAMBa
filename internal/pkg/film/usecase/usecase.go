@@ -1,6 +1,9 @@
 package usecase
 
-import "2021_2_MAMBa/internal/pkg/domain"
+import (
+	"2021_2_MAMBa/internal/pkg/domain"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+)
 
 type FilmUsecase struct {
 	FilmRepo domain.FilmRepository
@@ -29,7 +32,7 @@ func (uc *FilmUsecase) GetFilm(userID, filmID uint64, skipReviews int, limitRevi
 	myReview := domain.Review{}
 	if userID != 0 {
 		myReview, err = uc.FilmRepo.GetMyReview(filmID, userID)
-		if err != nil {
+		if err != nil && err != customErrors.ErrorNoReviewForFilm {
 			return domain.FilmPageInfo{}, err
 		}
 	}
