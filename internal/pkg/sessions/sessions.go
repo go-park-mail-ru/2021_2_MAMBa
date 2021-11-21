@@ -15,12 +15,14 @@ var sessionName = "session-name"
 // MaxAge<0 means delete cookie immediately.
 // MaxAge>0 means Max-Age attribute present and given in seconds.
 
-func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
+type SessionManager struct {}
+
+func StartSession (w http.ResponseWriter, r *http.Request, id uint64) error {
 	session, _ := store.Get(r, sessionName)
 	session.Values["id"] = id
 	session.Options = &sessions.Options{
 		MaxAge:   100000, // ~27 hours
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",

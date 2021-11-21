@@ -1,0 +1,320 @@
+syntax = "proto3";
+package proto;
+
+
+message Actor {
+  uint64 id = 1;
+  string nameEn = 2;
+  string nameRus = 3;
+  string pictureUrl = 4;
+  repeated string career = 5;
+  double height = 6;
+  int64 age = 7;
+  string birthday = 8;
+  string death = 9;
+  string birthPlace = 10;
+  string deathPlace = 11;
+  string gender = 12;
+  string familyStatus = 13;
+  int64 filmNumber = 14;
+}
+
+message Coll {
+  uint64 id = 1;
+  uint64 authId = 2;
+  string collName = 3;
+  string description = 4;
+  string creationTime = 5;
+  string picUrl = 6;
+}
+
+message Collection {
+  uint64 id = 1;
+  uint64 authId = 2;
+  string collName = 3;
+  string description = 4;
+  string creationTime = 5;
+  string picUrl = 6;
+}
+
+
+
+message CollectionPreview {
+  uint64 id = 1;
+  string title = 2;
+  string pictureUrl = 3;
+}
+
+message Collections {
+  repeated CollectionPreview collArray = 1;
+  bool moreAvailable = 2;
+  int64 collectionTotal = 3;
+  string currentSort = 4;
+  int64 currentLimit = 5;
+  int64 currentSkip = 6;
+}
+
+message Country {
+  uint64 id = 1;
+  string countryName = 2;
+}
+
+message Director {
+  uint64 id = 1;
+  string nameEn = 2;
+  string nameRus = 3;
+  string pictureUrl = 4;
+  repeated string career = 5;
+  double height = 6;
+  int64 age = 7;
+  string birthday = 8;
+  string death = 9;
+  string birthPlace = 10;
+  string deathPlace = 11;
+  string gender = 12;
+  string familyStatus = 13;
+  int64 filmNumber = 14;
+}
+
+message Film {
+  uint64 id = 1;
+  string title = 2;
+  string titleOriginal = 3;
+  double rating = 4;
+  string description = 5;
+  string totalRevenue = 6;
+  string posterUrl = 7;
+  string trailerUrl = 8;
+  string contentType = 9;
+  int64 releaseYear = 10;
+  int64 duration = 11;
+  repeated string originCountries = 12;
+  repeated Person cast = 13;
+  Person director = 14;
+  Person screenwriter = 15;
+  repeated Genre genres = 16;
+}
+
+message FilmJson {
+  uint64 id = 1;
+  string title = 2;
+  string titleOriginal = 3;
+  encoding/json.Number rating = 4;
+  string description = 5;
+  string totalRevenue = 6;
+  string posterUrl = 7;
+  string trailerUrl = 8;
+  string contentType = 9;
+  int64 releaseYear = 10;
+  int64 duration = 11;
+  repeated string originCountries = 12;
+  repeated Person cast = 13;
+  Person director = 14;
+  Person screenwriter = 15;
+  repeated Genre genres = 16;
+}
+
+message FilmList {
+  repeated Film filmList = 1;
+  bool moreAvailable = 2;
+  int64 filmTotal = 3;
+  int64 currentLimit = 4;
+  int64 currentSkip = 5;
+}
+
+message FilmMain {
+  uint64 id = 1;
+  string title = 2;
+  string titleOriginal = 3;
+  encoding/json.Number rating = 4;
+  string description = 5;
+  string totalRevenue = 6;
+  string posterUrl = 7;
+  string trailerUrl = 8;
+  string contentType = 9;
+  int64 releaseYear = 10;
+  int64 duration = 11;
+  repeated string originCountries = 12;
+  repeated Person cast = 13;
+  Person director = 14;
+  Person screenwriter = 15;
+  repeated Genre genres = 16;
+}
+
+message FilmPageInfo {
+  Film filmMain = 1;
+  FilmReviews reviews = 2;
+  FilmRecommendations recommendations = 3;
+  Review myReview = 4;
+}
+
+message FilmPageInfoJson {
+  FilmJson filmMain = 1;
+  FilmReviews reviews = 2;
+  FilmRecommendations recommendations = 3;
+  Review myReview = 4;
+}
+
+message FilmRecommendations {
+  repeated Film recommendationList = 1;
+  bool moreAvailable = 2;
+  int64 recommendationTotal = 3;
+  int64 currentLimit = 4;
+  int64 currentSkip = 5;
+}
+
+message FilmReviews {
+  repeated Review reviewList = 1;
+  bool moreAvailable = 2;
+  int64 reviewTotal = 3;
+  string currentSort = 4;
+  int64 currentLimit = 5;
+  int64 currentSkip = 6;
+}
+
+message Films {
+  repeated Film filmList = 1;
+  bool moreAvailable = 2;
+  int64 filmTotal = 3;
+  int64 currentLimit = 4;
+  int64 currentSkip = 5;
+}
+
+message Genre {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message MyReview {
+  uint64 id = 1;
+  uint64 filmId = 2;
+  string filmTitleRu = 3;
+  string filmTitleOriginal = 4;
+  string filmPictureUrl = 5;
+  uint64 authorId = 6;
+  string authorName = 7;
+  string authorPictureUrl = 8;
+  string reviewText = 9;
+  int64 reviewType = 10;
+  double stars = 11;
+  string date = 12;
+}
+
+message NewRate {
+  encoding/json.Number rating = 1;
+}
+
+message Person {
+  uint64 id = 1;
+  string nameEn = 2;
+  string nameRus = 3;
+  string pictureUrl = 4;
+  repeated string career = 5;
+  double height = 6;
+  int64 age = 7;
+  string birthday = 8;
+  string death = 9;
+  string birthPlace = 10;
+  string deathPlace = 11;
+  string gender = 12;
+  string familyStatus = 13;
+  int64 filmNumber = 14;
+}
+
+message PersonPage {
+  Person actor = 1;
+  FilmList films = 2;
+  FilmList popularFilms = 3;
+}
+
+message PopularFilms {
+  repeated Film filmList = 1;
+  bool moreAvailable = 2;
+  int64 filmTotal = 3;
+  int64 currentLimit = 4;
+  int64 currentSkip = 5;
+}
+
+message Profile {
+  uint64 id = 1;
+  string firstName = 2;
+  string surname = 3;
+  string pictureUrl = 4;
+  string email = 5;
+  string gender = 6;
+  string registerDate = 7;
+  int64 subCount = 8;
+  int64 bookmarkCount = 9;
+  bool amSubscribed = 10;
+}
+
+message Recommendations {
+  repeated Film recommendationList = 1;
+  bool moreAvailable = 2;
+  int64 recommendationTotal = 3;
+  int64 currentLimit = 4;
+  int64 currentSkip = 5;
+}
+
+message Response {
+  repeated RawMessage body = 1;
+  repeated RawMessage error = 2;
+  int64 status = 3;
+}
+
+message Review {
+  uint64 id = 1;
+  uint64 filmId = 2;
+  string filmTitleRu = 3;
+  string filmTitleOriginal = 4;
+  string filmPictureUrl = 5;
+  uint64 authorId = 6;
+  string authorName = 7;
+  string authorPictureUrl = 8;
+  string reviewText = 9;
+  int64 reviewType = 10;
+  double stars = 11;
+  string date = 12;
+}
+
+message Reviews {
+  repeated Review reviewList = 1;
+  bool moreAvailable = 2;
+  int64 reviewTotal = 3;
+  string currentSort = 4;
+  int64 currentLimit = 5;
+  int64 currentSkip = 6;
+}
+
+message Screenwriter {
+  uint64 id = 1;
+  string nameEn = 2;
+  string nameRus = 3;
+  string pictureUrl = 4;
+  repeated string career = 5;
+  double height = 6;
+  int64 age = 7;
+  string birthday = 8;
+  string death = 9;
+  string birthPlace = 10;
+  string deathPlace = 11;
+  string gender = 12;
+  string familyStatus = 13;
+  int64 filmNumber = 14;
+}
+
+message User {
+  uint64 id = 1;
+  string firstName = 2;
+  string surname = 3;
+  string email = 4;
+  string password = 5;
+  string passwordRepeat = 6;
+  string profilePic = 7;
+}
+
+message UserToLogin {
+  string email = 1;
+  string password = 2;
+}
+

@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/sessions/delivery/grpc/";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package GRPCcoll;
+
+message SkipLimit {
+  int64 skip = 1;
+  int64 limit = 2;
+}
+
+message CollectionPreview  {
+  uint64 Id = 1;
+  string Title = 2;
+  string PictureUrl = 3;
+}
+
+
+message Collections {
+  repeated CollectionPreview CollArray = 1;
+  bool     MoreAvailable = 2;
+  int64  CollectionTotal = 3;
+  string  CurrentSort = 4;
+  int64 CurrentLimit = 5;
+  int64   CurrentSkip = 6;
+}
+
+message Genre {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message Person {
+  uint64 id = 1;
+  string nameEn = 2;
+  string nameRus = 3;
+  string pictureUrl = 4;
+  repeated string career = 5;
+  double height = 6;
+  int64 age = 7;
+  string birthday = 8;
+  string death = 9;
+  string birthPlace = 10;
+  string deathPlace = 11;
+  string gender = 12;
+  string familyStatus = 13;
+  int64 filmNumber = 14;
+}
+
+message Film {
+  uint64 id = 1;
+  string title = 2;
+  string titleOriginal = 3;
+  double rating = 4;
+  string description = 5;
+  string totalRevenue = 6;
+  string posterUrl = 7;
+  string trailerUrl = 8;
+  string contentType = 9;
+  int64 releaseYear = 10;
+  int64 duration = 11;
+  repeated string originCountries = 12;
+  repeated Person cast = 13;
+  Person director = 14;
+  Person screenwriter = 15;
+  repeated Genre genres = 16;
+}
+
+message Collection {
+  uint64 id = 1;
+  uint64 authId = 2;
+  string collName = 3;
+  string description = 4;
+  string creationTime = 5;
+  string picUrl = 6;
+}
+
+message CollectionPage {
+  repeated Film films = 1;
+  Collection coll = 2;
+}
+
+message ID {
+  uint64 id = 1;
+}
+
+service CollectionsRPC {
+  rpc GetCollections (SkipLimit) returns (Collections);
+  rpc GetCollectionPage (ID) returns (CollectionPage);
+}
