@@ -2,6 +2,7 @@ package http
 
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
+	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -9,11 +10,13 @@ import (
 
 type UserHandler struct {
 	UserUsecase domain.UserUsecase
+	AuthClient authRPC.SessionRPCClient
 }
 
-func NewHandlers(router *mux.Router, uc domain.UserUsecase) {
+func NewHandlers(router *mux.Router, uc domain.UserUsecase, auth authRPC.SessionRPCClient) {
 	handler := &UserHandler{
 		UserUsecase: uc,
+		AuthClient: auth,
 	}
 
 	router.HandleFunc("/user/{id:[0-9]+}", handler.GetBasicInfo).Methods("GET", "OPTIONS")

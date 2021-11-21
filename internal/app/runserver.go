@@ -14,6 +14,7 @@ import (
 	reviewsDelivery "2021_2_MAMBa/internal/pkg/reviews/delivery/http"
 	reviewsRepository "2021_2_MAMBa/internal/pkg/reviews/repository"
 	reviewsUsecase "2021_2_MAMBa/internal/pkg/reviews/usecase"
+	grpcAuth "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
 	userDelivery "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	userRepository "2021_2_MAMBa/internal/pkg/user/repository"
 	userUsecase "2021_2_MAMBa/internal/pkg/user/usecase"
@@ -24,7 +25,7 @@ import (
 	"net/http"
 )
 
-func RunServer(addr string, collAddr string) {
+func RunServer(addr string, collAddr string, authAddr string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 
@@ -43,19 +44,25 @@ func RunServer(addr string, collAddr string) {
 	personRepo := personRepository.NewPersonRepository(db)
 	reviewRepo := reviewsRepository.NewReviewRepository(db)
 
-	conn, err := grpc.Dial("localhost:"+collAddr, grpc.WithInsecure())
+	collConn, err := grpc.Dial("localhost:"+collAddr, grpc.WithInsecure())
 	if err != nil {
 		return
 	}
-	defer conn.Close()
-	clientCollections := grpcCollection.NewCollectionsRPCClient(conn)
+	defer collConn.Close()
+	clientCollections := grpcCollection.NewCollectionsRPCClient(collConn)
+	authConn, err := grpc.Dial("localhost:"+authAddr, grpc.WithInsecure())
+	if err != nil {
+		return
+	}
+	defer authConn.Close()
+	clientAuth := grpcAuth.NewSessionRPCClient(authConn)
 
 	usUsecase := userUsecase.NewUserUsecase(userRepo)
 	filUsecase := filmUsecase.NewFilmUsecase(filmRepo)
 	persUsecase := personUsecase.NewPersonUsecase(personRepo)
 	revUsecase := reviewsUsecase.NewReviewUsecase(reviewRepo)
 
-	userDelivery.NewHandlers(api, usUsecase)
+	userDelivery.NewHandlers(api, usUsecase, clientAuth)
 	collectionsDelivery.NewHandlers(api, clientCollections)
 	filmDelivery.NewHandlers(api, filUsecase)
 	personDelivery.NewHandlers(api, persUsecase)

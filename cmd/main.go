@@ -5,8 +5,9 @@ import (
 )
 
 const serverPort = ":8080"
-const CollPort = "50040"
+const collPort = "50040"
+const authPort = "50041"
 
 func main() {
-	server.RunServer(serverPort, CollPort)
+	server.RunServer(serverPort, collPort, authPort)
 }
