@@ -4,6 +4,8 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/reviews/usecase/mock"
+	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
+	mockSessions "2021_2_MAMBa/internal/pkg/sessions/mock"
 	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
@@ -117,15 +119,18 @@ func TestPostReviewSuccess(t *testing.T) {
 	}
 	for _, test := range testTablePostRatingSuccess {
 		mock := mock3.NewMockUserUsecase(ctrl)
+		mockSessions1 := mockSessions.NewMockSessionRPCClient(ctrl)
 		var cl domain.UserToLogin
 		var ret domain.User
 		_ = json.Unmarshal([]byte(test1.bodyString), &cl)
 		_ = json.Unmarshal([]byte(test1.out), &ret)
-		handler := userDel.UserHandler{UserUsecase: mock}
+		handler := userDel.UserHandler{UserUsecase: mock, AuthClient: mockSessions1}
 		mock.EXPECT().Login(&cl).Times(1).Return(ret, nil)
 		bodyReader := strings.NewReader(test1.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test1.inQuery, bodyReader)
+		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
+		mockSessions1.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 		handler.Login(w, r)
 
 		var toPost domain.Review
@@ -133,9 +138,10 @@ func TestPostReviewSuccess(t *testing.T) {
 		_ = json.Unmarshal([]byte(test.bodyString), &toPost)
 		_ = json.Unmarshal([]byte(test.out), &res)
 		mock2 := mock2.NewMockReviewUsecase(ctrl)
+		mockSessions2 := mockSessions.NewMockSessionRPCClient(ctrl)
 		toPost.AuthorId = uint64(2)
 		mock2.EXPECT().PostReview(toPost).Times(1).Return(res, nil)
-		handler2 := ReviewHandler{ReiviewUsecase: mock2}
+		handler2 := ReviewHandler{ReiviewUsecase: mock2, AuthClient: mockSessions2}
 		bodyReader = strings.NewReader(test.bodyString)
 		r = httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		cookies := w.Result().Cookies()
@@ -143,6 +149,7 @@ func TestPostReviewSuccess(t *testing.T) {
 			r.AddCookie(cookie)
 		}
 		w = httptest.NewRecorder()
+		mockSessions2.EXPECT().CheckSession(r.Context(), &authRPC.Request{Name: "session-name", Value: "aaa"}).Return(&authRPC.ID{ID: 2}, nil).Times(1)
 		handler2.PostReview(w, r)
 		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
