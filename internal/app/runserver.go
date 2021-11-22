@@ -21,6 +21,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/log"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
@@ -28,11 +29,16 @@ func RunServer(addr string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 
+	middlewares.RegisterMetrics()
+
+	metrics := middlewares.InitMetrics()
 	// middleware
 	api.Use(middlewares.PanicRecovery)
+	api.Use(metrics.Metrics)
 	api.Use(middlewares.Logger)
 	api.Use(middlewares.CORS)
-	api.Use(middlewares.CSRF)
+	//api.Use(middlewares.CSRF)
+
 
 	// database
 	db := database.Connect()
@@ -55,6 +61,7 @@ func RunServer(addr string) {
 	filmDelivery.NewHandlers(api, filUsecase)
 	personDelivery.NewHandlers(api, persUsecase)
 	reviewsDelivery.NewHandlers(api, revUsecase)
+	r.Handle("/metrics", promhttp.Handler())
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()
