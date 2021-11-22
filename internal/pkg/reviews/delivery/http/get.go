@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
@@ -54,7 +53,10 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 	}
 	xss.SanitizeReview(&reviewForm)
 
-	authId, err := sessions.CheckSession(r)
+	rq :=  cast.CookieToRq(r,0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
+	authId:= authIDMessage.ID
+
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)

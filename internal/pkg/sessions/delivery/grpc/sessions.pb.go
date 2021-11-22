@@ -637,6 +637,7 @@ const _ = grpc.SupportPackageIsVersion6
 // SessionRPCClient is the client API for SessionRPC service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+//go:generate mockgen -destination=../sessions/mock/sessions_mock_client.go  -package=sessions_mock 2021_2_MAMBa/internal/pkg/sessions/delivery/grpc SessionRPCClient
 type SessionRPCClient interface {
 	StartSession(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Session, error)
 	EndSession(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Session, error)

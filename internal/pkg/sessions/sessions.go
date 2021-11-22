@@ -20,6 +20,7 @@ var sessionName = "session-name"
 // MaxAge<0 means delete cookie immediately.
 // MaxAge>0 means Max-Age attribute present and given in seconds.
 
+
 type SessionManager struct{}
 
 func NewSessionManager() sGrpc.SessionRPCServer {
@@ -128,19 +129,19 @@ func (sm *SessionManager) CheckSession(ctx context.Context, rq *sGrpc.Request) (
 	})
 	session, err := store.Get(r, sessionName)
 	if err != nil && !session.IsNew {
-		return &sGrpc.ID{}, err
+		return &sGrpc.ID{ID: 0}, err
 	}
 	id, isIn := session.Values["id"]
 	if !isIn || session.IsNew {
-		return &sGrpc.ID{}, customErrors.ErrorUserNotLoggedIn
+		return &sGrpc.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn
 	}
 	idCasted, ok := id.(uint64)
 	if !ok {
-		return &sGrpc.ID{}, customErrors.ErrorUint64Cast
+		return &sGrpc.ID{ID: 0}, customErrors.ErrorUint64Cast
 	}
 	return &sGrpc.ID{ID: idCasted}, nil
 }
-
+/*
 func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 	session, _ := store.Get(r, sessionName)
 	session.Values["id"] = id
@@ -170,9 +171,9 @@ func EndSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 		// deleting a session may only happen at maxage < 0
 		session.Options.MaxAge = -1
 		err := session.Save(r, w)
-		/*encoded, err := securecookie.EncodeMulti(session.Name(), session.ID,
-			store.Codecs...)
-		http.SetCookie(w, sessions.NewCookie(sessionName, encoded, session.Options))*/
+		//encoded, err := securecookie.EncodeMulti(session.Name(), session.ID,
+		//	store.Codecs...)
+		//http.SetCookie(w, sessions.NewCookie(sessionName, encoded, session.Options))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return err
@@ -195,4 +196,4 @@ func CheckSession(r *http.Request) (uint64, error) {
 		return 0, customErrors.ErrorUint64Cast
 	}
 	return idCasted, nil
-}
+}*/

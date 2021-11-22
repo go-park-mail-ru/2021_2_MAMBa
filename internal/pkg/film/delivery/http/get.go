@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
@@ -51,7 +50,9 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authId, err := sessions.CheckSession(r)
+	rq :=  cast.CookieToRq(r,0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
+	authId:= authIDMessage.ID
 
 	filmPageInfo, err := handler.FilmUsecase.GetFilm(authId, filmID, skipReview, limitReview, skipRecom, limitRecom)
 	if err == customErrors.ErrorSkip {
@@ -73,7 +74,9 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
-	authId, err := sessions.CheckSession(r)
+	rq :=  cast.CookieToRq(r,0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
+	authId:= authIDMessage.ID
 	if err == customErrors.ErrorUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
@@ -113,7 +116,9 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
-	authId, err := sessions.CheckSession(r)
+	rq :=  cast.CookieToRq(r,0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
+	authId:= authIDMessage.ID
 	if err == customErrors.ErrorUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)

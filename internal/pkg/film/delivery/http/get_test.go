@@ -1,5 +1,4 @@
 package http
-/*
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
@@ -122,7 +121,7 @@ func TestGetFilmSuccess(t *testing.T) {
 		var cl domain.FilmPageInfo
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockFilmUsecase(ctrl)
-		mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(cl, nil)
+		mock.EXPECT().GetFilm(uint64(0),uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(cl, nil)
 		handler := FilmHandler{FilmUsecase: mock}
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
@@ -143,7 +142,7 @@ func TestGetFilmFailure(t *testing.T) {
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockFilmUsecase(ctrl)
 		if i == 2 || i == 5 {
-			mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, customErrors.ErrorSkip)
+			mock.EXPECT().GetFilm(uint64(0),uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, customErrors.ErrorSkip)
 		}
 		handler := FilmHandler{FilmUsecase: mock}
 		bodyReader := strings.NewReader("")
@@ -425,4 +424,4 @@ func TestGetRecomFailure(t *testing.T) {
 		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
-}*/
+}

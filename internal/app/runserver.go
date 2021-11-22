@@ -64,9 +64,9 @@ func RunServer(addr string, collAddr string, authAddr string) {
 
 	userDelivery.NewHandlers(api, usUsecase, clientAuth)
 	collectionsDelivery.NewHandlers(api, clientCollections)
-	filmDelivery.NewHandlers(api, filUsecase)
+	filmDelivery.NewHandlers(api, filUsecase, clientAuth)
 	personDelivery.NewHandlers(api, persUsecase)
-	reviewsDelivery.NewHandlers(api, revUsecase)
+	reviewsDelivery.NewHandlers(api, revUsecase, clientAuth)
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()

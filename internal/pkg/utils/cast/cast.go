@@ -1,11 +1,33 @@
 package cast
 
 import (
+	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
 	"encoding/binary"
 	"encoding/json"
 	"github.com/jackc/pgtype"
 	"math"
+	"net/http"
 )
+
+func CookieToRq(request *http.Request, id uint64) authRPC.Request {
+	cookie, _ := request.Cookie("session-name")
+	if cookie == nil {
+		return authRPC.Request{ID: 0}
+	}
+	return authRPC.Request{
+		Name:     cookie.Name,
+		Value:    cookie.Value,
+		Path:     cookie.Path,
+		Domain:   cookie.Domain,
+		MaxAge:   int64(cookie.MaxAge),
+		Secure:   cookie.Secure,
+		HttpOnly: cookie.HttpOnly,
+		SameSite: int64(cookie.SameSite),
+		Raw:      cookie.Raw,
+		Unparsed: cookie.Unparsed,
+		ID:       id,
+	}
+}
 
 type JsonErr struct {
 	Error string `json:"error"`

@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
@@ -47,12 +46,14 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	clientID, err := sessions.CheckSession(r)
+	rq :=  cast.CookieToRq(r,0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
 	if err != nil && err != customErrors.ErrorUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
+	clientID := clientIDMessage.ID
 	us, err := handler.UserUsecase.GetProfileById(clientID, targetID)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusNotFound}
@@ -69,12 +70,14 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
-	clientID, err := sessions.CheckSession(r)
+	rq :=  cast.CookieToRq(r,0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
 	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
+	clientID := clientIDMessage.ID
 	profileForm := domain.Profile{}
 	err = json.NewDecoder(r.Body).Decode(&profileForm)
 	if err != nil {
@@ -102,12 +105,14 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 }
 
 func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
-	clientID, err := sessions.CheckSession(r)
+	rq :=  cast.CookieToRq(r,0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
 	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
+	clientID := clientIDMessage.ID
 	profileForm := domain.Profile{}
 	err = json.NewDecoder(r.Body).Decode(&profileForm)
 	if err != nil {

@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
 	"encoding/json"
@@ -12,21 +11,6 @@ import (
 	"net/http"
 )
 
-func CookieToRq(cookie *http.Cookie, id uint64) authRPC.Request {
-	return authRPC.Request{
-		Name:     cookie.Name,
-		Value:    cookie.Value,
-		Path:     cookie.Path,
-		Domain:   cookie.Domain,
-		MaxAge:   int64(cookie.MaxAge),
-		Secure:   cookie.Secure,
-		HttpOnly: cookie.HttpOnly,
-		SameSite: int64(cookie.SameSite),
-		Raw:      cookie.Raw,
-		Unparsed: cookie.Unparsed,
-		ID:       id,
-	}
-}
 
 func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -55,8 +39,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	ck, err := r.Cookie("session-name")
-	rq := CookieToRq(ck, us.ID)
+	rq := cast.CookieToRq(r, us.ID)
 	result, err := handler.AuthClient.StartSession(r.Context(), &rq)
 	http.SetCookie(w, sessions.NewCookie(result.Name, result.Value, &sessions.Options{
 		Path:     result.Path,
@@ -89,8 +72,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	ck, err := r.Cookie("session-name")
-	rq := CookieToRq(ck, 0)
+	rq := cast.CookieToRq(r, 0)
 	_, err = handler.AuthClient.CheckSession(r.Context(), &rq)
 	st, _ := status.FromError(err)
 	s2, _ := status.FromError(customErrors.ErrorUserNotLoggedIn)
@@ -120,7 +102,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	result, err := handler.AuthClient.StartSession(r.Context(), &rq)
 	http.SetCookie(w, sessions.NewCookie(result.Name, result.Value, &sessions.Options{
 		Path:     result.Path,
-		Domain:   "/",
+		Domain:   rq.Domain,
 		MaxAge:   int(result.MaxAge),
 		Secure:   result.Secure,
 		HttpOnly: result.HttpOnly,
@@ -140,8 +122,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	ck, err := r.Cookie("session-name")
-	rq := CookieToRq(ck, 0)
+	rq := cast.CookieToRq(r, 0)
 	idMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
 	if err == customErrors.ErrorUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusForbidden}
@@ -167,8 +148,7 @@ func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
-	ck, err := r.Cookie("session-name")
-	rq := CookieToRq(ck, 0)
+	rq := cast.CookieToRq(r, 0)
 	idMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
 	if err == customErrors.ErrorUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusForbidden}
