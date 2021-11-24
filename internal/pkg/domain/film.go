@@ -113,6 +113,15 @@ type FilmReviews struct {
 	CurrentSkip   int      `json:"current_skip"`
 }
 
+type FilmBookmarks struct {
+	FilmsList     []Film `json:"bookmarks_list"`
+	MoreAvailable bool   `json:"more_available"`
+	FilmsTotal    int    `json:"films_total"`
+	CurrentSort   string `json:"current_sort"`
+	CurrentLimit  int    `json:"current_limit"`
+	CurrentSkip   int    `json:"current_skip"`
+}
+
 type FilmPageInfo struct {
 	FilmMain        *Film               `json:"film"`
 	Reviews         FilmReviews         `json:"reviews"`
@@ -146,6 +155,8 @@ type FilmRepository interface {
 	GetFilmRecommendations(id uint64, skip int, limit int) (FilmRecommendations, error)
 	PostRating(id uint64, authorId uint64, rating float64) (float64, error)
 	GetMyReview(id uint64, authorId uint64) (Review, error)
+	LoadUserBookmarkedFilmsID(userID uint64, skip int, limit int) ([]uint64, error)
+	CountBookmarks(userID uint64) (int, error)
 }
 
 //go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
@@ -155,4 +166,5 @@ type FilmUsecase interface {
 	LoadFilmReviews(id uint64, skip int, limit int) (FilmReviews, error)
 	LoadFilmRecommendations(id uint64, skip int, limit int) (FilmRecommendations, error)
 	LoadMyReview(id uint64, authorId uint64) (Review, error)
+	LoadUserBookmarks(userID uint64, skip int, limit int) (FilmBookmarks, error)
 }

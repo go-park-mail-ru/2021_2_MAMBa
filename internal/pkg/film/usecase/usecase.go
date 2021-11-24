@@ -15,6 +15,40 @@ func NewFilmUsecase(u domain.FilmRepository) domain.FilmUsecase {
 	}
 }
 
+func (uc *FilmUsecase) LoadUserBookmarks(userID uint64, skip int, limit int) (domain.FilmBookmarks, error) {
+	filmIdxList, err := uc.FilmRepo.LoadUserBookmarkedFilmsID(userID, skip, limit)
+	if err != nil {
+		return domain.FilmBookmarks{}, err
+	}
+	filmsList := make([]domain.Film, 0)
+	for _, filmID := range filmIdxList {
+		film, err := uc.FilmRepo.GetFilm(filmID)
+		if err != nil {
+			return domain.FilmBookmarks{}, err
+		}
+		filmsList = append(filmsList, film)
+	}
+	countBookmarks, err := uc.FilmRepo.CountBookmarks(userID)
+	if err != nil {
+		return domain.FilmBookmarks{}, err
+	}
+	if skip >= countBookmarks && skip != 0 {
+		return domain.FilmBookmarks{}, customErrors.ErrorSkip
+	}
+
+	moreAvailable := skip+limit < countBookmarks
+
+	bookmarks := domain.FilmBookmarks{
+		FilmsList:     filmsList,
+		MoreAvailable: moreAvailable,
+		FilmsTotal:    countBookmarks,
+		CurrentSort:   "",
+		CurrentLimit:  limit,
+		CurrentSkip:   skip + limit,
+	}
+	return bookmarks, nil
+}
+
 func (uc *FilmUsecase) GetFilm(userID, filmID uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (domain.FilmPageInfo, error) {
 	film, err := uc.FilmRepo.GetFilm(filmID)
 	if err != nil {

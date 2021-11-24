@@ -10,6 +10,7 @@ var (
 	ErrDBMsg             = "DB error"
 	ErrEncMsg            = "encoding error"
 	ErrIdMsg             = "no such id"
+	ErrSearchQuery       = "invalid search query"
 	ErrRateMsg           = "incorrect rating"
 	ErrNoReviewMsg       = "no review"
 	ErrorSkip            = errors.New(ErrSkipMsg)

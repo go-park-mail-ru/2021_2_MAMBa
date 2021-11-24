@@ -19,6 +19,7 @@ func NewFilmRepository(manager *database.DBManager) domain.FilmRepository {
 const (
 	queryCountFilmReviews         = "SELECT COUNT(*) FROM Review WHERE Film_ID = $1 AND (NOT type = 0)"
 	queryCountFilmRecommendations = "SELECT COUNT(*) FROM recommended WHERE Film_ID = $1"
+	queryCountUserBookmarks       = "SELECT COUNT(*) FROM bookmark b WHERE user_id = $1"
 	queryGetFilmId                = "SELECT * FROM film WHERE film_id = $1"
 	queryGetFilmDirScr            = "SELECT film.*, p.person_id,p.name_en,p.name_rus,p.picture_url,p.career, p1.person_id,p1.name_en,p1.name_rus,p1.picture_url,p1.career FROM film JOIN person p on film.director = p.person_id JOIN person p1 on film.screenwriter = p1.person_id WHERE film_id = $1"
 	queryGetFilmCountries         = "SELECT country.country_name FROM country JOIN countryproduction c ON country.country_id = c.country_id WHERE c.Film_ID = $1"
@@ -32,7 +33,20 @@ const (
 	queryUpdateRating             = "UPDATE review SET stars = $1 WHERE film_id = $2 AND author_id = $3"
 	queryGetAuthorName            = "SELECT first_name, surname, picture_url FROM profile WHERE user_id = $1"
 	queryGetFilmShort             = "SELECT title, title_original, poster_url FROM FILM WHERE Film_ID = $1"
+	queryGetBookmarksByUserID     = "SELECT b.film_id FROM bookmark b WHERE user_id = $1 LIMIT $2 OFFSET $3"
 )
+
+func (ur *dbFilmRepository) LoadUserBookmarkedFilmsID(userID uint64, skip int, limit int) ([]uint64, error) {
+	result, err := ur.dbm.Query(queryGetBookmarksByUserID, userID, limit, skip)
+	filmIdxList := make([]uint64, 0)
+	if err != nil {
+		return filmIdxList, err
+	}
+	for i := range result {
+		filmIdxList = append(filmIdxList, cast.ToUint64(result[i][0]))
+	}
+	return filmIdxList, nil
+}
 
 func (fr *dbFilmRepository) GetFilm(id uint64) (domain.Film, error) {
 	result, err := fr.dbm.Query(queryGetFilmDirScr, id)
@@ -192,6 +206,15 @@ func (fr *dbFilmRepository) GetFilmRecommendations(id uint64, skip int, limit in
 		CurrentSkip:         skip + limit,
 	}
 	return reviewsList, nil
+}
+
+func (fr *dbFilmRepository) CountBookmarks(userID uint64) (int, error) {
+	result, err := fr.dbm.Query(queryCountUserBookmarks, userID)
+	if err != nil {
+		return 0, customErrors.ErrorInternalServer
+	}
+	dbSize := int(cast.ToUint64(result[0][0]))
+	return dbSize, nil
 }
 
 func (fr *dbFilmRepository) PostRating(id uint64, author_id uint64, rating float64) (float64, error) {

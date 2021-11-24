@@ -8,13 +8,13 @@ import (
 
 type FilmHandler struct {
 	FilmUsecase domain.FilmUsecase
-	AuthClient authRPC.SessionRPCClient
+	AuthClient  authRPC.SessionRPCClient
 }
 
 func NewHandlers(router *mux.Router, uc domain.FilmUsecase, auth authRPC.SessionRPCClient) {
 	handler := &FilmHandler{
 		FilmUsecase: uc,
-		AuthClient: auth,
+		AuthClient:  auth,
 	}
 
 	router.HandleFunc("/film/getFilm", handler.GetFilm).Methods("GET", "OPTIONS")
@@ -22,4 +22,5 @@ func NewHandlers(router *mux.Router, uc domain.FilmUsecase, auth authRPC.Session
 	router.HandleFunc("/film/loadFilmReviews", handler.loadFilmReviews).Methods("GET", "OPTIONS")
 	router.HandleFunc("/film/loadFilmRecommendations", handler.loadFilmRecommendations).Methods("GET", "OPTIONS")
 	router.HandleFunc("/film/loadMyReviewForFilm", handler.LoadMyRv).Methods("GET", "OPTIONS")
+	router.HandleFunc("/user/getBookmarks", handler.LoadUserBookmarks).Methods("GET", "OPTIONS")
 }

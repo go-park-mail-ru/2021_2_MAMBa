@@ -14,6 +14,9 @@ import (
 	reviewsDelivery "2021_2_MAMBa/internal/pkg/reviews/delivery/http"
 	reviewsRepository "2021_2_MAMBa/internal/pkg/reviews/repository"
 	reviewsUsecase "2021_2_MAMBa/internal/pkg/reviews/usecase"
+	searchDelivery "2021_2_MAMBa/internal/pkg/search/delivery/http"
+	searchRepository "2021_2_MAMBa/internal/pkg/search/repository"
+	searchUsecase "2021_2_MAMBa/internal/pkg/search/usecase"
 	grpcAuth "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
 	userDelivery "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	userRepository "2021_2_MAMBa/internal/pkg/user/repository"
@@ -33,7 +36,7 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	api.Use(middlewares.PanicRecovery)
 	api.Use(middlewares.Logger)
 	api.Use(middlewares.CORS)
-	//api.Use(middlewares.CSRF)
+	// api.Use(middlewares.CSRF)
 
 	// database
 	db := database.Connect()
@@ -43,6 +46,7 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	filmRepo := filmRepository.NewFilmRepository(db)
 	personRepo := personRepository.NewPersonRepository(db)
 	reviewRepo := reviewsRepository.NewReviewRepository(db)
+	searchRepo := searchRepository.NewSearchRepository(db)
 
 	collConn, err := grpc.Dial("localhost:"+collAddr, grpc.WithInsecure())
 	if err != nil {
@@ -61,12 +65,14 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	filUsecase := filmUsecase.NewFilmUsecase(filmRepo)
 	persUsecase := personUsecase.NewPersonUsecase(personRepo)
 	revUsecase := reviewsUsecase.NewReviewUsecase(reviewRepo)
+	searUsecase := searchUsecase.NewSearchUsecase(searchRepo)
 
 	userDelivery.NewHandlers(api, usUsecase, clientAuth)
 	collectionsDelivery.NewHandlers(api, clientCollections)
 	filmDelivery.NewHandlers(api, filUsecase, clientAuth)
 	personDelivery.NewHandlers(api, persUsecase)
 	reviewsDelivery.NewHandlers(api, revUsecase, clientAuth)
+	searchDelivery.NewHandlers(api, searUsecase, clientAuth)
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()
