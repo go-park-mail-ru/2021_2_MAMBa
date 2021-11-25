@@ -15,6 +15,72 @@ func NewFilmUsecase(u domain.FilmRepository) domain.FilmUsecase {
 	}
 }
 
+func (uc *FilmUsecase) GetGenres() (domain.GenresList, error) {
+	genresList, err := uc.FilmRepo.GetGenres()
+	if err != nil {
+		return domain.GenresList{}, err
+	}
+	return genresList, nil
+}
+
+func (uc *FilmUsecase) GetFilmsByGenre(genreID uint64, limit int, skip int) (domain.GenreFilmList, error) {
+	genreFilmList, err := uc.FilmRepo.GetFilmsByGenre(genreID, limit, skip)
+	if err != nil {
+		return domain.GenreFilmList{}, err
+	}
+	return genreFilmList, nil
+}
+
+func (uc *FilmUsecase) BookmarkFilm(userID uint64, filmID uint64, bookmarked bool) error {
+	err := uc.FilmRepo.BookmarkFilm(userID, filmID, bookmarked)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *FilmUsecase) GetFilmsByMonthYear(month int, year int, limit int, skip int) (domain.FilmList, error) {
+	filmList, err := uc.FilmRepo.GetFilmsByMonthYear(month, year, limit, skip)
+	if err != nil {
+		return domain.FilmList{}, err
+	}
+	return filmList, nil
+}
+
+func (uc *FilmUsecase) LoadUserBookmarks(userID uint64, skip int, limit int) (domain.FilmBookmarks, error) {
+	filmIdxList, err := uc.FilmRepo.LoadUserBookmarkedFilmsID(userID, skip, limit)
+	if err != nil {
+		return domain.FilmBookmarks{}, err
+	}
+	filmsList := make([]domain.Film, 0)
+	for _, filmID := range filmIdxList {
+		film, err := uc.FilmRepo.GetFilm(filmID)
+		if err != nil {
+			return domain.FilmBookmarks{}, err
+		}
+		filmsList = append(filmsList, film)
+	}
+	countBookmarks, err := uc.FilmRepo.CountBookmarks(userID)
+	if err != nil {
+		return domain.FilmBookmarks{}, err
+	}
+	if skip >= countBookmarks && skip != 0 {
+		return domain.FilmBookmarks{}, customErrors.ErrorSkip
+	}
+
+	moreAvailable := skip+limit < countBookmarks
+
+	bookmarks := domain.FilmBookmarks{
+		FilmsList:     filmsList,
+		MoreAvailable: moreAvailable,
+		FilmsTotal:    countBookmarks,
+		CurrentSort:   "",
+		CurrentLimit:  limit,
+		CurrentSkip:   skip + limit,
+	}
+	return bookmarks, nil
+}
+
 func (uc *FilmUsecase) GetFilm(userID, filmID uint64, skipReviews int, limitReviews int, skipRecommend int, limitRecommend int) (domain.FilmPageInfo, error) {
 	film, err := uc.FilmRepo.GetFilm(filmID)
 	if err != nil {
@@ -36,11 +102,21 @@ func (uc *FilmUsecase) GetFilm(userID, filmID uint64, skipReviews int, limitRevi
 			return domain.FilmPageInfo{}, err
 		}
 	}
+
+	bookmarked := false
+	if userID != 0 {
+		bookmarked, err = uc.FilmRepo.CheckFilmBookmarked(userID, filmID)
+		if err != nil {
+			return domain.FilmPageInfo{}, err
+		}
+	}
+
 	result := domain.FilmPageInfo{
 		FilmMain:        &film,
 		Reviews:         Reviews,
 		Recommendations: Recommended,
 		MyReview:        myReview,
+		Bookmarked:      bookmarked,
 	}
 	return result, nil
 }

@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/filesaver"
 	"2021_2_MAMBa/internal/pkg/utils/log"
@@ -19,12 +18,14 @@ const (
 )
 
 func (handler *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
-	clientID, err := sessions.CheckSession(r)
-	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
+	clientID := clientIDMessage.ID
 
 	err = r.ParseMultipartForm(10 * 1024 * 1024) // лимит 10МБ
 	if err != nil {

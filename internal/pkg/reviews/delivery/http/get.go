@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
@@ -17,7 +16,6 @@ const (
 )
 
 func (handler *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -54,12 +52,15 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 	}
 	xss.SanitizeReview(&reviewForm)
 
-	authId, err := sessions.CheckSession(r)
-	if err != nil {
+	rq := cast.CookieToRq(r, 0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil && err.Error() == customErrors.RPCErrUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
 	}
+	authId := authIDMessage.ID
+
 	reviewForm.AuthorId = authId
 	review, err := handler.ReiviewUsecase.PostReview(reviewForm)
 	x, err := json.Marshal(review)
@@ -71,7 +72,6 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 }
 
 func (handler *ReviewHandler) LoadExcept(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}

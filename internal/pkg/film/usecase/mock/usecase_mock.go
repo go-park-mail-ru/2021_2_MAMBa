@@ -35,18 +35,18 @@ func (m *MockFilmUsecase) EXPECT() *MockFilmUsecaseMockRecorder {
 }
 
 // GetFilm mocks base method.
-func (m *MockFilmUsecase) GetFilm(arg0 uint64, arg1, arg2, arg3, arg4 int) (domain.FilmPageInfo, error) {
+func (m *MockFilmUsecase) GetFilm(arg0, arg1 uint64, arg2, arg3, arg4, arg5 int) (domain.FilmPageInfo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFilm", arg0, arg1, arg2, arg3, arg4)
+	ret := m.ctrl.Call(m, "GetFilm", arg0, arg1, arg2, arg3, arg4, arg5)
 	ret0, _ := ret[0].(domain.FilmPageInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFilm indicates an expected call of GetFilm.
-func (mr *MockFilmUsecaseMockRecorder) GetFilm(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+func (mr *MockFilmUsecaseMockRecorder) GetFilm(arg0, arg1, arg2, arg3, arg4, arg5 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFilm", reflect.TypeOf((*MockFilmUsecase)(nil).GetFilm), arg0, arg1, arg2, arg3, arg4)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFilm", reflect.TypeOf((*MockFilmUsecase)(nil).GetFilm), arg0, arg1, arg2, arg3, arg4, arg5)
 }
 
 // LoadFilmRecommendations mocks base method.

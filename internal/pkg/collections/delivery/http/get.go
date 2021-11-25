@@ -1,10 +1,12 @@
 package http
 
 import (
+	"2021_2_MAMBa/internal/pkg/collections/delivery/grpc"
 	"2021_2_MAMBa/internal/pkg/domain"
 	"2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
+	"context"
 	"encoding/json"
 	"net/http"
 )
@@ -15,7 +17,6 @@ const (
 )
 
 func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http.Request) {
-	var err error
 	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
@@ -29,7 +30,7 @@ func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http
 		return
 	}
 
-	collectionsList, err := handler.CollectionsUsecase.GetCollections(skip, limit)
+	collectionsList, err := handler.CollectionsClient.GetCollections(context.Background(), &grpc.SkipLimit{Skip: int64(skip), Limit: int64(limit)})
 	if err == customErrors.ErrorSkip {
 		resp := domain.Response{Body: cast.ErrorToJson(err.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -49,7 +50,6 @@ func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http
 }
 
 func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -57,7 +57,7 @@ func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *
 		return
 	}
 
-	collectionFilms, err := handler.CollectionsUsecase.GetCollectionPage(id)
+	collectionFilms, err := handler.CollectionsClient.GetCollectionPage(context.Background(), &grpc.ID{Id: id})
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
 		resp.Write(w)

@@ -15,7 +15,6 @@ const (
 )
 
 func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -42,7 +41,6 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *PersonHandler) GetPersonFilms(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}

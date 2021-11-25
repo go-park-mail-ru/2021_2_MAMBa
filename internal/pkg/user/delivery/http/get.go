@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
@@ -47,11 +46,15 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	clientID, err := sessions.CheckSession(r)
-	if err != nil && err != customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	var clientID uint64 = 0
+	if err != nil && err.Error() != customErrors.RPCErrUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
+	} else if err == nil {
+		clientID = clientIDMessage.ID
 	}
 	us, err := handler.UserUsecase.GetProfileById(clientID, targetID)
 	if err != nil {
@@ -69,12 +72,14 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
-	clientID, err := sessions.CheckSession(r)
-	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
+	clientID := clientIDMessage.ID
 	profileForm := domain.Profile{}
 	err = json.NewDecoder(r.Body).Decode(&profileForm)
 	if err != nil {
@@ -102,12 +107,14 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 }
 
 func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
-	clientID, err := sessions.CheckSession(r)
-	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
+	clientID := clientIDMessage.ID
 	profileForm := domain.Profile{}
 	err = json.NewDecoder(r.Body).Decode(&profileForm)
 	if err != nil {
@@ -132,7 +139,6 @@ func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Re
 }
 
 func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
