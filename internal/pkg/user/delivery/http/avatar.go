@@ -18,9 +18,9 @@ const (
 )
 
 func (handler *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
-	rq :=  cast.CookieToRq(r,0)
-	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
-	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return

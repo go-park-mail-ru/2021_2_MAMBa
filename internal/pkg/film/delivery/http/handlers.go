@@ -22,5 +22,10 @@ func NewHandlers(router *mux.Router, uc domain.FilmUsecase, auth authRPC.Session
 	router.HandleFunc("/film/loadFilmReviews", handler.loadFilmReviews).Methods("GET", "OPTIONS")
 	router.HandleFunc("/film/loadFilmRecommendations", handler.loadFilmRecommendations).Methods("GET", "OPTIONS")
 	router.HandleFunc("/film/loadMyReviewForFilm", handler.LoadMyRv).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/postBookmark", handler.BookmarkFilm).Methods("POST", "OPTIONS")
+	router.HandleFunc("/film/calendar", handler.GetFilmsByMonthYear).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/genres", handler.GetGenres).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/genreFilms", handler.GetFilmsByGenre).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/calendar", handler.GetFilmsByMonthYear).Methods("GET", "OPTIONS")
 	router.HandleFunc("/user/getBookmarks", handler.LoadUserBookmarks).Methods("GET", "OPTIONS")
 }

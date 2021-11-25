@@ -64,7 +64,7 @@ func (uc *collectionsUsecase) GetCollectionPage(ctx context.Context, id *grpc.ID
 	}
 	collPage := grpc.CollectionPage{
 		Films: bufferFilms,
-		Coll:  &grpc.Collection{
+		Coll: &grpc.Collection{
 			Id:           coll.Id,
 			AuthId:       coll.AuthId,
 			CollName:     coll.CollName,

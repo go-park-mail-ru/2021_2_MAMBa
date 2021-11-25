@@ -8,13 +8,13 @@ import (
 
 type ReviewHandler struct {
 	ReiviewUsecase domain.ReviewUsecase
-	AuthClient authRPC.SessionRPCClient
+	AuthClient     authRPC.SessionRPCClient
 }
 
 func NewHandlers(router *mux.Router, uc domain.ReviewUsecase, auth authRPC.SessionRPCClient) {
 	handler := &ReviewHandler{
 		ReiviewUsecase: uc,
-		AuthClient: auth,
+		AuthClient:     auth,
 	}
 
 	router.HandleFunc("/film/getReview", handler.GetReview).Methods("GET", "OPTIONS")

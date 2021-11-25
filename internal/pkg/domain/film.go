@@ -28,8 +28,19 @@ type Country struct {
 }
 
 type Genre struct {
-	Id   uint64 `json:"id"`
-	Name string `json:"name"`
+	Id         uint64 `json:"id"`
+	Name       string `json:"name"`
+	PictureURL string `json:"picture_url,omitempty"`
+}
+
+type GenresList struct {
+	GenresList []Genre `json:"genres_list"`
+}
+
+type GenreFilmList struct {
+	Id        uint64   `json:"id"`
+	Name      string   `json:"name"`
+	FilmsList FilmList `json:"films"`
 }
 
 type Film struct {
@@ -44,6 +55,7 @@ type Film struct {
 	ContentType     string   `json:"content_type,omitempty"`
 	ReleaseYear     int      `json:"release_year,omitempty"`
 	Duration        int      `json:"duration,omitempty"`
+	PremiereRu      string   `json:"premiere_ru,omitempty"`
 	OriginCountries []string `json:"origin_countries,omitempty"`
 	Cast            []Person `json:"cast,omitempty"`
 	Director        Person   `json:"director,omitempty"`
@@ -63,6 +75,7 @@ type FilmJson struct {
 	ContentType     string      `json:"content_type,omitempty"`
 	ReleaseYear     int         `json:"release_year,omitempty"`
 	Duration        int         `json:"duration,omitempty"`
+	PremiereRu      string      `json:"premiere_ru,omitempty"`
 	OriginCountries []string    `json:"origin_countries,omitempty"`
 	Cast            []Person    `json:"cast,omitempty"`
 	Director        Person      `json:"director,omitempty"`
@@ -84,6 +97,7 @@ func (film *Film) toJsonNum() FilmJson {
 		ContentType:     film.ContentType,
 		ReleaseYear:     film.ReleaseYear,
 		Duration:        film.Duration,
+		PremiereRu:      film.PremiereRu,
 		OriginCountries: film.OriginCountries,
 		Cast:            film.Cast,
 		Director:        film.Director,
@@ -127,6 +141,7 @@ type FilmPageInfo struct {
 	Reviews         FilmReviews         `json:"reviews"`
 	Recommendations FilmRecommendations `json:"recommendations"`
 	MyReview        Review              `json:"my_review"`
+	Bookmarked      bool                `json:"bookmarked"`
 }
 
 type FilmPageInfoJson struct {
@@ -134,6 +149,7 @@ type FilmPageInfoJson struct {
 	Reviews         FilmReviews         `json:"reviews"`
 	Recommendations FilmRecommendations `json:"recommendations"`
 	MyReview        Review              `json:"my_review"`
+	Bookmarked      bool                `json:"bookmarked"`
 }
 
 func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
@@ -142,11 +158,17 @@ func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
 		Reviews:         filmPage.Reviews,
 		Recommendations: filmPage.Recommendations,
 		MyReview:        filmPage.MyReview,
+		Bookmarked:      filmPage.Bookmarked,
 	})
 }
 
 type NewRate struct {
-	Rating json.Number `json:"rating,omitempty"`
+	Rating json.Number `json:"rating"`
+}
+
+type PostBookmarkResult struct {
+	FilmID     uint64 `json:"film_id"`
+	Bookmarked bool   `json:"bookmarked"`
 }
 
 type FilmRepository interface {
@@ -155,8 +177,13 @@ type FilmRepository interface {
 	GetFilmRecommendations(id uint64, skip int, limit int) (FilmRecommendations, error)
 	PostRating(id uint64, authorId uint64, rating float64) (float64, error)
 	GetMyReview(id uint64, authorId uint64) (Review, error)
+	CheckFilmBookmarked(userID uint64, filmID uint64) (bool, error)
 	LoadUserBookmarkedFilmsID(userID uint64, skip int, limit int) ([]uint64, error)
 	CountBookmarks(userID uint64) (int, error)
+	BookmarkFilm(userID uint64, filmID uint64, bookmarked bool) error
+	GetFilmsByMonthYear(month int, year int, limit int, skip int) (FilmList, error)
+	GetGenres() (GenresList, error)
+	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
 }
 
 //go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
@@ -167,4 +194,8 @@ type FilmUsecase interface {
 	LoadFilmRecommendations(id uint64, skip int, limit int) (FilmRecommendations, error)
 	LoadMyReview(id uint64, authorId uint64) (Review, error)
 	LoadUserBookmarks(userID uint64, skip int, limit int) (FilmBookmarks, error)
+	BookmarkFilm(userID uint64, filmID uint64, bookmarked bool) error
+	GetFilmsByMonthYear(month int, year int, limit int, skip int) (FilmList, error)
+	GetGenres() (GenresList, error)
+	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
 }

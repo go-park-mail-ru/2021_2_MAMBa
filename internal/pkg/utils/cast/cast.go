@@ -69,6 +69,16 @@ func DateToString(src []byte) (string, error) {
 	return timeString, err
 }
 
+func DateToStringUnderscore(src []byte) (string, error) {
+	timeBuffer := pgtype.Date{}
+	err := timeBuffer.DecodeBinary(nil, src)
+	timeString := timeBuffer.Time.Format("2006-01-02")
+	if timeString == "0001-01-01" {
+		return "", err
+	}
+	return timeString, err
+}
+
 func StringToJson(src string) []byte {
 	res, _ := json.Marshal(src)
 	return res

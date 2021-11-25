@@ -8,13 +8,13 @@ import (
 
 type SearchHandler struct {
 	SearchUsecase domain.SearchUsecase
-	AuthClient authRPC.SessionRPCClient
+	AuthClient    authRPC.SessionRPCClient
 }
 
 func NewHandlers(router *mux.Router, uc domain.SearchUsecase, auth authRPC.SessionRPCClient) {
 	handler := &SearchHandler{
 		SearchUsecase: uc,
-		AuthClient: auth,
+		AuthClient:    auth,
 	}
 
 	router.HandleFunc("/search", handler.GetSearch).Methods("GET", "OPTIONS")

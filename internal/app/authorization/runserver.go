@@ -8,7 +8,6 @@ import (
 	"net"
 )
 
-
 func RunServer(addr string) {
 
 	lis, err := net.Listen("tcp", "localhost:"+addr)

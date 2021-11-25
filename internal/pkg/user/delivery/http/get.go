@@ -46,14 +46,16 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	rq :=  cast.CookieToRq(r,0)
-	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
-	if err != nil && err != customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	var clientID uint64 = 0
+	if err != nil && err.Error() != customErrors.RPCErrUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
+	} else if err == nil {
+		clientID = clientIDMessage.ID
 	}
-	clientID := clientIDMessage.ID
 	us, err := handler.UserUsecase.GetProfileById(clientID, targetID)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusNotFound}
@@ -70,9 +72,9 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
-	rq :=  cast.CookieToRq(r,0)
-	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
-	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
@@ -105,9 +107,9 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 }
 
 func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
-	rq :=  cast.CookieToRq(r,0)
-	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(),&rq)
-	if err != nil || err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	clientIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorInternalServer.Error()), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
@@ -137,7 +139,6 @@ func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Re
 }
 
 func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}

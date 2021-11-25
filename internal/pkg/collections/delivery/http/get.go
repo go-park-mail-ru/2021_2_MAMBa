@@ -17,7 +17,6 @@ const (
 )
 
 func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http.Request) {
-	var err error
 	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
@@ -31,7 +30,7 @@ func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http
 		return
 	}
 
-	collectionsList, err := handler.CollectionsClient.GetCollections(context.Background(), &grpc.SkipLimit{Skip:  int64(skip), Limit: int64(limit)})
+	collectionsList, err := handler.CollectionsClient.GetCollections(context.Background(), &grpc.SkipLimit{Skip: int64(skip), Limit: int64(limit)})
 	if err == customErrors.ErrorSkip {
 		resp := domain.Response{Body: cast.ErrorToJson(err.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -51,7 +50,6 @@ func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http
 }
 
 func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}

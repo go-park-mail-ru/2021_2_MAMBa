@@ -20,6 +20,7 @@ const (
 	queryCountFilmReviews         = "SELECT COUNT(*) FROM Review WHERE Film_ID = $1 AND (NOT type = 0)"
 	queryCountFilmRecommendations = "SELECT COUNT(*) FROM recommended WHERE Film_ID = $1"
 	queryCountUserBookmarks       = "SELECT COUNT(*) FROM bookmark b WHERE user_id = $1"
+	queryCheckFilmBookmarked      = "SELECT COUNT(*) FROM bookmark b WHERE user_id = $1 AND film_id = $2"
 	queryGetFilmId                = "SELECT * FROM film WHERE film_id = $1"
 	queryGetFilmDirScr            = "SELECT film.*, p.person_id,p.name_en,p.name_rus,p.picture_url,p.career, p1.person_id,p1.name_en,p1.name_rus,p1.picture_url,p1.career FROM film JOIN person p on film.director = p.person_id JOIN person p1 on film.screenwriter = p1.person_id WHERE film_id = $1"
 	queryGetFilmCountries         = "SELECT country.country_name FROM country JOIN countryproduction c ON country.country_id = c.country_id WHERE c.Film_ID = $1"
@@ -34,10 +35,148 @@ const (
 	queryGetAuthorName            = "SELECT first_name, surname, picture_url FROM profile WHERE user_id = $1"
 	queryGetFilmShort             = "SELECT title, title_original, poster_url FROM FILM WHERE Film_ID = $1"
 	queryGetBookmarksByUserID     = "SELECT b.film_id FROM bookmark b WHERE user_id = $1 LIMIT $2 OFFSET $3"
+	queryAddBookmark              = "INSERT INTO bookmark (film_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING"
+	queryDeleteBookmark           = "DELETE FROM bookmark WHERE film_id = $1 AND user_id = $2"
+	queryGetFilmsByMonthYear      = "SELECT film_id, title, title_original, release_year, description, poster_url, premiere_ru FROM film WHERE EXTRACT(MONTH FROM premiere_ru) = $1 AND EXTRACT(YEAR FROM premiere_ru) = $2 LIMIT $3 OFFSET $4"
+	queryCountFilmsByMonthYear    = "SELECT COUNT(*) FROM film WHERE EXTRACT(MONTH FROM premiere_ru) = $1 AND EXTRACT(YEAR FROM premiere_ru) = $2"
+	queryGetGenres                = "SELECT genre_id, genre_name, picture_url FROM genre LIMIT 15"
+	queryGetFilmsByGenreID        = "SELECT f.film_id, f.title, f.title_original, f.release_year, f.description, f.poster_url, f.premiere_ru FROM film f JOIN filmgenres g on f.film_id = g.film_id WHERE genre_id = $1 LIMIT $2 OFFSET $3"
+	queryCountFilmsByGenreID      = "SELECT COUNT(*) FROM film f JOIN filmgenres g on f.film_id = g.film_id WHERE genre_id = $1"
+	queryGetGenreName             = "SELECT genre_name FROM genre WHERE genre_id = $1"
 )
 
-func (ur *dbFilmRepository) LoadUserBookmarkedFilmsID(userID uint64, skip int, limit int) ([]uint64, error) {
-	result, err := ur.dbm.Query(queryGetBookmarksByUserID, userID, limit, skip)
+func (fr *dbFilmRepository) GetGenres() (domain.GenresList, error) {
+	result, err := fr.dbm.Query(queryGetGenres)
+	if err != nil {
+		return domain.GenresList{}, customErrors.ErrorInternalServer
+	}
+
+	bufferGenres := make([]domain.Genre, 0)
+	for i := range result {
+		genre := domain.Genre{
+			Id:         uint64(cast.ToUint32(result[i][0])),
+			Name:       cast.ToString(result[i][1]),
+			PictureURL: cast.ToString(result[i][2]),
+		}
+		bufferGenres = append(bufferGenres, genre)
+	}
+	return domain.GenresList{GenresList: bufferGenres}, nil
+}
+
+func (fr *dbFilmRepository) GetFilmsByGenre(genreID uint64, limit int, skip int) (domain.GenreFilmList, error) {
+	result, err := fr.dbm.Query(queryCountFilmsByGenreID, genreID)
+	if err != nil {
+		return domain.GenreFilmList{}, customErrors.ErrorInternalServer
+	}
+	dbSize := int(cast.ToUint64(result[0][0]))
+	if skip >= dbSize && skip != 0 {
+		return domain.GenreFilmList{}, customErrors.ErrorSkip
+	}
+	moreAvailable := skip+limit < dbSize
+
+	result, err = fr.dbm.Query(queryGetFilmsByGenreID, genreID, limit, skip)
+	if err != nil {
+		return domain.GenreFilmList{}, err
+	}
+
+	bufferFilms := make([]domain.Film, 0)
+	for i := range result {
+		film := domain.Film{
+			Id:            cast.ToUint64(result[i][0]),
+			Title:         cast.ToString(result[i][1]),
+			TitleOriginal: cast.ToString(result[i][2]),
+			ReleaseYear:   int(cast.ToUint32(result[i][3])),
+			Description:   cast.ToString(result[i][4]),
+			PosterUrl:     cast.ToString(result[i][5]),
+		}
+		dateString, err := cast.DateToStringUnderscore(result[i][6])
+		if err != nil {
+			return domain.GenreFilmList{}, err
+		}
+		film.PremiereRu = dateString
+		bufferFilms = append(bufferFilms, film)
+	}
+
+	filmList := domain.FilmList{
+		FilmList:      bufferFilms,
+		MoreAvailable: moreAvailable,
+		FilmTotal:     dbSize,
+		CurrentLimit:  limit,
+		CurrentSkip:   skip + limit,
+	}
+
+	result, err = fr.dbm.Query(queryGetGenreName, genreID)
+	if err != nil {
+		return domain.GenreFilmList{}, err
+	}
+	genreName := cast.ToString(result[0][0])
+
+	genreFilmList := domain.GenreFilmList{
+		Id:        genreID,
+		Name:      genreName,
+		FilmsList: filmList,
+	}
+	return genreFilmList, nil
+}
+
+func (fr *dbFilmRepository) BookmarkFilm(userID uint64, filmID uint64, bookmarked bool) error {
+	var err error
+	if bookmarked {
+		_, err = fr.dbm.Query(queryAddBookmark, filmID, userID)
+	} else {
+		_, err = fr.dbm.Query(queryDeleteBookmark, filmID, userID)
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (fr *dbFilmRepository) GetFilmsByMonthYear(month int, year int, limit int, skip int) (domain.FilmList, error) {
+	result, err := fr.dbm.Query(queryCountFilmsByMonthYear, month, year)
+	if err != nil {
+		return domain.FilmList{}, customErrors.ErrorInternalServer
+	}
+	dbSize := int(cast.ToUint64(result[0][0]))
+	if skip >= dbSize && skip != 0 {
+		return domain.FilmList{}, customErrors.ErrorSkip
+	}
+	moreAvailable := skip+limit < dbSize
+
+	result, err = fr.dbm.Query(queryGetFilmsByMonthYear, month, year, limit, skip)
+	if err != nil {
+		return domain.FilmList{}, err
+	}
+
+	bufferFilms := make([]domain.Film, 0)
+	for i := range result {
+		film := domain.Film{
+			Id:            cast.ToUint64(result[i][0]),
+			Title:         cast.ToString(result[i][1]),
+			TitleOriginal: cast.ToString(result[i][2]),
+			ReleaseYear:   int(cast.ToUint32(result[i][3])),
+			Description:   cast.ToString(result[i][4]),
+			PosterUrl:     cast.ToString(result[i][5]),
+		}
+		dateString, err := cast.DateToStringUnderscore(result[i][6])
+		if err != nil {
+			return domain.FilmList{}, err
+		}
+		film.PremiereRu = dateString
+		bufferFilms = append(bufferFilms, film)
+	}
+	filmList := domain.FilmList{
+		FilmList:      bufferFilms,
+		MoreAvailable: moreAvailable,
+		FilmTotal:     dbSize,
+		CurrentLimit:  limit,
+		CurrentSkip:   skip + limit,
+	}
+	return filmList, nil
+}
+
+func (fr *dbFilmRepository) LoadUserBookmarkedFilmsID(userID uint64, skip int, limit int) ([]uint64, error) {
+	result, err := fr.dbm.Query(queryGetBookmarksByUserID, userID, limit, skip)
 	filmIdxList := make([]uint64, 0)
 	if err != nil {
 		return filmIdxList, err
@@ -46,6 +185,19 @@ func (ur *dbFilmRepository) LoadUserBookmarkedFilmsID(userID uint64, skip int, l
 		filmIdxList = append(filmIdxList, cast.ToUint64(result[i][0]))
 	}
 	return filmIdxList, nil
+}
+
+func (fr *dbFilmRepository) CheckFilmBookmarked(userID uint64, filmID uint64) (bool, error) {
+	result, err := fr.dbm.Query(queryCheckFilmBookmarked, userID, filmID)
+	if err != nil {
+		return false, err
+	}
+	dbSize := int(cast.ToUint64(result[0][0]))
+	if dbSize > 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
 func (fr *dbFilmRepository) GetFilm(id uint64) (domain.Film, error) {
@@ -69,21 +221,28 @@ func (fr *dbFilmRepository) GetFilm(id uint64) (domain.Film, error) {
 		OriginCountries: nil,
 		Cast:            nil,
 		Director: domain.Person{
-			Id:         cast.ToUint64(raw[13]),
-			NameEn:     cast.ToString(raw[14]),
-			NameRus:    cast.ToString(raw[15]),
-			PictureUrl: cast.ToString(raw[16]),
-			Career:     []string{cast.ToString(raw[17])},
+			Id:         cast.ToUint64(raw[14]),
+			NameEn:     cast.ToString(raw[15]),
+			NameRus:    cast.ToString(raw[16]),
+			PictureUrl: cast.ToString(raw[17]),
+			Career:     []string{cast.ToString(raw[18])},
 		},
 		Screenwriter: domain.Person{
-			Id:         cast.ToUint64(raw[18]),
-			NameEn:     cast.ToString(raw[19]),
-			NameRus:    cast.ToString(raw[20]),
-			PictureUrl: cast.ToString(raw[21]),
-			Career:     []string{cast.ToString(raw[22])},
+			Id:         cast.ToUint64(raw[19]),
+			NameEn:     cast.ToString(raw[20]),
+			NameRus:    cast.ToString(raw[21]),
+			PictureUrl: cast.ToString(raw[22]),
+			Career:     []string{cast.ToString(raw[23])},
 		},
 		Genres: nil,
 	}
+
+	dateString, err := cast.DateToStringUnderscore(raw[13])
+	if err != nil {
+		return domain.Film{}, err
+	}
+	film.PremiereRu = dateString
+
 	result, err = fr.dbm.Query(queryGetFilmRating, id)
 	if err != nil {
 		return domain.Film{}, err

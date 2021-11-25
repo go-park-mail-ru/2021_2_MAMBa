@@ -10,7 +10,6 @@ import (
 	"net"
 )
 
-
 func RunServer(addr string) {
 	db := database.Connect()
 	defer db.Disconnect()

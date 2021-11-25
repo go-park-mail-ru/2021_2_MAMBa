@@ -65,7 +65,7 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	filUsecase := filmUsecase.NewFilmUsecase(filmRepo)
 	persUsecase := personUsecase.NewPersonUsecase(personRepo)
 	revUsecase := reviewsUsecase.NewReviewUsecase(reviewRepo)
-	searUsecase := searchUsecase.NewSearchUsecase(searchRepo)
+	searUsecase := searchUsecase.NewSearchUsecase(searchRepo, personRepo, filmRepo)
 
 	userDelivery.NewHandlers(api, usUsecase, clientAuth)
 	collectionsDelivery.NewHandlers(api, clientCollections)

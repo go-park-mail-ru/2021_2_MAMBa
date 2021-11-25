@@ -15,68 +15,51 @@ func NewSearchRepository(manager *database.DBManager) domain.SearchRepository {
 	return &dbSearchRepository{dbm: manager}
 }
 
-func (fr *dbSearchRepository) GetSearch(query string, skipFilms int, limitFilms int, skipPersons int, limitPersons int) (domain.SearchResult, error) {
-	result, err := fr.dbm.Query(queryCountFilmsBySearch, query)
-	if err != nil {
-		return domain.SearchResult{}, customErrors.ErrorInternalServer
-	}
-	dbSizeFilms := int(cast.ToUint64(result[0][0]))
-	if skipFilms >= dbSizeFilms && skipFilms != 0 {
-		return domain.SearchResult{}, customErrors.ErrorSkip
-	}
-	moreAvailableFilms := skipFilms+skipFilms < dbSizeFilms
+const (
+	queryCountFoundFilms       = "SELECT COUNT(*) FROM film WHERE title ILIKE $1 OR title_original ILIKE $1"
+	queryCountFoundPersons     = "SELECT COUNT(*) FROM person WHERE name_en ILIKE $1 OR name_rus ILIKE $1"
+	querySearchFilmsByString   = "SELECT film_id FROM film WHERE title ILIKE $1 OR title_original ILIKE $1 LIMIT $2 OFFSET $3"
+	querySearchPersonsByString = "SELECT person_id FROM person WHERE name_en ILIKE $1 OR name_rus ILIKE $1 LIMIT $2 OFFSET $3"
+)
 
-	result, err := fr.dbm.Query(queryCountPersonsBySearch, query)
+func (fr *dbSearchRepository) CountFoundFilms(query string) (int, error) {
+	result, err := fr.dbm.Query(queryCountFoundFilms, "%"+query+"%")
 	if err != nil {
-		return domain.SearchResult{}, customErrors.ErrorInternalServer
+		return 0, customErrors.ErrorInternalServer
 	}
-	dbSizePersons := int(cast.ToUint64(result[0][0]))
-	if skipPersons >= dbSizePersons && skipPersons != 0 {
-		return domain.SearchResult{}, customErrors.ErrorSkip
-	}
-	moreAvailablePersons := skipPersons+skipPersons < dbSizePersons
+	dbSize := int(cast.ToUint64(result[0][0]))
+	return dbSize, nil
+}
 
-
-	result, err = fr.dbm.Query(querySearchPersonsByQuery, query, limitFilms, skipFilms)
+func (fr *dbSearchRepository) CountFoundPersons(query string) (int, error) {
+	result, err := fr.dbm.Query(queryCountFoundPersons, "%"+query+"%")
 	if err != nil {
-		return domain.SearchResult{}, customErrors.ErrorInternalServer
+		return 0, customErrors.ErrorInternalServer
 	}
-	films := make([]domain.Film, 0)
+	dbSize := int(cast.ToUint64(result[0][0]))
+	return dbSize, nil
+}
+
+func (fr *dbSearchRepository) SearchFilmsIDList(query string, skip int, limit int) ([]uint64, error) {
+	result, err := fr.dbm.Query(querySearchFilmsByString, "%"+query+"%", limit, skip)
+	filmIdxList := make([]uint64, 0)
+	if err != nil {
+		return filmIdxList, err
+	}
 	for i := range result {
-		timestamp, err := cast.TimestampToString(result[i][6])
-		if err != nil {
-			return domain.FilmReviews{}, err
-		}
-		films = append(films, domain.Film{
-			Id:              0,
-			Title:           "",
-			TitleOriginal:   "",
-			Rating:          0,
-			Description:     "",
-			TotalRevenue:    "",
-			PosterUrl:       "",
-			TrailerUrl:      "",
-			ContentType:     "",
-			ReleaseYear:     0,
-			Duration:        0,
-			OriginCountries: nil,
-			Cast:            nil,
-			Director:        domain.Person{},
-			Screenwriter:    domain.Person{},
-			Genres:          nil,
-		})
-		reviews = append(reviews, domain.Review{
-			Id:               cast.ToUint64(result[i][0]),
-			FilmId:           cast.ToUint64(result[i][1]),
-			AuthorName:       cast.ToString(result[i][7]) + " " + cast.ToString(result[i][8]),
-			ReviewText:       cast.ToString(result[i][3]),
-			AuthorPictureUrl: cast.ToString(result[i][9]),
-			ReviewType:       int(cast.ToUint32(result[i][4])),
-			Stars:            cast.ToFloat64(result[i][5]),
-			Date:             timestamp,
-		})
+		filmIdxList = append(filmIdxList, cast.ToUint64(result[i][0]))
 	}
-	searchResult := domain.SearchResult{
+	return filmIdxList, nil
+}
+
+func (fr *dbSearchRepository) SearchPersonsIDList(query string, skip int, limit int) ([]uint64, error) {
+	result, err := fr.dbm.Query(querySearchPersonsByString, "%"+query+"%", limit, skip)
+	personIdxList := make([]uint64, 0)
+	if err != nil {
+		return personIdxList, err
 	}
-	return reviewsList, nil
+	for i := range result {
+		personIdxList = append(personIdxList, cast.ToUint64(result[i][0]))
+	}
+	return personIdxList, nil
 }

@@ -11,7 +11,6 @@ import (
 	"net/http"
 )
 
-
 func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	userForm := new(domain.User)
@@ -124,7 +123,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	rq := cast.CookieToRq(r, 0)
 	idMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
-	if err == customErrors.ErrorUserNotLoggedIn {
+	if err != nil && err.Error() == customErrors.RPCErrUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusForbidden}
 		resp.Write(w)
 		return
@@ -150,7 +149,7 @@ func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	rq := cast.CookieToRq(r, 0)
 	idMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
-	if err == customErrors.ErrorUserNotLoggedIn {
+	if err != nil && err.Error() == customErrors.RPCErrUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusForbidden}
 		resp.Write(w)
 		return

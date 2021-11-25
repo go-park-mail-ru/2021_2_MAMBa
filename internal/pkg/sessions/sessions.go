@@ -11,7 +11,7 @@ import (
 	"net/http/httptest"
 )
 
-//http.SetCookie(w, sessions.NewCookie(sessionName, encoded, session.Options))
+// http.SetCookie(w, sessions.NewCookie(sessionName, encoded, session.Options))
 var store = sessions.NewFilesystemStore("", securecookie.GenerateRandomKey(32))
 var sessionName = "session-name"
 
@@ -19,7 +19,6 @@ var sessionName = "session-name"
 // deleted after the browser session ends.
 // MaxAge<0 means delete cookie immediately.
 // MaxAge>0 means Max-Age attribute present and given in seconds.
-
 
 type SessionManager struct{}
 
@@ -51,7 +50,7 @@ func (sm *SessionManager) StartSession(ctx context.Context, rq *sGrpc.Request) (
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 	}
-	w:=httptest.NewRecorder()
+	w := httptest.NewRecorder()
 	err = session.Save(r, w)
 	encoded, err := securecookie.EncodeMulti(session.Name(), session.ID,
 		store.Codecs...)
@@ -94,7 +93,7 @@ func (sm *SessionManager) EndSession(ctx context.Context, rq *sGrpc.Request) (*s
 	if isIn && rq.ID == sessionId {
 		// deleting a session may only happen at maxage < 0
 		session.Options.MaxAge = -1
-		w:=httptest.NewRecorder()
+		w := httptest.NewRecorder()
 		err = session.Save(r, w)
 		if err != nil {
 			return &sGrpc.Session{}, err
@@ -141,6 +140,7 @@ func (sm *SessionManager) CheckSession(ctx context.Context, rq *sGrpc.Request) (
 	}
 	return &sGrpc.ID{ID: idCasted}, nil
 }
+
 /*
 func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 	session, _ := store.Get(r, sessionName)

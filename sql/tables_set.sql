@@ -33,6 +33,7 @@ CREATE TABLE FILM
     screenwriter   integer default -1,
     director       integer default -1,
     content_type   varchar(30),
+    premiere_ru    date,
     CONSTRAINT to_film_screenwriter FOREIGN KEY (screenwriter) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT,
     CONSTRAINT to_film_director FOREIGN KEY (director) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT
 );
@@ -87,7 +88,8 @@ DROP TABLE IF EXISTS Genre CASCADE;
 CREATE TABLE Genre
 (
     Genre_ID   SERIAL NOT NULL PRIMARY KEY,
-    Genre_name varchar(50)
+    Genre_name varchar(50),
+    Picture_url varchar(100)
 );
 
 DROP TABLE IF EXISTS Subscription CASCADE;

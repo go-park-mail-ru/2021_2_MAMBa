@@ -15,7 +15,6 @@ const (
 )
 
 func (handler *SearchHandler) GetSearch(w http.ResponseWriter, r *http.Request) {
-	var err error
 	// default
 	queryList, isIn := r.URL.Query()["query"]
 	query := queryList[0]
