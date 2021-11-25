@@ -1,11 +1,33 @@
 package cast
 
 import (
+	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
 	"encoding/binary"
 	"encoding/json"
 	"github.com/jackc/pgtype"
 	"math"
+	"net/http"
 )
+
+func CookieToRq(request *http.Request, id uint64) authRPC.Request {
+	cookie, _ := request.Cookie("session-name")
+	if cookie == nil {
+		return authRPC.Request{ID: 0}
+	}
+	return authRPC.Request{
+		Name:     cookie.Name,
+		Value:    cookie.Value,
+		Path:     cookie.Path,
+		Domain:   cookie.Domain,
+		MaxAge:   int64(cookie.MaxAge),
+		Secure:   cookie.Secure,
+		HttpOnly: cookie.HttpOnly,
+		SameSite: int64(cookie.SameSite),
+		Raw:      cookie.Raw,
+		Unparsed: cookie.Unparsed,
+		ID:       id,
+	}
+}
 
 type JsonErr struct {
 	Error string `json:"error"`
@@ -42,6 +64,16 @@ func DateToString(src []byte) (string, error) {
 	err := timeBuffer.DecodeBinary(nil, src)
 	timeString := timeBuffer.Time.Format("02.01.2006")
 	if timeString == "01.01.0001" {
+		return "", err
+	}
+	return timeString, err
+}
+
+func DateToStringUnderscore(src []byte) (string, error) {
+	timeBuffer := pgtype.Date{}
+	err := timeBuffer.DecodeBinary(nil, src)
+	timeString := timeBuffer.Time.Format("2006-01-02")
+	if timeString == "0001-01-01" {
 		return "", err
 	}
 	return timeString, err

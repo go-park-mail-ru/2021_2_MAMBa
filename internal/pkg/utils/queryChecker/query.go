@@ -40,3 +40,16 @@ func CheckIsInFloat64(w http.ResponseWriter, r *http.Request, queryString string
 	}
 	return defaultValue, nil
 }
+
+func CheckIsInBool(w http.ResponseWriter, r *http.Request, queryString string, defaultValue bool, returnError error) (bool, error) {
+	valueString, isIn := r.URL.Query()[queryString]
+	if isIn {
+		value, err := strconv.ParseBool(valueString[0])
+		if err != nil {
+			return defaultValue, returnError
+		}
+		return value, nil
+	} else {
+		return defaultValue, returnError
+	}
+}

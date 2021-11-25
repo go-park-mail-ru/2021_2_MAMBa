@@ -25,6 +25,14 @@ type FilmList struct {
 	CurrentSkip   int    `json:"current_skip"`
 }
 
+type PersonList struct {
+	PersonList    []Person `json:"person_list"`
+	MoreAvailable bool     `json:"more_available"`
+	PersonTotal   int      `json:"person_total"`
+	CurrentLimit  int      `json:"current_limit"`
+	CurrentSkip   int      `json:"current_skip"`
+}
+
 type PersonPage struct {
 	Actor        Person   `json:"actor"`
 	Films        FilmList `json:"films"`

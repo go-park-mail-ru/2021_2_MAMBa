@@ -3,7 +3,6 @@ package http
 import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	"2021_2_MAMBa/internal/pkg/sessions"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"encoding/json"
@@ -15,11 +14,13 @@ import (
 const (
 	defaultLimit = 10
 	defaultSkip  = 0
+	minYear      = 1800
+	maxYear      = 2100
+	minMonth     = 0
+	maxMonth     = 13
 )
 
 func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
-	var err error
-	// default
 	filmID, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -51,7 +52,16 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authId, err := sessions.CheckSession(r)
+	rq := cast.CookieToRq(r, 0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	var authId uint64 = 0
+	if err != nil && err.Error() != customErrors.RPCErrUserNotLoggedIn {
+		resp := domain.Response{Body: cast.ErrorToJson(err.Error()), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	} else if err == nil {
+		authId = authIDMessage.ID
+	}
 
 	filmPageInfo, err := handler.FilmUsecase.GetFilm(authId, filmID, skipReview, limitReview, skipRecom, limitRecom)
 	if err == customErrors.ErrorSkip {
@@ -73,8 +83,9 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
-	authId, err := sessions.CheckSession(r)
-	if err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil && err.Error() == customErrors.RPCErrUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
@@ -84,6 +95,7 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
+	authId := authIDMessage.ID
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -113,8 +125,9 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
-	authId, err := sessions.CheckSession(r)
-	if err == customErrors.ErrorUserNotLoggedIn {
+	rq := cast.CookieToRq(r, 0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil && err.Error() == customErrors.RPCErrUserNotLoggedIn {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)
 		return
@@ -124,6 +137,7 @@ func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
+	authId := authIDMessage.ID
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -151,7 +165,6 @@ func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *FilmHandler) loadFilmReviews(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -190,8 +203,55 @@ func (handler *FilmHandler) loadFilmReviews(w http.ResponseWriter, r *http.Reque
 	resp.Write(w)
 }
 
+func (handler *FilmHandler) GetFilmsByMonthYear(w http.ResponseWriter, r *http.Request) {
+	month, err := queryChecker.CheckIsIn(w, r, "month", 0, customErrors.ErrorDate)
+	if err != nil || !(month < maxMonth && month > minMonth) {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDateMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	year, err := queryChecker.CheckIsIn(w, r, "year", 0, customErrors.ErrorDate)
+	if err != nil || !(year < maxYear && year > minYear) {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDateMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrLimitMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+
+	filmList, err := handler.FilmUsecase.GetFilmsByMonthYear(month, year, limit, skip)
+	if err == customErrors.ErrorSkip {
+		resp := domain.Response{Body: cast.ErrorToJson(err.Error()), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	x, err := json.Marshal(filmList)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	if filmList.FilmTotal == 0 {
+		resp.Status = http.StatusNotFound
+	}
+	resp.Write(w)
+}
+
 func (handler *FilmHandler) loadFilmRecommendations(w http.ResponseWriter, r *http.Request) {
-	var err error
 	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
@@ -222,6 +282,145 @@ func (handler *FilmHandler) loadFilmRecommendations(w http.ResponseWriter, r *ht
 		return
 	}
 	x, err := json.Marshal(recommendations)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	resp.Write(w)
+}
+
+func (handler *FilmHandler) LoadUserBookmarks(w http.ResponseWriter, r *http.Request) {
+	id, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrLimitMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+
+	bookmarks, err := handler.FilmUsecase.LoadUserBookmarks(id, skip, limit)
+	if err == customErrors.ErrorSkip {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	x, err := json.Marshal(bookmarks)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	resp.Write(w)
+}
+
+func (handler *FilmHandler) BookmarkFilm(w http.ResponseWriter, r *http.Request) {
+	rq := cast.CookieToRq(r, 0)
+	authIDMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
+	if err != nil && err.Error() == customErrors.RPCErrUserNotLoggedIn {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusUnauthorized}
+		resp.Write(w)
+		return
+	}
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	userID := authIDMessage.ID
+	filmID, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorID)
+	if err != nil || filmID == 0 {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	bookmarked, err := queryChecker.CheckIsInBool(w, r, "bookmarked", false, customErrors.ErrorBookmarked)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrBookmarkedMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+
+	err = handler.FilmUsecase.BookmarkFilm(userID, filmID, bookmarked)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+
+	bookmarkedResult := domain.PostBookmarkResult{
+		FilmID:     filmID,
+		Bookmarked: bookmarked,
+	}
+	x, err := json.Marshal(bookmarkedResult)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	resp.Write(w)
+}
+
+func (handler *FilmHandler) GetGenres(w http.ResponseWriter, r *http.Request) {
+	genreList, err := handler.FilmUsecase.GetGenres()
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	x, err := json.Marshal(genreList)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	resp.Write(w)
+}
+
+func (handler *FilmHandler) GetFilmsByGenre(w http.ResponseWriter, r *http.Request) {
+	genreID, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	skip, err := queryChecker.CheckIsIn(w, r, "skip", defaultSkip, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	limit, err := queryChecker.CheckIsIn(w, r, "limit", defaultLimit, customErrors.ErrorLimit)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrLimitMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+
+	genreFilmList, err := handler.FilmUsecase.GetFilmsByGenre(genreID, limit, skip)
+	if err == customErrors.ErrorSkip {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	x, err := json.Marshal(genreFilmList)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
