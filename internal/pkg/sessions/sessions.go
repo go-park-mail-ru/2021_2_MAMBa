@@ -11,7 +11,6 @@ import (
 	"net/http/httptest"
 )
 
-// http.SetCookie(w, sessions.NewCookie(sessionName, encoded, session.Options))
 var store = sessions.NewFilesystemStore("", securecookie.GenerateRandomKey(32))
 var sessionName = "session-name"
 
