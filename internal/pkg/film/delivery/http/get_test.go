@@ -131,7 +131,7 @@ func TestGetFilmSuccess(t *testing.T) {
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0},  errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 		handler.GetFilm(w, r)
 		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)

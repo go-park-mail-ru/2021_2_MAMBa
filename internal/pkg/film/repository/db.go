@@ -28,7 +28,7 @@ const (
 	queryGetFilmCast              = "SELECT p.person_id,p.name_en,p.name_rus,p.picture_url,p.career  FROM person p JOIN filmcast f on p.person_id = f.person_id WHERE f.film_id = $1"
 	queryGetFilmReviews           = "SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 AND (NOT type = 0) ORDER BY review.review_date DESC LIMIT $2 OFFSET $3"
 	queryGetFilmRecommendations   = "SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = $1 LIMIT $2 OFFSET $3"
-	queryGetFilmRating            = "SELECT AVG(stars) FROM review WHERE film_id = $1AND (NOT stars = 0)"
+	queryGetFilmRating            = "SELECT AVG(stars) FROM review WHERE film_id = $1 AND (NOT stars = 0)"
 	queryPostRating               = "INSERT INTO  review (review_id, film_id, author_id, review_text, type, stars, review_date) VALUES (DEFAULT, $1, $2, '', $3, $4, $5)"
 	queryGetReviewByAuthor        = "SELECT * FROM review WHERE film_id = $1 AND author_id = $2"
 	queryUpdateRating             = "UPDATE review SET stars = $1 WHERE film_id = $2 AND author_id = $3"
@@ -37,7 +37,7 @@ const (
 	queryGetBookmarksByUserID     = "SELECT b.film_id FROM bookmark b WHERE user_id = $1 LIMIT $2 OFFSET $3"
 	queryAddBookmark              = "INSERT INTO bookmark (film_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING"
 	queryDeleteBookmark           = "DELETE FROM bookmark WHERE film_id = $1 AND user_id = $2"
-	queryGetFilmsByMonthYear      = "SELECT film_id, title, title_original, release_year, description, poster_url, premiere_ru FROM film WHERE EXTRACT(MONTH FROM premiere_ru) = $1 AND EXTRACT(YEAR FROM premiere_ru) = $2 LIMIT $3 OFFSET $4"
+	queryGetFilmsByMonthYear      = "SELECT film_id, title, title_original, release_year, description, poster_url, premiere_ru FROM film WHERE EXTRACT(MONTH FROM premiere_ru) = $1 AND EXTRACT(YEAR FROM premiere_ru) = $2 ORDER BY premiere_ru ASC LIMIT $3 OFFSET $4 "
 	queryCountFilmsByMonthYear    = "SELECT COUNT(*) FROM film WHERE EXTRACT(MONTH FROM premiere_ru) = $1 AND EXTRACT(YEAR FROM premiere_ru) = $2"
 	queryGetGenres                = "SELECT genre_id, genre_name, picture_url FROM genre LIMIT 15"
 	queryGetFilmsByGenreID        = "SELECT f.film_id, f.title, f.title_original, f.release_year, f.description, f.poster_url, f.premiere_ru FROM film f JOIN filmgenres g on f.film_id = g.film_id WHERE genre_id = $1 LIMIT $2 OFFSET $3"
@@ -163,6 +163,13 @@ func (fr *dbFilmRepository) GetFilmsByMonthYear(month int, year int, limit int, 
 			return domain.FilmList{}, err
 		}
 		film.PremiereRu = dateString
+
+		resultRating, err := fr.dbm.Query(queryGetFilmRating, film.Id)
+		if err != nil {
+			return domain.FilmList{}, err
+		}
+		film.Rating = cast.ToFloat64(resultRating[0][0])
+
 		bufferFilms = append(bufferFilms, film)
 	}
 	filmList := domain.FilmList{

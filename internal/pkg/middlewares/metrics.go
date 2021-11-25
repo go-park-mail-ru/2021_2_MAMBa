@@ -22,7 +22,7 @@ var durationHist = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 type MetricsProm struct {
 }
 
-func RegisterMetrics () {
+func RegisterMetrics() {
 	prometheus.MustRegister(hits, errors, durationHist)
 }
 
@@ -33,9 +33,9 @@ func InitMetrics() *MetricsProm {
 func (m *MetricsProm) Metrics(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uri := r.RequestURI
-		i:= strings.Index(uri, "?")
+		i := strings.Index(uri, "?")
 		if i > 0 {
-			uri = uri[:i]+"param"
+			uri = uri[:i] + "param"
 		}
 		urlSplit := strings.Split(uri, "/")
 		_, err := strconv.Atoi(urlSplit[len(urlSplit)-1])
@@ -44,24 +44,24 @@ func (m *MetricsProm) Metrics(next http.Handler) http.Handler {
 		}
 		url := strings.Join(urlSplit, "/")
 
-
 		customWriter := &statusWriter{
 			ResponseWriter: w,
 		}
-		//start time
+		// start time
 		timerHist := prometheus.NewTimer(durationHist.WithLabelValues(url))
 		next.ServeHTTP(customWriter, r)
-		//stop time
+		// stop time
 		if s := timerHist.ObserveDuration().Seconds(); s < 0 {
 			mylog.Debug().Msg("negative request duration")
 		}
-		//record hits and errors
+		// record hits and errors
 		hits.WithLabelValues(strconv.Itoa(customWriter.Status), url).Inc()
 		if customWriter.Status >= 400 {
 			errors.WithLabelValues(strconv.Itoa(customWriter.Status), url).Inc()
 		}
 	})
 }
+
 type statusWriter struct {
 	http.ResponseWriter
 	Status int
@@ -71,4 +71,3 @@ func (w *statusWriter) WriteHeader(status int) {
 	w.Status = status
 	w.ResponseWriter.WriteHeader(http.StatusOK)
 }
-

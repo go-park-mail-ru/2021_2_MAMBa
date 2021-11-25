@@ -43,7 +43,6 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	api.Use(middlewares.CORS)
 	api.Use(middlewares.CSRF)
 
-
 	// database
 	db := database.Connect()
 	defer db.Disconnect()

@@ -148,7 +148,7 @@ func TestGetProfileInfoSuccess(t *testing.T) {
 	bodyReader := strings.NewReader(test.bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0},errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 	mockSessions.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 1}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
