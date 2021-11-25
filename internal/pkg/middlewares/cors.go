@@ -13,6 +13,9 @@ var allowedOrigins = map[string]struct{}{
 	"http://89.208.198.137:3001": {},
 	"http://film4u.club":         {},
 	"http://film4u.club:3001":    {},
+	"http://film4u.club:3000":    {},
+	"http://film4u.club:9090":    {},
+	"http://film4u.club:9100":    {},
 	"":                           {}, // Для дебага локально
 
 	"https://89.208.198.137":      {},
