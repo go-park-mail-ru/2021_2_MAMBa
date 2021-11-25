@@ -37,7 +37,7 @@ func RunServer(addr string) {
 	api.Use(metrics.Metrics)
 	api.Use(middlewares.Logger)
 	api.Use(middlewares.CORS)
-	//api.Use(middlewares.CSRF)
+	api.Use(middlewares.CSRF)
 
 
 	// database
