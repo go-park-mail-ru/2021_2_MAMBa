@@ -69,5 +69,6 @@ type statusWriter struct {
 
 func (w *statusWriter) WriteHeader(status int) {
 	w.Status = status
-	w.ResponseWriter.WriteHeader(status)
+	w.ResponseWriter.WriteHeader(http.StatusOK)
 }
+

@@ -14,7 +14,7 @@ type Response struct {
 }
 
 func (r *Response) Write(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(r.Status)
 	err := json.NewEncoder(w).Encode(r)
 	if err != nil {
 		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
