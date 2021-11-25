@@ -1,24 +1,5 @@
 package http
 
-import (
-	"2021_2_MAMBa/internal/pkg/domain"
-	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
-	mock2 "2021_2_MAMBa/internal/pkg/film/usecase/mock"
-	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
-	mockSessions "2021_2_MAMBa/internal/pkg/sessions/mock"
-	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
-	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
-	"encoding/json"
-	"fmt"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
-
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
-)
-
 type testRow struct {
 	inQuery    string
 	bodyString string
@@ -29,7 +10,7 @@ type testRow struct {
 	limit      int
 	skip1      int
 	limit1     int
-}
+}/*
 
 var testTableGetFilmSuccess = [...]testRow{
 	{
@@ -441,4 +422,4 @@ func TestGetRecomFailure(t *testing.T) {
 		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
-}
+}*/

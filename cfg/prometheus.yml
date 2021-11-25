@@ -1,0 +1,21 @@
+global:
+  scrape_interval:     10s
+  evaluation_interval: 10s
+
+alerting:
+    alertmanagers:
+      - follow_redirects: true
+        scheme: http
+        timeout: 10s
+        api_version: v2
+        static_configs:
+          - targets: [ ]
+
+
+scrape_configs:
+  - job_name: 'golang'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:9100']
