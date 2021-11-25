@@ -79,7 +79,7 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	personDelivery.NewHandlers(api, persUsecase)
 	reviewsDelivery.NewHandlers(api, revUsecase, clientAuth)
 	searchDelivery.NewHandlers(api, searUsecase, clientAuth)
-  r.Handle("/metrics", promhttp.Handler())
+    r.Handle("/metrics", promhttp.Handler())
 
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()
