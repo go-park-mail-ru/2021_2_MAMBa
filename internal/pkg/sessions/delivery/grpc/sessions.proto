@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/sessions/delivery/grpc/";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package grpcSessions;
+message writer {
+  bytes w = 1;
+}
+
+message Request {
+  string Name = 1;
+  string Value = 2;
+  string Path = 3;
+  string Domain = 4;
+  int64 MaxAge = 5;
+  bool Secure = 6;
+  bool HttpOnly = 7;
+  int64 SameSite = 8;
+  string raw = 9;
+  repeated string Unparsed = 10;
+  uint64 ID = 11;
+}
+
+message ID {
+  uint64 ID = 1;
+}
+
+message Session {
+  string Name = 1;
+  string Path = 2;
+  int64 MaxAge = 3;
+  bool Secure = 4;
+  bool HttpOnly = 5;
+  int64 SameSite = 6;
+  string value = 7;
+}
+
+message Cookie {
+  string Name = 1;
+  string Value = 2;
+}
+
+message Nothing {}
+
+service SessionRPC {
+  rpc StartSession (Request) returns (Session);
+  rpc EndSession (Request) returns (Session);
+  rpc CheckSession (Request) returns (ID);
+}

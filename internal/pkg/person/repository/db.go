@@ -41,18 +41,18 @@ func (pr *dbPersonRepository) GetPerson(id uint64) (domain.Person, error) {
 		DeathPlace:   cast.ToString(result[0][10]),
 		Gender:       cast.ToString(result[0][11]),
 		FamilyStatus: cast.ToString(result[0][12]),
-		FilmNumber:   cast.ToString(result[0][13]),
+		FilmNumber:   int(cast.ToUint32(result[0][13])),
 	}
-	timestamp, err := cast.ToTime(result[0][7])
+	timestamp, err := cast.DateToString(result[0][7])
 	if err != nil {
 		return domain.Person{}, err
 	}
-	timestamp2, err := cast.ToTime(result[0][8])
+	timestamp2, err := cast.DateToString(result[0][8])
 	if err != nil {
 		return domain.Person{}, err
 	}
-	person.Birthday = timestamp.String()
-	person.Death = timestamp2.String()
+	person.Birthday = timestamp
+	person.Death = timestamp2
 	return person, nil
 }
 func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.FilmList, error) {
@@ -61,7 +61,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 		return domain.FilmList{}, err
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmList{}, customErrors.ErrorSkip
 	}
 
@@ -83,7 +83,7 @@ func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.F
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: skip+limit < dbSize,
+		MoreAvailable: skip+limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,
@@ -96,7 +96,7 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 		return domain.FilmList{}, err
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmList{}, customErrors.ErrorBadCredentials
 	}
 
@@ -118,7 +118,7 @@ func (pr *dbPersonRepository) GetFilmsPopular(id uint64, skip int, limit int) (d
 
 	personFilms := domain.FilmList{
 		FilmList:      filmList,
-		MoreAvaliable: skip+limit < dbSize,
+		MoreAvailable: skip+limit < dbSize,
 		FilmTotal:     dbSize,
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,

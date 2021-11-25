@@ -33,8 +33,9 @@ CREATE TABLE FILM
     screenwriter   integer default -1,
     director       integer default -1,
     content_type   varchar(30),
-    CONSTRAINT film_screenwriter FOREIGN KEY (screenwriter) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT,
-    CONSTRAINT film_director FOREIGN KEY (director) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT
+    premiere_ru    date,
+    CONSTRAINT to_film_screenwriter FOREIGN KEY (screenwriter) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT,
+    CONSTRAINT to_film_director FOREIGN KEY (director) REFERENCES Person (Person_ID) ON DELETE SET DEFAULT
 );
 
 DROP TABLE IF EXISTS Profile CASCADE;
@@ -70,7 +71,7 @@ CREATE TABLE Collection
     Collection_ID   BIGSERIAL NOT NULL PRIMARY KEY,
     Author_ID       BIGINT,
     collection_name varchar(60),
-    description     varchar(200),
+    description     varchar(600),
     creation_time   timestamp,
     picture_url     varchar(100),
     CONSTRAINT to_author FOREIGN KEY (Author_ID) REFERENCES Profile (User_ID) ON DELETE CASCADE
@@ -87,7 +88,8 @@ DROP TABLE IF EXISTS Genre CASCADE;
 CREATE TABLE Genre
 (
     Genre_ID   SERIAL NOT NULL PRIMARY KEY,
-    Genre_name varchar(50)
+    Genre_name varchar(50),
+    Picture_url varchar(100)
 );
 
 DROP TABLE IF EXISTS Subscription CASCADE;
@@ -95,8 +97,8 @@ CREATE TABLE Subscription
 (
     Subscriber_ID bigint,
     Author_ID     bigint,
-    CONSTRAINT to_sub FOREIGN KEY (Subscriber_ID) REFERENCES Profile (User_ID) ON DELETE CASCADE,
-    CONSTRAINT to_auth FOREIGN KEY (Author_ID) REFERENCES Profile (User_ID) ON DELETE CASCADE,
+    CONSTRAINT to_subscriber FOREIGN KEY (Subscriber_ID) REFERENCES Profile (User_ID) ON DELETE CASCADE,
+    CONSTRAINT to_author FOREIGN KEY (Author_ID) REFERENCES Profile (User_ID) ON DELETE CASCADE,
     CONSTRAINT subscription_ID PRIMARY KEY (Subscriber_ID, Author_ID)
 );
 
@@ -126,7 +128,7 @@ CREATE TABLE FilmGenres
     Film_ID  bigint NOT NULL,
     Genre_ID bigint NOT NULL,
     CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM (Film_ID) ON DELETE CASCADE,
-    CONSTRAINT to_country FOREIGN KEY (Genre_ID) REFERENCES Genre (Genre_ID) ON DELETE CASCADE,
+    CONSTRAINT to_genre FOREIGN KEY (Genre_ID) REFERENCES Genre (Genre_ID) ON DELETE CASCADE,
     CONSTRAINT FilmGenre_ID PRIMARY KEY (Film_ID, Genre_ID)
 );
 
@@ -146,7 +148,7 @@ CREATE TABLE CollectionConnection
     Film_ID       bigint NOT NULL,
     Collection_ID bigint NOT NULL,
     CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM (Film_ID) ON DELETE CASCADE,
-    CONSTRAINT to_coll FOREIGN KEY (Collection_ID) REFERENCES Collection (Collection_ID) ON DELETE CASCADE,
+    CONSTRAINT to_collection FOREIGN KEY (Collection_ID) REFERENCES Collection (Collection_ID) ON DELETE CASCADE,
     CONSTRAINT Connect_ID PRIMARY KEY (Film_ID, Collection_ID)
 );
 
@@ -156,6 +158,6 @@ CREATE TABLE Recommended
     Film_ID bigint NOT NULL,
     Recommended_ID bigint NOT NULL,
     CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM(Film_ID) ON DELETE CASCADE,
-    CONSTRAINT to_filmRec FOREIGN KEY (Film_ID) REFERENCES  FILM(Film_ID) ON DELETE CASCADE,
+    CONSTRAINT to_filmRecommended FOREIGN KEY (Film_ID) REFERENCES  FILM(Film_ID) ON DELETE CASCADE,
     CONSTRAINT Recommended_ID PRIMARY KEY (Film_ID, Recommended_ID)
 );

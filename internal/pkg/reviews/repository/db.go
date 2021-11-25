@@ -23,7 +23,7 @@ const (
 	queryGetFilmShort            = "SELECT title, title_original, poster_url FROM FILM WHERE Film_ID = $1"
 	queryGetReviewByFilmIDEXCEPT = "SELECT * FROM review WHERE film_id = $1 AND (NOT review_id = $2) AND (NOT type = 0) LIMIT $3 OFFSET $4"
 	querySearchReview            = "SELECT * FROM review WHERE film_id = $1 AND author_id = $2"
-	queryInsertReview            = "INSERT INTO review VALUES (DEFAULT, $1, $2, $3, $4, $5, $6) RETURNING review_id"
+	queryInsertReview            = "INSERT INTO review (review_id, film_id, author_id, review_text, type, stars, review_date) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6) RETURNING review_id"
 	queryUpdateReview            = "UPDATE review SET review_text = $1, type = $2 WHERE film_id = $3 AND author_id = $4 RETURNING review_id"
 )
 
@@ -32,7 +32,7 @@ func (rr *dbReviewRepository) GetReview(id uint64) (domain.Review, error) {
 	if err != nil {
 		return domain.Review{}, err
 	}
-	timestamp, err := cast.ToTime(result[0][6])
+	timestamp, err := cast.TimestampToString(result[0][6])
 	if err != nil {
 		return domain.Review{}, err
 	}
@@ -87,7 +87,7 @@ func (rr *dbReviewRepository) LoadReviewsExcept(id uint64, film_id uint64, skip 
 		return domain.FilmReviews{}, customErrors.ErrorInternalServer
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 
@@ -99,7 +99,7 @@ func (rr *dbReviewRepository) LoadReviewsExcept(id uint64, film_id uint64, skip 
 	}
 	reviewList := make([]domain.Review, 0)
 	for i := range result {
-		timestamp, err := cast.ToTime(result[i][6])
+		timestamp, err := cast.TimestampToString(result[i][6])
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
@@ -130,7 +130,7 @@ func (rr *dbReviewRepository) LoadReviewsExcept(id uint64, film_id uint64, skip 
 	}
 	reviews := domain.FilmReviews{
 		ReviewList:    reviewList,
-		MoreAvaliable: moreAvailable,
+		MoreAvailable: moreAvailable,
 		ReviewTotal:   dbSize,
 		CurrentSort:   "",
 		CurrentLimit:  limit,

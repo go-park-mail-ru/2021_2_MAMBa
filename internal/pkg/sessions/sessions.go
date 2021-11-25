@@ -1,16 +1,17 @@
 package sessions
 
 import (
-	"errors"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	sGrpc "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
+	"context"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"io"
 	"net/http"
+	"net/http/httptest"
 )
 
-var ErrUserNotLoggedIn = errors.New("user not logged in")
-var errUint64Cast = errors.New("id uint64 cast error")
-
-var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
+var store = sessions.NewFilesystemStore("", securecookie.GenerateRandomKey(32))
 var sessionName = "session-name"
 
 // MaxAge=0 means no Max-Age attribute specified and the cookie will be
@@ -18,9 +19,29 @@ var sessionName = "session-name"
 // MaxAge<0 means delete cookie immediately.
 // MaxAge>0 means Max-Age attribute present and given in seconds.
 
-func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
+type SessionManager struct{}
+
+func NewSessionManager() sGrpc.SessionRPCServer {
+	return &SessionManager{}
+}
+
+func (sm *SessionManager) StartSession(ctx context.Context, rq *sGrpc.Request) (*sGrpc.Session, error) {
+	rd := new(io.Reader)
+	r, err := http.NewRequest("", "", *rd)
+	r.AddCookie(&http.Cookie{
+		Name:     rq.Name,
+		Value:    rq.Value,
+		Path:     rq.Path,
+		Domain:   rq.Domain,
+		MaxAge:   int(rq.MaxAge),
+		Secure:   rq.Secure,
+		HttpOnly: rq.HttpOnly,
+		SameSite: http.SameSite(rq.SameSite),
+		Raw:      rq.Raw,
+		Unparsed: rq.Unparsed,
+	})
 	session, _ := store.Get(r, sessionName)
-	session.Values["id"] = id
+	session.Values["id"] = rq.ID
 	session.Options = &sessions.Options{
 		MaxAge:   100000, // ~27 hours
 		Secure:   true,
@@ -28,45 +49,93 @@ func StartSession(w http.ResponseWriter, r *http.Request, id uint64) error {
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 	}
-	err := session.Save(r, w)
+	w := httptest.NewRecorder()
+	err = session.Save(r, w)
+	encoded, err := securecookie.EncodeMulti(session.Name(), session.ID,
+		store.Codecs...)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return err
+		return &sGrpc.Session{}, err
 	}
-	return nil
+	return &sGrpc.Session{
+		Name:     sessionName,
+		Path:     "/",
+		MaxAge:   int64(session.Options.MaxAge),
+		Secure:   session.Options.Secure,
+		HttpOnly: session.Options.HttpOnly,
+		SameSite: int64(session.Options.SameSite),
+		Value:    encoded,
+	}, nil
 }
 
-func EndSession(w http.ResponseWriter, r *http.Request, id uint64) error {
+func (sm *SessionManager) EndSession(ctx context.Context, rq *sGrpc.Request) (*sGrpc.Session, error) {
+	rd := new(io.Reader)
+	r, err := http.NewRequest("", "", *rd)
+	r.WithContext(ctx)
+	r.AddCookie(&http.Cookie{
+		Name:     rq.Name,
+		Value:    rq.Value,
+		Path:     rq.Path,
+		Domain:   rq.Domain,
+		MaxAge:   int(rq.MaxAge),
+		Secure:   rq.Secure,
+		HttpOnly: rq.HttpOnly,
+		SameSite: http.SameSite(rq.SameSite),
+		Raw:      rq.Raw,
+		Unparsed: rq.Unparsed,
+	})
 	session, err := store.Get(r, sessionName)
 	if err != nil {
-		return err
+		return &sGrpc.Session{}, err
 	}
 	// Get() always returns a session, even if empty, so check isIn
 	sessionId, isIn := session.Values["id"]
-	if isIn && id == sessionId {
+	if isIn && rq.ID == sessionId {
 		// deleting a session may only happen at maxage < 0
 		session.Options.MaxAge = -1
-		err := session.Save(r, w)
+		w := httptest.NewRecorder()
+		err = session.Save(r, w)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return err
+			return &sGrpc.Session{}, err
 		}
 	}
-	return nil
+	return &sGrpc.Session{
+		Name:     session.Name(),
+		Path:     session.Options.Path,
+		MaxAge:   int64(session.Options.MaxAge),
+		Secure:   session.Options.Secure,
+		HttpOnly: session.Options.HttpOnly,
+		SameSite: int64(session.Options.SameSite),
+		Value:    "",
+	}, nil
 }
 
-func CheckSession(r *http.Request) (uint64, error) {
+func (sm *SessionManager) CheckSession(ctx context.Context, rq *sGrpc.Request) (*sGrpc.ID, error) {
+	rd := new(io.Reader)
+	r, err := http.NewRequest("", "", *rd)
+	r.WithContext(ctx)
+	r.AddCookie(&http.Cookie{
+		Name:     rq.Name,
+		Value:    rq.Value,
+		Path:     rq.Path,
+		Domain:   rq.Domain,
+		MaxAge:   int(rq.MaxAge),
+		Secure:   rq.Secure,
+		HttpOnly: rq.HttpOnly,
+		SameSite: http.SameSite(rq.SameSite),
+		Raw:      rq.Raw,
+		Unparsed: rq.Unparsed,
+	})
 	session, err := store.Get(r, sessionName)
 	if err != nil && !session.IsNew {
-		return 0, err
+		return &sGrpc.ID{ID: 0}, err
 	}
 	id, isIn := session.Values["id"]
 	if !isIn || session.IsNew {
-		return 0, ErrUserNotLoggedIn
+		return &sGrpc.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn
 	}
 	idCasted, ok := id.(uint64)
 	if !ok {
-		return 0, errUint64Cast
+		return &sGrpc.ID{ID: 0}, customErrors.ErrorUint64Cast
 	}
-	return idCasted, nil
+	return &sGrpc.ID{ID: idCasted}, nil
 }

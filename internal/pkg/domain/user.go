@@ -1,20 +1,18 @@
 package domain
 
-import "time"
-
 const BasePicture = "/static/media/img/users/base.jpg"
 
 type Profile struct {
-	ID            uint64    `json:"id"`
-	FirstName     string    `json:"first_name,omitempty"`
-	Surname       string    `json:"surname,omitempty"`
-	PictureUrl    string    `json:"picture_url,omitempty"`
-	Email         string    `json:"email,omitempty"`
-	Gender        string    `json:"gender,omitempty"`
-	RegisterDate  time.Time `json:"register_date,omitempty"`
-	SubCount      int       `json:"sub_count"`
-	BookmarkCount int       `json:"bookmark_count"`
-	AmSubscribed  bool      `json:"am_subscribed"`
+	ID            uint64 `json:"id"`
+	FirstName     string `json:"first_name,omitempty"`
+	Surname       string `json:"surname,omitempty"`
+	PictureUrl    string `json:"profile_pic,omitempty"`
+	Email         string `json:"email,omitempty"`
+	Gender        string `json:"gender,omitempty"`
+	RegisterDate  string `json:"register_date,omitempty"`
+	SubCount      int    `json:"sub_count"`
+	BookmarkCount int    `json:"bookmark_count"`
+	AmSubscribed  bool   `json:"am_subscribed"`
 }
 
 type User struct {

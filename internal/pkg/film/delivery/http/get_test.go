@@ -4,16 +4,18 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	mock2 "2021_2_MAMBa/internal/pkg/film/usecase/mock"
+	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
+	mockSessions "2021_2_MAMBa/internal/pkg/sessions/mock"
 	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 )
@@ -33,7 +35,7 @@ type testRow struct {
 var testTableGetFilmSuccess = [...]testRow{
 	{
 		inQuery: "id=8&skip_reviews=0&limit_reviews=10&skip_recommend=0&limit_recommend=10",
-		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_avaliable":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_avaliable":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_rating":-1}` + "\n",
+		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
 		status:  http.StatusOK,
 		name:    `full works`,
 		skip:    0,
@@ -43,7 +45,7 @@ var testTableGetFilmSuccess = [...]testRow{
 	},
 	{
 		inQuery: "id=8",
-		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_avaliable":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_avaliable":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_rating":-1}` + "\n",
+		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
 		status:  http.StatusOK,
 		name:    `empty works`,
 		skip:    0,
@@ -123,16 +125,17 @@ func TestGetFilmSuccess(t *testing.T) {
 		var cl domain.FilmPageInfo
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockFilmUsecase(ctrl)
-		mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(cl, nil)
-		handler := FilmHandler{FilmUsecase: mock}
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+		mockSessions := mockSessions.NewMockSessionRPCClient(ctrl)
+		mock.EXPECT().GetFilm(uint64(0), uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(cl, nil)
+		handler := FilmHandler{FilmUsecase: mock, AuthClient: mockSessions}
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 		handler.GetFilm(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
 	}
 }
 
@@ -144,25 +147,25 @@ func TestGetFilmFailure(t *testing.T) {
 		var cl domain.FilmPageInfo
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		mock := mock2.NewMockFilmUsecase(ctrl)
+		mockSessions := mockSessions.NewMockSessionRPCClient(ctrl)
 		if i == 2 || i == 5 {
-			mock.EXPECT().GetFilm(uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, customErrors.ErrorSkip)
+			mock.EXPECT().GetFilm(uint64(0), uint64(8), test.skip, test.limit, test.skip1, test.limit1).Times(1).Return(domain.FilmPageInfo{}, customErrors.ErrorSkip)
 		}
-		handler := FilmHandler{FilmUsecase: mock}
-		fmt.Fprintf(os.Stdout, "Test:"+test.name)
+		handler := FilmHandler{FilmUsecase: mock, AuthClient: mockSessions}
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).AnyTimes()
 		handler.GetFilm(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
-		fmt.Fprintf(os.Stdout, " done\n")
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
 var testTablePostRatingSuccess = [...]testRow{
 	{
 		inQuery:    "id=2&rating=10",
-		out:        `{"rating":10}` + "\n",
+		out:        `{"rating":10.0}` + "\n",
 		bodyString: `{"film_id":7,"review_text":"и так тоже","review_type":2}`,
 		status:     http.StatusOK,
 		name:       `normal`,
@@ -186,26 +189,32 @@ func TestPostReviewSuccess(t *testing.T) {
 		var ret domain.User
 		_ = json.Unmarshal([]byte(test1.bodyString), &cl)
 		_ = json.Unmarshal([]byte(test1.out), &ret)
-		handler := userDel.UserHandler{UserUsecase: mock}
+		mockSessions1 := mockSessions.NewMockSessionRPCClient(ctrl)
+		handler := userDel.UserHandler{UserUsecase: mock, AuthClient: mockSessions1}
 		mock.EXPECT().Login(&cl).Times(1).Return(ret, nil)
 		bodyReader := strings.NewReader(test1.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test1.inQuery, bodyReader)
+		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+		mockSessions1.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 		handler.Login(w, r)
 
 		_ = json.Unmarshal([]byte(test.bodyString), &cl)
 		_ = json.Unmarshal([]byte(test.out), &ret)
 		mock2 := mock2.NewMockFilmUsecase(ctrl)
+		mockSessions2 := mockSessions.NewMockSessionRPCClient(ctrl)
 		mock2.EXPECT().PostRating(uint64(2), uint64(2), 10.0).Times(1).Return(10.0, nil)
-		handler2 := FilmHandler{FilmUsecase: mock2}
+		handler2 := FilmHandler{FilmUsecase: mock2, AuthClient: mockSessions2}
 		r = httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		cookies := w.Result().Cookies()
 		for _, cookie := range cookies {
 			r.AddCookie(cookie)
 		}
 		w = httptest.NewRecorder()
+		mockSessions2.EXPECT().CheckSession(r.Context(), &authRPC.Request{Name: "session-name", Value: "aaa"}).Return(&authRPC.ID{ID: 2}, nil).Times(1)
 		handler2.PostRating(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -237,26 +246,32 @@ func TestGetMySuccess(t *testing.T) {
 		var ret domain.User
 		_ = json.Unmarshal([]byte(test1.bodyString), &cl)
 		_ = json.Unmarshal([]byte(test1.out), &ret)
-		handler := userDel.UserHandler{UserUsecase: mock}
+		mockSessions1 := mockSessions.NewMockSessionRPCClient(ctrl)
+		handler := userDel.UserHandler{UserUsecase: mock, AuthClient: mockSessions1}
 		mock.EXPECT().Login(&cl).Times(1).Return(ret, nil)
 		bodyReader := strings.NewReader(test1.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test1.inQuery, bodyReader)
+		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+		mockSessions1.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 		handler.Login(w, r)
 
 		var review domain.Review
 		_ = json.Unmarshal([]byte(test.out), &review)
 		mock2 := mock2.NewMockFilmUsecase(ctrl)
+		mockSessions2 := mockSessions.NewMockSessionRPCClient(ctrl)
 		mock2.EXPECT().LoadMyReview(uint64(2), uint64(2)).Return(review, nil)
-		handler2 := FilmHandler{FilmUsecase: mock2}
+		handler2 := FilmHandler{FilmUsecase: mock2, AuthClient: mockSessions2}
 		r = httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
 		cookies := w.Result().Cookies()
 		for _, cookie := range cookies {
 			r.AddCookie(cookie)
 		}
 		w = httptest.NewRecorder()
+		mockSessions2.EXPECT().CheckSession(r.Context(), &authRPC.Request{Name: "session-name", Value: "aaa"}).Return(&authRPC.ID{ID: 2}, nil).Times(1)
 		handler2.LoadMyRv(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -264,7 +279,7 @@ func TestGetMySuccess(t *testing.T) {
 var testTableGetReviewsSuccess = [...]testRow{
 	{
 		inQuery: "id=8&skips=0&limits=10",
-		out:     `{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_avaliable":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		out:     `{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `full works`,
 		skip:    0,
@@ -272,7 +287,7 @@ var testTableGetReviewsSuccess = [...]testRow{
 	},
 	{
 		inQuery: "id=8",
-		out:     `{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_avaliable":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		out:     `{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `empty works`,
 		skip:    0,
@@ -320,7 +335,8 @@ func TestGetReviewsSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmReviews(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -339,15 +355,15 @@ func TestGetReviewsFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmReviews(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
 
 var testTableGetRecomSuccess = [...]testRow{
 	{
 		inQuery: "id=8&skips=0&limits=10",
-		out:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_avaliable":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
+		out:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `full works`,
 		skip:    0,
@@ -355,7 +371,7 @@ var testTableGetRecomSuccess = [...]testRow{
 	},
 	{
 		inQuery: "id=8",
-		out:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_avaliable":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
+		out:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `empty works`,
 		skip:    0,
@@ -403,7 +419,8 @@ func TestGetRecomSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmRecommendations(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
 }
@@ -422,7 +439,7 @@ func TestGetRecomFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.loadFilmRecommendations(w, r)
-		assert.Equal(t, test.out, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }

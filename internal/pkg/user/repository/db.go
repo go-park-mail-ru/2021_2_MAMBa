@@ -5,7 +5,6 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
-	"github.com/jackc/pgx/pgtype"
 )
 
 type dbUserRepository struct {
@@ -93,8 +92,7 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 	}
 
 	rawRow := result[0]
-	timeBuffer := pgtype.Timestamp{}
-	err = timeBuffer.DecodeBinary(nil, result[0][7])
+	timeBuffer, err := cast.TimestampToString(result[0][7])
 	if err != nil {
 		return domain.Profile{}, err
 	}
@@ -121,7 +119,7 @@ func (ur *dbUserRepository) GetProfileById(whoAskID, id uint64) (domain.Profile,
 		PictureUrl:    cast.ToString(rawRow[5]),
 		Email:         cast.ToString(rawRow[3]),
 		Gender:        cast.ToString(rawRow[6]),
-		RegisterDate:  timeBuffer.Time,
+		RegisterDate:  timeBuffer,
 		SubCount:      int(cast.ToUint64(resultSubscribers[0][0])),
 		BookmarkCount: int(cast.ToUint64(resultBookmarks[0][0])),
 		AmSubscribed:  amSubscribed,
@@ -192,7 +190,7 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 	}
 	dbSizeRaw := cast.ToUint64(result[0][0])
 	dbSize := int(dbSizeRaw)
-	if skip >= dbSize {
+	if skip >= dbSize && skip != 0 {
 		return domain.FilmReviews{}, customErrors.ErrorSkip
 	}
 
@@ -204,8 +202,7 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 	}
 	reviewList := make([]domain.Review, 0)
 	for i := range result {
-		timeBuffer := pgtype.Timestamp{}
-		err = timeBuffer.DecodeBinary(nil, result[i][6])
+		timeBuffer, err := cast.TimestampToString(result[i][6])
 		if err != nil {
 			return domain.FilmReviews{}, err
 		}
@@ -215,7 +212,7 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 			ReviewText: cast.ToString(result[i][3]),
 			ReviewType: int(cast.ToUint32(result[i][4])),
 			Stars:      cast.ToFloat64(result[i][5]),
-			Date:       timeBuffer.Time,
+			Date:       timeBuffer,
 		}
 		filmId := cast.ToUint64(result[i][1])
 		authId := cast.ToUint64(result[i][2])
@@ -236,7 +233,7 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 	}
 	reviews := domain.FilmReviews{
 		ReviewList:    reviewList,
-		MoreAvaliable: moreAvailable,
+		MoreAvailable: moreAvailable,
 		ReviewTotal:   dbSize,
 		CurrentSort:   "",
 		CurrentLimit:  limit,

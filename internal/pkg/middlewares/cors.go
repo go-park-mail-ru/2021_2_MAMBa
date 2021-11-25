@@ -13,6 +13,9 @@ var allowedOrigins = map[string]struct{}{
 	"http://89.208.198.137:3001": {},
 	"http://film4u.club":         {},
 	"http://film4u.club:3001":    {},
+	"http://film4u.club:3000":    {},
+	"http://film4u.club:9090":    {},
+	"http://film4u.club:9100":    {},
 	"":                           {}, // Для дебага локально
 
 	"https://89.208.198.137":      {},
@@ -31,6 +34,7 @@ func CORS(h http.Handler) http.Handler {
 			log.Warn(fmt.Sprintf("unknown origin: \"%s\"", origin))
 			http.Error(w, "Access denied", http.StatusForbidden)
 		}
+		w.Header().Add("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Accept-language, Content-Type, Content-Language, Content-Encoding")

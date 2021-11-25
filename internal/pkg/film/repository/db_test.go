@@ -7,7 +7,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 	"math"
@@ -63,10 +63,11 @@ func TestGetSuccess(t *testing.T) {
 		Director:        mockPersonPreview,
 		Screenwriter:    mockPersonPreview,
 		Genres:          []domain.Genre{{Id: 1, Name: "Комедия"}},
+		PremiereRu:      "2005-07-14",
 	}
 	rowsFilm := pgxmock.NewRows([]string{"id", "title", "title_original", "rating", "description",
 		"poster_url", "trailer", "total_revenue", "release", "duration", "scr", "dir",
-		"cont_type", "pid", "pnameen", "pnameru", "ppicture", "pcareer",
+		"cont_type", "premiere", "pid", "pnameen", "pnameru", "ppicture", "pcareer",
 		"p1id", "p1nameen", "p1nameru", "p1picture", "p1career"})
 	byteId := make([]byte, 8)
 	binary.BigEndian.PutUint64(byteId, mf.Id)
@@ -80,7 +81,7 @@ func TestGetSuccess(t *testing.T) {
 	binary.BigEndian.PutUint32(byteGenreId, 1)
 	rowsFilm.AddRow(byteId, []uint8(mf.Title), []uint8(mf.TitleOriginal), byteRating, []uint8(mf.Description),
 		[]uint8(mf.PosterUrl), []uint8(mf.TrailerUrl), []uint8(mf.TotalRevenue), byteRelease, byteDuration, byteId, byteId,
-		[]uint8(mf.ContentType), byteId, []uint8(mf.Director.NameEn), []uint8(mf.Director.NameRus), []uint8(mf.Director.PictureUrl), []uint8(mf.Director.Career[0]),
+		[]uint8(mf.ContentType), byteRelease, byteId, []uint8(mf.Director.NameEn), []uint8(mf.Director.NameRus), []uint8(mf.Director.PictureUrl), []uint8(mf.Director.Career[0]),
 		byteId, []uint8(mf.Director.NameEn), []uint8(mf.Director.NameRus), []uint8(mf.Director.PictureUrl), []uint8(mf.Director.Career[0]))
 	rowsRate := pgxmock.NewRows([]string{"rating"}).AddRow(byteRating)
 	rowsCountry := pgxmock.NewRows([]string{"country_name"}).AddRow([]uint8("США"))
@@ -121,7 +122,7 @@ func TestGetFilmRecommendationsSucess(t *testing.T) {
 			Id:        1,
 			Title:     "Test_film",
 			PosterUrl: "/pic/TestPoster.webp"}},
-		MoreAvaliable:       false,
+		MoreAvailable:       false,
 		RecommendationTotal: 1,
 		CurrentLimit:        10,
 		CurrentSkip:         10,
@@ -155,7 +156,7 @@ func TestGetFilmReviewsSucess(t *testing.T) {
 	timeBuffer := pgtype.Timestamp{}
 	timeBuffer.Time = time.Now()
 	reviews := domain.FilmReviews{
-		ReviewList: []domain.Review{domain.Review{
+		ReviewList: []domain.Review{{
 			Id:               1,
 			FilmId:           1,
 			AuthorName:       "Ivan Ivanovich",
@@ -163,9 +164,9 @@ func TestGetFilmReviewsSucess(t *testing.T) {
 			AuthorPictureUrl: "pic1.jopeg",
 			ReviewType:       3,
 			Stars:            4.0,
-			Date:             time.Time{},
+			Date:             "",
 		}},
-		MoreAvaliable: false,
+		MoreAvailable: false,
 		ReviewTotal:   1,
 		CurrentLimit:  10,
 		CurrentSkip:   10,

@@ -5,7 +5,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/domain"
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"math"
 	"time"
 
@@ -174,7 +174,7 @@ func TestGetReviewsSuccess(t *testing.T) {
 	timeBuffer := pgtype.Timestamp{}
 	timeBuffer.Time = time.Now()
 	reviews := domain.FilmReviews{
-		ReviewList: []domain.Review{domain.Review{
+		ReviewList: []domain.Review{{
 			Id:                1,
 			FilmId:            1,
 			FilmTitleRu:       "Фильм",
@@ -185,9 +185,9 @@ func TestGetReviewsSuccess(t *testing.T) {
 			AuthorPictureUrl:  "pic1.jopeg",
 			ReviewType:        3,
 			Stars:             4.0,
-			Date:              time.Time{},
+			Date:              "",
 		}},
-		MoreAvaliable: false,
+		MoreAvailable: false,
 		ReviewTotal:   1,
 		CurrentLimit:  10,
 		CurrentSkip:   10,
@@ -244,7 +244,7 @@ func TestGetProfileSuccess(t *testing.T) {
 		Email:         "Testosteron@mail.ru",
 		PictureUrl:    "/pic/1.jpg",
 		Gender:        "male",
-		RegisterDate:  timeBuffer.Time,
+		RegisterDate:  "",
 		SubCount:      2,
 		BookmarkCount: 2,
 		AmSubscribed:  false,
@@ -294,7 +294,7 @@ func TestUpdateProfileSuccess(t *testing.T) {
 		Email:         "Testosteron@mail.ru",
 		PictureUrl:    "/pic/1.jpg",
 		Gender:        "male",
-		RegisterDate:  timeBuffer.Time,
+		RegisterDate:  "",
 		SubCount:      2,
 		BookmarkCount: 2,
 		AmSubscribed:  false,

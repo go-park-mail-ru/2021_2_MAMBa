@@ -6,7 +6,7 @@ import (
 	mylog "2021_2_MAMBa/internal/pkg/utils/log"
 	"encoding/binary"
 	"errors"
-	"github.com/jackc/pgx/pgtype"
+	"github.com/jackc/pgtype"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 	"math"
@@ -39,13 +39,13 @@ func TestGetSuccess(t *testing.T) {
 		Career:       []string{"Тестер"},
 		Height:       130.0,
 		Age:          20,
-		Birthday:     timeBuffer1.Time.String(),
-		Death:        timeBuffer2.Time.String(),
+		Birthday:     "",
+		Death:        "",
 		BirthPlace:   "",
 		DeathPlace:   "",
 		Gender:       "",
 		FamilyStatus: "",
-		FilmNumber:   "",
+		FilmNumber:   0,
 	}
 	byteId := make([]uint8, 8)
 	binary.BigEndian.PutUint64(byteId, pers.Id)
@@ -53,11 +53,13 @@ func TestGetSuccess(t *testing.T) {
 	binary.BigEndian.PutUint32(byteHeight, uint32(int(pers.Height)))
 	byteAge := make([]uint8, 4)
 	binary.BigEndian.PutUint32(byteAge, uint32(pers.Age))
+	byteFilmNumber := make([]uint8, 4)
+	binary.BigEndian.PutUint32(byteFilmNumber, uint32(pers.FilmNumber))
 
 	rowPerson := pgxmock.NewRows([]string{"id", "name-en", "name_ru", "pic-url", "career", "height", "age", "bday", "dday",
 		"bp", "dp", "gender", "status", "number"})
 	rowPerson.AddRow(byteId, []uint8(pers.NameEn), []uint8(pers.NameRus), []uint8(pers.PictureUrl), []uint8(pers.Career[0]),
-		byteHeight, byteAge, []uint8(nil), []uint8(nil), []uint8(""), []uint8(""), []uint8(""), []uint8(""), []uint8(""))
+		byteHeight, byteAge, []uint8(nil), []uint8(nil), []uint8(""), []uint8(""), []uint8(""), []uint8(""), byteFilmNumber)
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetPerson)).WithArgs(pers.Id).WillReturnRows(rowPerson)
 	pool.ExpectCommit()
@@ -77,7 +79,7 @@ func TestGetFilms(t *testing.T) {
 
 	fl := domain.FilmList{
 		FilmList: []domain.Film{
-			domain.Film{
+			{
 				Id:          1,
 				Title:       "TestFilm",
 				Description: "ahahah ehehehe",
@@ -85,7 +87,7 @@ func TestGetFilms(t *testing.T) {
 				ReleaseYear: 2020,
 			},
 		},
-		MoreAvaliable: false,
+		MoreAvailable: false,
 		FilmTotal:     1,
 		CurrentLimit:  10,
 		CurrentSkip:   10,
@@ -121,7 +123,7 @@ func TestGetPopularFilms(t *testing.T) {
 
 	fl := domain.FilmList{
 		FilmList: []domain.Film{
-			domain.Film{
+			{
 				Id:          1,
 				Title:       "TestFilm",
 				Description: "ahahah ehehehe",
@@ -129,7 +131,7 @@ func TestGetPopularFilms(t *testing.T) {
 				ReleaseYear: 2020,
 			},
 		},
-		MoreAvaliable: false,
+		MoreAvailable: false,
 		FilmTotal:     1,
 		CurrentLimit:  10,
 		CurrentSkip:   10,
