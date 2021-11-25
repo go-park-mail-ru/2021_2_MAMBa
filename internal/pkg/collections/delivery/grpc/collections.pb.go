@@ -86,9 +86,9 @@ type CollectionPreview struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id         uint64 `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
-	Title      string `protobuf:"bytes,2,opt,name=Title,proto3" json:"Title,omitempty"`
-	PictureUrl string `protobuf:"bytes,3,opt,name=PictureUrl,proto3" json:"PictureUrl,omitempty"`
+	Id         uint64 `protobuf:"varint,1,opt,name=Id,proto3"         json:"id"`
+	Title      string `protobuf:"bytes,2,opt,name=Title,proto3"       json:"title"`
+	PictureUrl string `protobuf:"bytes,3,opt,name=PictureUrl,proto3"  json:"picture_url"`
 }
 
 func (x *CollectionPreview) Reset() {
@@ -149,12 +149,12 @@ type Collections struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CollArray       []*CollectionPreview `protobuf:"bytes,1,rep,name=CollArray,proto3" json:"CollArray,omitempty"`
-	MoreAvailable   bool                 `protobuf:"varint,2,opt,name=MoreAvailable,proto3" json:"MoreAvailable,omitempty"`
-	CollectionTotal int64                `protobuf:"varint,3,opt,name=CollectionTotal,proto3" json:"CollectionTotal,omitempty"`
-	CurrentSort     string               `protobuf:"bytes,4,opt,name=CurrentSort,proto3" json:"CurrentSort,omitempty"`
-	CurrentLimit    int64                `protobuf:"varint,5,opt,name=CurrentLimit,proto3" json:"CurrentLimit,omitempty"`
-	CurrentSkip     int64                `protobuf:"varint,6,opt,name=CurrentSkip,proto3" json:"CurrentSkip,omitempty"`
+	CollArray       []*CollectionPreview `protobuf:"bytes,1,rep,name=CollArray,proto3"        json:"collections_list"`
+	MoreAvailable   bool                 `protobuf:"varint,2,opt,name=MoreAvailable,proto3"   json:"more_available"`
+	CollectionTotal int64                `protobuf:"varint,3,opt,name=CollectionTotal,proto3" json:"collection_total"`
+	CurrentSort     string               `protobuf:"bytes,4,opt,name=CurrentSort,proto3"      json:"current_sort"`
+	CurrentLimit    int64                `protobuf:"varint,5,opt,name=CurrentLimit,proto3"    json:"current_limit"`
+	CurrentSkip     int64                `protobuf:"varint,6,opt,name=CurrentSkip,proto3"     json:"current_skip"`
 }
 
 func (x *Collections) Reset() {
@@ -291,20 +291,20 @@ type Person struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id           uint64   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	NameEn       string   `protobuf:"bytes,2,opt,name=nameEn,proto3" json:"nameEn,omitempty"`
-	NameRus      string   `protobuf:"bytes,3,opt,name=nameRus,proto3" json:"nameRus,omitempty"`
-	PictureUrl   string   `protobuf:"bytes,4,opt,name=pictureUrl,proto3" json:"pictureUrl,omitempty"`
-	Career       []string `protobuf:"bytes,5,rep,name=career,proto3" json:"career,omitempty"`
-	Height       float64  `protobuf:"fixed64,6,opt,name=height,proto3" json:"height,omitempty"`
-	Age          int64    `protobuf:"varint,7,opt,name=age,proto3" json:"age,omitempty"`
-	Birthday     string   `protobuf:"bytes,8,opt,name=birthday,proto3" json:"birthday,omitempty"`
-	Death        string   `protobuf:"bytes,9,opt,name=death,proto3" json:"death,omitempty"`
-	BirthPlace   string   `protobuf:"bytes,10,opt,name=birthPlace,proto3" json:"birthPlace,omitempty"`
-	DeathPlace   string   `protobuf:"bytes,11,opt,name=deathPlace,proto3" json:"deathPlace,omitempty"`
-	Gender       string   `protobuf:"bytes,12,opt,name=gender,proto3" json:"gender,omitempty"`
-	FamilyStatus string   `protobuf:"bytes,13,opt,name=familyStatus,proto3" json:"familyStatus,omitempty"`
-	FilmNumber   int64    `protobuf:"varint,14,opt,name=filmNumber,proto3" json:"filmNumber,omitempty"`
+	Id           uint64   `protobuf:"varint,1,opt,name=id,proto3"               json:"id,omitempty"`
+	NameEn       string   `protobuf:"bytes,2,opt,name=nameEn,proto3"            json:"name_en,omitempty"`
+	NameRus      string   `protobuf:"bytes,3,opt,name=nameRus,proto3"           json:"name_rus,omitempty"`
+	PictureUrl   string   `protobuf:"bytes,4,opt,name=pictureUrl,proto3"        json:"picture_url,omitempty"`
+	Career       []string `protobuf:"bytes,5,rep,name=career,proto3"            json:"career,omitempty"`
+	Height       float64  `protobuf:"fixed64,6,opt,name=height,proto3"          json:"height,omitempty"`
+	Age          int64    `protobuf:"varint,7,opt,name=age,proto3"              json:"age,omitempty"`
+	Birthday     string   `protobuf:"bytes,8,opt,name=birthday,proto3"          json:"birthday,omitempty"`
+	Death        string   `protobuf:"bytes,9,opt,name=death,proto3"             json:"death,omitempty"`
+	BirthPlace   string   `protobuf:"bytes,10,opt,name=birthPlace,proto3"       json:"birth_place,omitempty"`
+	DeathPlace   string   `protobuf:"bytes,11,opt,name=deathPlace,proto3"       json:"death_place,omitempty"`
+	Gender       string   `protobuf:"bytes,12,opt,name=gender,proto3"           json:"gender,omitempty"`
+	FamilyStatus string   `protobuf:"bytes,13,opt,name=familyStatus,proto3"     json:"family_status,omitempty"`
+	FilmNumber   int64    `protobuf:"varint,14,opt,name=filmNumber,proto3"      json:"film_number,omitempty"`
 }
 
 func (x *Person) Reset() {
@@ -442,22 +442,22 @@ type Film struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id              uint64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title           string    `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	TitleOriginal   string    `protobuf:"bytes,3,opt,name=titleOriginal,proto3" json:"titleOriginal,omitempty"`
-	Rating          float64   `protobuf:"fixed64,4,opt,name=rating,proto3" json:"rating,omitempty"`
-	Description     string    `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	TotalRevenue    string    `protobuf:"bytes,6,opt,name=totalRevenue,proto3" json:"totalRevenue,omitempty"`
-	PosterUrl       string    `protobuf:"bytes,7,opt,name=posterUrl,proto3" json:"posterUrl,omitempty"`
-	TrailerUrl      string    `protobuf:"bytes,8,opt,name=trailerUrl,proto3" json:"trailerUrl,omitempty"`
-	ContentType     string    `protobuf:"bytes,9,opt,name=contentType,proto3" json:"contentType,omitempty"`
-	ReleaseYear     int64     `protobuf:"varint,10,opt,name=releaseYear,proto3" json:"releaseYear,omitempty"`
-	Duration        int64     `protobuf:"varint,11,opt,name=duration,proto3" json:"duration,omitempty"`
-	OriginCountries []string  `protobuf:"bytes,12,rep,name=originCountries,proto3" json:"originCountries,omitempty"`
-	Cast            []*Person `protobuf:"bytes,13,rep,name=cast,proto3" json:"cast,omitempty"`
-	Director        *Person   `protobuf:"bytes,14,opt,name=director,proto3" json:"director,omitempty"`
-	Screenwriter    *Person   `protobuf:"bytes,15,opt,name=screenwriter,proto3" json:"screenwriter,omitempty"`
-	Genres          []*Genre  `protobuf:"bytes,16,rep,name=genres,proto3" json:"genres,omitempty"`
+	Id              uint64    `protobuf:"varint,1,opt,name=id,proto3"              json:"id,omitempty"`
+	Title           string    `protobuf:"bytes,2,opt,name=title,proto3"            json:"title,omitempty"`
+	TitleOriginal   string    `protobuf:"bytes,3,opt,name=titleOriginal,proto3"    json:"title_original,omitempty"`
+	Rating          float64   `protobuf:"fixed64,4,opt,name=rating,proto3"         json:"rating,omitempty"`
+	Description     string    `protobuf:"bytes,5,opt,name=description,proto3"      json:"description,omitempty"`
+	TotalRevenue    string    `protobuf:"bytes,6,opt,name=totalRevenue,proto3"     json:"total_revenue,omitempty"`
+	PosterUrl       string    `protobuf:"bytes,7,opt,name=posterUrl,proto3"        json:"poster_url,omitempty"`
+	TrailerUrl      string    `protobuf:"bytes,8,opt,name=trailerUrl,proto3"       json:"trailer_url,omitempty"`
+	ContentType     string    `protobuf:"bytes,9,opt,name=contentType,proto3"      json:"content_type,omitempty"`
+	ReleaseYear     int64     `protobuf:"varint,10,opt,name=releaseYear,proto3"    json:"release_year,omitempty"`
+	Duration        int64     `protobuf:"varint,11,opt,name=duration,proto3"       json:"duration,omitempty"`
+	OriginCountries []string  `protobuf:"bytes,12,rep,name=originCountries,proto3" json:"origin_countries,omitempty"`
+	Cast            []*Person `protobuf:"bytes,13,rep,name=cast,proto3"            json:"cast,omitempty"`
+	Director        *Person   `protobuf:"bytes,14,opt,name=director,proto3"        json:"director,omitempty"`
+	Screenwriter    *Person   `protobuf:"bytes,15,opt,name=screenwriter,proto3"    json:"screenwriter,omitempty"`
+	Genres          []*Genre  `protobuf:"bytes,16,rep,name=genres,proto3"          json:"genres,omitempty"`
 }
 
 func (x *Film) Reset() {
@@ -609,12 +609,12 @@ type Collection struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id           uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	AuthId       uint64 `protobuf:"varint,2,opt,name=authId,proto3" json:"authId,omitempty"`
-	CollName     string `protobuf:"bytes,3,opt,name=collName,proto3" json:"collName,omitempty"`
-	Description  string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	CreationTime string `protobuf:"bytes,5,opt,name=creationTime,proto3" json:"creationTime,omitempty"`
-	PicUrl       string `protobuf:"bytes,6,opt,name=picUrl,proto3" json:"picUrl,omitempty"`
+	Id           uint64 `protobuf:"varint,1,opt,name=id,proto3"          json:"id"`
+	AuthId       uint64 `protobuf:"varint,2,opt,name=authId,proto3"      json:"auth_id"`
+	CollName     string `protobuf:"bytes,3,opt,name=collName,proto3"     json:"collection_name"`
+	Description  string `protobuf:"bytes,4,opt,name=description,proto3"  json:"description"`
+	CreationTime string `protobuf:"bytes,5,opt,name=creationTime,proto3" json:"creation_time"`
+	PicUrl       string `protobuf:"bytes,6,opt,name=picUrl,proto3"       json:"picture_url"`
 }
 
 func (x *Collection) Reset() {
@@ -696,8 +696,8 @@ type CollectionPage struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Films []*Film     `protobuf:"bytes,1,rep,name=films,proto3" json:"films,omitempty"`
-	Coll  *Collection `protobuf:"bytes,2,opt,name=coll,proto3" json:"coll,omitempty"`
+	Films []*Film     `protobuf:"bytes,1,rep,name=films,proto3" json:"films"`
+	Coll  *Collection `protobuf:"bytes,2,opt,name=coll,proto3" json:"collection"`
 }
 
 func (x *CollectionPage) Reset() {
