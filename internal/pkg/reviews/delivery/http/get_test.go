@@ -9,6 +9,7 @@ import (
 	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
 	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -129,7 +130,7 @@ func TestPostReviewSuccess(t *testing.T) {
 		bodyReader := strings.NewReader(test1.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test1.inQuery, bodyReader)
-		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
+		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 		mockSessions1.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 		handler.Login(w, r)
 

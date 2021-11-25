@@ -45,7 +45,7 @@ func (sm *SessionManager) StartSession(ctx context.Context, rq *sGrpc.Request) (
 	session.Values["id"] = rq.ID
 	session.Options = &sessions.Options{
 		MaxAge:   100000, // ~27 hours
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",

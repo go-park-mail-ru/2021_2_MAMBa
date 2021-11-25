@@ -6,6 +6,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/sessions"
 	"google.golang.org/grpc/status"
 	"net/http"
@@ -74,7 +75,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	rq := cast.CookieToRq(r, 0)
 	_, err = handler.AuthClient.CheckSession(r.Context(), &rq)
 	st, _ := status.FromError(err)
-	s2, _ := status.FromError(customErrors.ErrorUserNotLoggedIn)
+	s2, _ := status.FromError(errors.New(customErrors.RPCErrUserNotLoggedIn))
 	if st.Message() != s2.Message() {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorAlreadyIn.Error()), Status: http.StatusUnauthorized}
 		resp.Write(w)

@@ -1,5 +1,25 @@
 package http
 
+import (
+	"2021_2_MAMBa/internal/pkg/domain"
+	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
+	mock2 "2021_2_MAMBa/internal/pkg/film/usecase/mock"
+	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
+	mockSessions "2021_2_MAMBa/internal/pkg/sessions/mock"
+	userDel "2021_2_MAMBa/internal/pkg/user/delivery/http"
+	mock3 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+)
+
 type testRow struct {
 	inQuery    string
 	bodyString string
@@ -10,12 +30,12 @@ type testRow struct {
 	limit      int
 	skip1      int
 	limit1     int
-}/*
+}
 
 var testTableGetFilmSuccess = [...]testRow{
 	{
 		inQuery: "id=8&skip_reviews=0&limit_reviews=10&skip_recommend=0&limit_recommend=10",
-		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""}}` + "\n",
+		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
 		status:  http.StatusOK,
 		name:    `full works`,
 		skip:    0,
@@ -25,7 +45,7 @@ var testTableGetFilmSuccess = [...]testRow{
 	},
 	{
 		inQuery: "id=8",
-		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""}}` + "\n",
+		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
 		status:  http.StatusOK,
 		name:    `empty works`,
 		skip:    0,
@@ -111,7 +131,7 @@ func TestGetFilmSuccess(t *testing.T) {
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0},  errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 		handler.GetFilm(w, r)
 		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
@@ -135,7 +155,7 @@ func TestGetFilmFailure(t *testing.T) {
 		bodyReader := strings.NewReader("")
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).AnyTimes()
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).AnyTimes()
 		handler.GetFilm(w, r)
 		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
@@ -175,7 +195,7 @@ func TestPostReviewSuccess(t *testing.T) {
 		bodyReader := strings.NewReader(test1.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test1.inQuery, bodyReader)
-		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
+		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 		mockSessions1.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 		handler.Login(w, r)
 
@@ -232,7 +252,7 @@ func TestGetMySuccess(t *testing.T) {
 		bodyReader := strings.NewReader(test1.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", "/api/user/login"+test1.inQuery, bodyReader)
-		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
+		mockSessions1.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 		mockSessions1.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 		handler.Login(w, r)
 
@@ -422,4 +442,4 @@ func TestGetRecomFailure(t *testing.T) {
 		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
-}*/
+}

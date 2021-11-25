@@ -7,6 +7,7 @@ import (
 	mockSessions "2021_2_MAMBa/internal/pkg/sessions/mock"
 	mock2 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -76,7 +77,7 @@ func TestRegisterSuccess(t *testing.T) {
 		handler.Register(w, r)
 		result := `{"body":` + test.out + `,"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
-		assert.Equal(t, 200, w.Code, "Test: "+test.name)
+		assert.Equal(t, 201, w.Code, "Test: "+test.name)
 	}
 }
 func TestRegisterFailure(t *testing.T) {
@@ -167,7 +168,7 @@ func TestLoginSuccess(t *testing.T) {
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).AnyTimes()
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).AnyTimes()
 		mockSessions.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name"}, nil)
 		handler.Login(w, r)
 		result := `{"body":` + test.out + `,"status":` + fmt.Sprint(test.status) + "}\n"
@@ -196,7 +197,7 @@ func TestLoginFailure(t *testing.T) {
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("POST", apiPath+test.inQuery, bodyReader)
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).AnyTimes()
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).AnyTimes()
 		handler.Login(w, r)
 		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
@@ -224,7 +225,7 @@ func TestLogoutFailure(t *testing.T) {
 		bodyReader := strings.NewReader(test.bodyString)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).AnyTimes()
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0},  errors.New(customErrors.RPCErrUserNotLoggedIn)).AnyTimes()
 		handler.Logout(w, r)
 		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
@@ -245,7 +246,7 @@ func TestLogoutSuccess(t *testing.T) {
 	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
+	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 	mockSessions.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
@@ -276,7 +277,7 @@ func TestCheckAuthSuccess(t *testing.T) {
 	bodyReader := strings.NewReader(testTableLoginSuccess[0].bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
+	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0},  errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
 	mockSessions.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 2}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
@@ -304,7 +305,7 @@ func TestCheckAuthFailure(t *testing.T) {
 	bodyReader := strings.NewReader("")
 	r := httptest.NewRequest("GET", "/api/user/checkAuth", bodyReader)
 	w := httptest.NewRecorder()
-	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).AnyTimes()
+	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).AnyTimes()
 	handler.CheckAuth(w, r)
 	result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}\n"
 	assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
