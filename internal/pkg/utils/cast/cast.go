@@ -12,7 +12,7 @@ import (
 func CookieToRq(request *http.Request, id uint64) authRPC.Request {
 	cookie, _ := request.Cookie("session-name")
 	if cookie == nil {
-		return authRPC.Request{ID: 0}
+		return authRPC.Request{ID: id}
 	}
 	return authRPC.Request{
 		Name:     cookie.Name,

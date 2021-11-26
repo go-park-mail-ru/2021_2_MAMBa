@@ -42,7 +42,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	result, err := handler.AuthClient.StartSession(r.Context(), &rq)
 	http.SetCookie(w, sessions.NewCookie(result.Name, result.Value, &sessions.Options{
 		Path:     result.Path,
-		Domain:   "/",
+		Domain:   rq.Domain,
 		MaxAge:   int(result.MaxAge),
 		Secure:   result.Secure,
 		HttpOnly: result.HttpOnly,
