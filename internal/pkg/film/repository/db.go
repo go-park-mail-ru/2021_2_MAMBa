@@ -326,6 +326,7 @@ func (fr *dbFilmRepository) GetFilmReviews(id uint64, skip int, limit int) (doma
 			Id:               cast.ToUint64(result[i][0]),
 			FilmId:           cast.ToUint64(result[i][1]),
 			AuthorName:       cast.ToString(result[i][7]) + " " + cast.ToString(result[i][8]),
+			AuthorId:         cast.ToUint64(result[i][2]),
 			ReviewText:       cast.ToString(result[i][3]),
 			AuthorPictureUrl: cast.ToString(result[i][9]),
 			ReviewType:       int(cast.ToUint32(result[i][4])),
@@ -424,6 +425,7 @@ func (fr *dbFilmRepository) GetMyReview(id uint64, author_id uint64) (domain.Rev
 	review := domain.Review{
 		Id:         cast.ToUint64(result[0][0]),
 		FilmId:     cast.ToUint64(result[0][1]),
+		AuthorId:   cast.ToUint64(result[0][2]),
 		ReviewText: cast.ToString(result[0][3]),
 		ReviewType: rtype,
 		Stars:      cast.ToFloat64(result[0][5]),
