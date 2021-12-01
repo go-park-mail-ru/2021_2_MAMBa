@@ -38,6 +38,7 @@ func (rr *dbReviewRepository) GetReview(id uint64) (domain.Review, error) {
 	}
 	review := domain.Review{
 		Id:         cast.ToUint64(result[0][0]),
+		AuthorId:   cast.ToUint64(result[0][2]),
 		FilmId:     cast.ToUint64(result[0][1]),
 		ReviewText: cast.ToString(result[0][3]),
 		ReviewType: int(cast.ToUint32(result[0][4])),
@@ -106,6 +107,7 @@ func (rr *dbReviewRepository) LoadReviewsExcept(id uint64, film_id uint64, skip 
 		review := domain.Review{
 			Id:         cast.ToUint64(result[i][0]),
 			FilmId:     cast.ToUint64(result[i][1]),
+			AuthorId:   cast.ToUint64(result[i][2]),
 			ReviewText: cast.ToString(result[i][3]),
 			ReviewType: int(cast.ToUint32(result[i][4])),
 			Stars:      cast.ToFloat64(result[i][5]),
