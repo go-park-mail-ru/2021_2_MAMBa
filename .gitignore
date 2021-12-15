@@ -21,4 +21,4 @@ profile
 profile.cov
 logs*.txt
 profile1.cov
-
+cfg.yaml

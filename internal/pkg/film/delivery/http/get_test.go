@@ -447,3 +447,192 @@ func TestGetRecomFailure(t *testing.T) {
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
+
+var testTableGetMYSuccess = [...]testRow{
+	{
+		inQuery: "id=8&skips=0&limits=10&month=2&year=2010",
+		out:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		resultJSON:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		status:  http.StatusOK,
+		name:    `full works`,
+		skip:    0,
+		limit:   10,
+	},
+	{
+		inQuery: "id=8&month=2&year=2010",
+		out:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		resultJSON:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		status:  http.StatusOK,
+		name:    `empty works`,
+		skip:    0,
+		limit:   10,
+	},
+}
+
+var testTableGetMYFailure = [...]testRow{
+	{
+		inQuery: "id=8&skip=-1&limit=10&month=2&year=2010",
+		out:     customErrors.ErrSkipMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `negative skip`,
+		skip:    -1,
+		limit:   10,
+	},
+	{
+		inQuery: "id=8&skip=11&limit=-2&month=2&year=2010",
+		out:     customErrors.ErrLimitMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `negative limit`,
+		skip:    11,
+		limit:   -2,
+	},
+	{
+		inQuery: "id=8&skip=14&limit=1&month=2&year=2010",
+		out:     customErrors.ErrSkipMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `skip overshoot`,
+		skip:    14,
+		limit:   1,
+	},
+	{
+		inQuery: "id=8&skip=1&limit=10&month=-2&year=2010",
+		out:     customErrors.ErrDateMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `negative skip`,
+		skip:    -1,
+		limit:   10,
+	},
+	{
+		inQuery: "id=8&skip=11&limit=2&month=2&year=10",
+		out:     customErrors.ErrDateMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `negative limit`,
+		skip:    11,
+		limit:   -2,
+	},
+}
+
+func TestGetMYSuccess(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	apiPath := "/api/film/calendar?"
+	for _, test := range testTableGetMYSuccess {
+		var cl domain.FilmList
+		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
+		mock := mock2.NewMockFilmUsecase(ctrl)
+		mock.EXPECT().GetFilmsByMonthYear(2, 2010, 10, 0).Return(cl, nil)
+		handler := FilmHandler{FilmUsecase: mock}
+		bodyReader := strings.NewReader("")
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
+		handler.GetFilmsByMonthYear(w, r)
+		result := `{"body":` + test.resultJSON[:len(test.resultJSON)-1] + `,"status":` + fmt.Sprint(test.status) + "}"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+	}
+}
+
+func TestGetMYFailure(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	apiPath := "/api/film/calendar?"
+	for i, test := range testTableGetMYFailure {
+		mock := mock2.NewMockFilmUsecase(ctrl)
+		if i == 2 {
+			mock.EXPECT().GetFilmsByMonthYear(2, 2010, 1, 14).Return(domain.FilmList{}, customErrors.ErrorSkip)
+		}
+		handler := FilmHandler{FilmUsecase: mock}
+		bodyReader := strings.NewReader("")
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
+		handler.GetFilmsByMonthYear(w, r)
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
+	}
+}
+
+var testTableGetBMSuccess = [...]testRow{
+	{
+		inQuery: "id=8&skips=0&limits=10",
+		out:     `` + "\n",
+		resultJSON:     `` + "\n",
+		status:  http.StatusOK,
+		name:    `full works`,
+		skip:    0,
+		limit:   10,
+	},
+	{
+		inQuery: "id=8",
+		out:     `` + "\n",
+		resultJSON:     `` + "\n",
+		status:  http.StatusOK,
+		name:    `empty works`,
+		skip:    0,
+		limit:   10,
+	},
+}
+var testTableGetBMFailure = [...]testRow{
+	{
+		inQuery: "id=8&skip=-1&limit=10",
+		out:     customErrors.ErrSkipMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `negative skip`,
+		skip:    -1,
+		limit:   10,
+	},
+	{
+		inQuery: "id=8&skip_reviews=11&limit=-2",
+		out:     customErrors.ErrLimitMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `negative limit`,
+		skip:    11,
+		limit:   -2,
+	},
+	{
+		inQuery: "id=8&skip=14&limit=1",
+		out:     customErrors.ErrSkipMsg + "\n",
+		status:  http.StatusBadRequest,
+		name:    `skip overshoot`,
+		skip:    14,
+		limit:   1,
+	},
+}
+
+func TestGetBMSuccess(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	apiPath := "/api/film/getBookmarks?"
+	for _, test := range testTableGetBMSuccess {
+		var cl domain.FilmBookmarks
+		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
+		mock := mock2.NewMockFilmUsecase(ctrl)
+		mock.EXPECT().LoadUserBookmarks(uint64(8), test.skip, test.limit).Return(cl, nil)
+		handler := FilmHandler{FilmUsecase: mock}
+		bodyReader := strings.NewReader("")
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
+		handler.LoadUserBookmarks(w, r)
+		result := `{"body":` + test.resultJSON[:len(test.resultJSON)-1] + `,"status":` + fmt.Sprint(test.status) + "}"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
+		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
+	}
+}
+
+func TestGetBMFailure(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	apiPath := "/api/film/loadFilmRecommendations?"
+	for i, test := range testTableGetRecomsFailure {
+		mock := mock2.NewMockFilmUsecase(ctrl)
+		if i == 2 {
+			mock.EXPECT().LoadFilmRecommendations(uint64(8), test.skip, test.limit).Return(domain.FilmRecommendations{}, customErrors.ErrorSkip)
+		}
+		handler := FilmHandler{FilmUsecase: mock}
+		bodyReader := strings.NewReader("")
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
+		handler.loadFilmRecommendations(w, r)
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}"
+		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
+	}
+}
