@@ -57,7 +57,7 @@ CREATE TABLE Review
     Review_ID   BIGSERIAL NOT NULL PRIMARY KEY,
     Film_ID     BIGINT,
     Author_ID   BIGINT,
-    review_text text,
+    review_text varchar(2000),
     type        integer,
     stars       double precision,
     review_date timestamp,
@@ -160,14 +160,4 @@ CREATE TABLE Recommended
     CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM (Film_ID) ON DELETE CASCADE,
     CONSTRAINT to_filmRecommended FOREIGN KEY (Film_ID) REFERENCES FILM (Film_ID) ON DELETE CASCADE,
     CONSTRAINT Recommended_ID PRIMARY KEY (Film_ID, Recommended_ID)
-);
-
-DROP TABLE IF EXISTS Banners CASCADE;
-CREATE TABLE Banners
-(
-    Banner_ID   BIGSERIAL NOT NULL PRIMARY KEY,
-    title       varchar(100),
-    description text,
-    picture_url varchar(100),
-    link        varchar(100)
 );
