@@ -5,7 +5,6 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
-	"encoding/json"
 	"net/http"
 )
 
@@ -33,7 +32,7 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	x, err := json.Marshal(page)
+	x, err := page.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -71,7 +70,7 @@ func (handler *PersonHandler) GetPersonFilms(w http.ResponseWriter, r *http.Requ
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(films)
+	x, err := films.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,

@@ -5,9 +5,7 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 )
 
@@ -81,7 +79,7 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	x, err := json.Marshal(filmPageInfo)
+	x, err := filmPageInfo.CustomEasyJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -122,8 +120,8 @@ func (handler *FilmHandler) PostRating(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	jsRate := json.Number(fmt.Sprintf("%.1f", newRating))
-	x, err := json.Marshal(domain.NewRate{Rating: jsRate})
+	jsRate := cast.Float64toJSONp1f(newRating)
+	x, err := domain.NewRate{Rating: jsRate}.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -163,7 +161,7 @@ func (handler *FilmHandler) LoadMyRv(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(review)
+	x, err := review.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -202,7 +200,7 @@ func (handler *FilmHandler) loadFilmReviews(w http.ResponseWriter, r *http.Reque
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(reviews)
+	x, err := reviews.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -247,7 +245,7 @@ func (handler *FilmHandler) GetFilmsByMonthYear(w http.ResponseWriter, r *http.R
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(filmList)
+	x, err := filmList.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -288,7 +286,7 @@ func (handler *FilmHandler) loadFilmRecommendations(w http.ResponseWriter, r *ht
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(recommendations)
+	x, err := recommendations.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -327,7 +325,7 @@ func (handler *FilmHandler) LoadUserBookmarks(w http.ResponseWriter, r *http.Req
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(bookmarks)
+	x, err := bookmarks.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -373,7 +371,7 @@ func (handler *FilmHandler) BookmarkFilm(w http.ResponseWriter, r *http.Request)
 		FilmID:     filmID,
 		Bookmarked: bookmarked,
 	}
-	x, err := json.Marshal(bookmarkedResult)
+	x, err := bookmarkedResult.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -388,7 +386,7 @@ func (handler *FilmHandler) GetGenres(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(genreList)
+	x, err := genreList.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -403,7 +401,7 @@ func (handler *FilmHandler) GetBanners(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(bannersList)
+	x, err := bannersList.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -418,7 +416,7 @@ func (handler *FilmHandler) GetPopularFilms(w http.ResponseWriter, r *http.Reque
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(filmsList)
+	x, err := filmsList.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -462,7 +460,7 @@ func (handler *FilmHandler) GetFilmsByGenre(w http.ResponseWriter, r *http.Reque
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(genreFilmList)
+	x, err := genreFilmList.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,

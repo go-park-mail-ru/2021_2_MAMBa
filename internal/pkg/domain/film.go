@@ -117,10 +117,14 @@ func (film *Film) toJsonNum() FilmJson {
 		Genres:          film.Genres,
 	}
 }
+func (f *Film) CustomEasyJSON() ([]byte, error) {
+	return f.toJsonNum().MarshalJSON()
+}
 
+/*
 func (film *Film) MarshalJSON() ([]byte, error) {
 	return json.Marshal(film.toJsonNum())
-}
+}*/
 
 type FilmRecommendations struct {
 	RecommendationList  []Film `json:"recommendation_list"`
@@ -164,14 +168,15 @@ type FilmPageInfoJson struct {
 	Bookmarked      bool                `json:"bookmarked"`
 }
 
-func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(FilmPageInfoJson{
+func (filmPage *FilmPageInfo) CustomEasyJSON() ([]byte, error) {
+	fpiJSON := FilmPageInfoJson{
 		FilmMain:        filmPage.FilmMain.toJsonNum(),
 		Reviews:         filmPage.Reviews,
 		Recommendations: filmPage.Recommendations,
 		MyReview:        filmPage.MyReview,
 		Bookmarked:      filmPage.Bookmarked,
-	})
+	}
+	return fpiJSON.MarshalJSON()
 }
 
 type NewRate struct {
