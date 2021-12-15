@@ -19,10 +19,12 @@ var sessionName = "session-name"
 // MaxAge<0 means delete cookie immediately.
 // MaxAge>0 means Max-Age attribute present and given in seconds.
 
-type SessionManager struct{}
+type SessionManager struct{
+	secure bool
+}
 
-func NewSessionManager() sGrpc.SessionRPCServer {
-	return &SessionManager{}
+func NewSessionManager(secure bool) sGrpc.SessionRPCServer {
+	return &SessionManager{secure: secure}
 }
 
 func (sm *SessionManager) StartSession(ctx context.Context, rq *sGrpc.Request) (*sGrpc.Session, error) {
@@ -44,7 +46,7 @@ func (sm *SessionManager) StartSession(ctx context.Context, rq *sGrpc.Request) (
 	session.Values["id"] = rq.ID
 	session.Options = &sessions.Options{
 		MaxAge:   100000, // ~27 hours
-		Secure:   true,
+		Secure:   sm.secure,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",

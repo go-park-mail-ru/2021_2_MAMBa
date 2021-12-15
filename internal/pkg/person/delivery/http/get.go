@@ -20,6 +20,11 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 		resp.Write(w)
 		return
 	}
+	if id == 0 {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
 	page, err := handler.PersonUsecase.GetPerson(id)
 	if err == customErrors.ErrNotFound {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrNotFoundMsg), Status: http.StatusNotFound}

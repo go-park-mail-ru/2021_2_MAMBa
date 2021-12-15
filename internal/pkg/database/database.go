@@ -1,6 +1,7 @@
 package database
 
 import (
+	"2021_2_MAMBa/internal/app/config"
 	mylog "2021_2_MAMBa/internal/pkg/utils/log"
 	"context"
 	"fmt"
@@ -8,13 +9,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-const (
-	dbUser     = "dev"
-	dbPassword = "1234"
-	dbHost     = "localhost"
-	dbPport    = 5432
-	dbName     = "film4u"
-)
+
 
 type ConnectionPool interface {
 	Begin(context.Context) (pgx.Tx, error)
@@ -25,8 +20,8 @@ type DBManager struct {
 	Pool ConnectionPool
 }
 
-func Connect() *DBManager {
-	connString := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s", dbUser, dbPassword, dbHost, dbPport, dbName)
+func Connect(cfg config.DbConfig) *DBManager {
+	connString := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s", cfg.User, cfg.Pass, cfg.Host, cfg.Port, cfg.Name)
 	pool, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
 		mylog.Warn("Postgres error")
