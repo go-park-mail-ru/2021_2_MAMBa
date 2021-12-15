@@ -678,7 +678,7 @@ func easyjson14b8084aDecode20212MAMBaInternalPkgDomain7(in *jlexer.Lexer, out *F
 				}
 				for !in.IsDelim(']') {
 					var v7 Film
-					(v7).UnmarshalEasyJSON(in)
+					easyjson14b8084aDecode20212MAMBaInternalPkgDomain8(in, &v7)
 					out.RecommendationList = append(out.RecommendationList, v7)
 					in.WantComma()
 				}
@@ -717,7 +717,7 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain7(out *jwriter.Writer, in 
 				if v8 > 0 {
 					out.RawByte(',')
 				}
-				(v9).MarshalEasyJSON(out)
+				out.Raw((v9).MarshalJSON())
 			}
 			out.RawByte(']')
 		}
@@ -768,207 +768,7 @@ func (v *FilmRecommendations) UnmarshalJSON(data []byte) error {
 func (v *FilmRecommendations) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson14b8084aDecode20212MAMBaInternalPkgDomain7(l, v)
 }
-func easyjson14b8084aDecode20212MAMBaInternalPkgDomain8(in *jlexer.Lexer, out *FilmPageInfoJson) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "film":
-			(out.FilmMain).UnmarshalEasyJSON(in)
-		case "reviews":
-			(out.Reviews).UnmarshalEasyJSON(in)
-		case "recommendations":
-			(out.Recommendations).UnmarshalEasyJSON(in)
-		case "my_review":
-			(out.MyReview).UnmarshalEasyJSON(in)
-		case "bookmarked":
-			out.Bookmarked = bool(in.Bool())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson14b8084aEncode20212MAMBaInternalPkgDomain8(out *jwriter.Writer, in FilmPageInfoJson) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"film\":"
-		out.RawString(prefix[1:])
-		(in.FilmMain).MarshalEasyJSON(out)
-	}
-	{
-		const prefix string = ",\"reviews\":"
-		out.RawString(prefix)
-		(in.Reviews).MarshalEasyJSON(out)
-	}
-	{
-		const prefix string = ",\"recommendations\":"
-		out.RawString(prefix)
-		(in.Recommendations).MarshalEasyJSON(out)
-	}
-	{
-		const prefix string = ",\"my_review\":"
-		out.RawString(prefix)
-		(in.MyReview).MarshalEasyJSON(out)
-	}
-	{
-		const prefix string = ",\"bookmarked\":"
-		out.RawString(prefix)
-		out.Bool(bool(in.Bookmarked))
-	}
-	out.RawByte('}')
-}
-
-// MarshalJSON supports json.Marshaler interface
-func (v FilmPageInfoJson) MarshalJSON() ([]byte, error) {
-	w := jwriter.Writer{}
-	easyjson14b8084aEncode20212MAMBaInternalPkgDomain8(&w, v)
-	return w.Buffer.BuildBytes(), w.Error
-}
-
-// MarshalEasyJSON supports easyjson.Marshaler interface
-func (v FilmPageInfoJson) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson14b8084aEncode20212MAMBaInternalPkgDomain8(w, v)
-}
-
-// UnmarshalJSON supports json.Unmarshaler interface
-func (v *FilmPageInfoJson) UnmarshalJSON(data []byte) error {
-	r := jlexer.Lexer{Data: data}
-	easyjson14b8084aDecode20212MAMBaInternalPkgDomain8(&r, v)
-	return r.Error()
-}
-
-// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *FilmPageInfoJson) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson14b8084aDecode20212MAMBaInternalPkgDomain8(l, v)
-}
-func easyjson14b8084aDecode20212MAMBaInternalPkgDomain9(in *jlexer.Lexer, out *FilmPageInfo) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "film":
-			if in.IsNull() {
-				in.Skip()
-				out.FilmMain = nil
-			} else {
-				if out.FilmMain == nil {
-					out.FilmMain = new(Film)
-				}
-				(*out.FilmMain).UnmarshalEasyJSON(in)
-			}
-		case "reviews":
-			(out.Reviews).UnmarshalEasyJSON(in)
-		case "recommendations":
-			(out.Recommendations).UnmarshalEasyJSON(in)
-		case "my_review":
-			(out.MyReview).UnmarshalEasyJSON(in)
-		case "bookmarked":
-			out.Bookmarked = bool(in.Bool())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson14b8084aEncode20212MAMBaInternalPkgDomain9(out *jwriter.Writer, in FilmPageInfo) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"film\":"
-		out.RawString(prefix[1:])
-		if in.FilmMain == nil {
-			out.RawString("null")
-		} else {
-			(*in.FilmMain).MarshalEasyJSON(out)
-		}
-	}
-	{
-		const prefix string = ",\"reviews\":"
-		out.RawString(prefix)
-		(in.Reviews).MarshalEasyJSON(out)
-	}
-	{
-		const prefix string = ",\"recommendations\":"
-		out.RawString(prefix)
-		(in.Recommendations).MarshalEasyJSON(out)
-	}
-	{
-		const prefix string = ",\"my_review\":"
-		out.RawString(prefix)
-		(in.MyReview).MarshalEasyJSON(out)
-	}
-	{
-		const prefix string = ",\"bookmarked\":"
-		out.RawString(prefix)
-		out.Bool(bool(in.Bookmarked))
-	}
-	out.RawByte('}')
-}
-
-// MarshalJSON supports json.Marshaler interface
-func (v FilmPageInfo) MarshalJSON() ([]byte, error) {
-	w := jwriter.Writer{}
-	easyjson14b8084aEncode20212MAMBaInternalPkgDomain9(&w, v)
-	return w.Buffer.BuildBytes(), w.Error
-}
-
-// MarshalEasyJSON supports easyjson.Marshaler interface
-func (v FilmPageInfo) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson14b8084aEncode20212MAMBaInternalPkgDomain9(w, v)
-}
-
-// UnmarshalJSON supports json.Unmarshaler interface
-func (v *FilmPageInfo) UnmarshalJSON(data []byte) error {
-	r := jlexer.Lexer{Data: data}
-	easyjson14b8084aDecode20212MAMBaInternalPkgDomain9(&r, v)
-	return r.Error()
-}
-
-// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *FilmPageInfo) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson14b8084aDecode20212MAMBaInternalPkgDomain9(l, v)
-}
-func easyjson14b8084aDecode20212MAMBaInternalPkgDomain10(in *jlexer.Lexer, out *FilmJson) {
+func easyjson14b8084aDecode20212MAMBaInternalPkgDomain8(in *jlexer.Lexer, out *Film) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -994,7 +794,7 @@ func easyjson14b8084aDecode20212MAMBaInternalPkgDomain10(in *jlexer.Lexer, out *
 		case "title_original":
 			out.TitleOriginal = string(in.String())
 		case "rating":
-			out.Rating = in.JsonNumber()
+			out.Rating = float64(in.Float64())
 		case "description":
 			out.Description = string(in.String())
 		case "total_revenue":
@@ -1094,7 +894,7 @@ func easyjson14b8084aDecode20212MAMBaInternalPkgDomain10(in *jlexer.Lexer, out *
 		in.Consumed()
 	}
 }
-func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in FilmJson) {
+func easyjson14b8084aEncode20212MAMBaInternalPkgDomain8(out *jwriter.Writer, in Film) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1132,7 +932,7 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in
 		} else {
 			out.RawString(prefix)
 		}
-		out.String(string(in.Rating))
+		out.Float64(float64(in.Rating))
 	}
 	if in.Description != "" {
 		const prefix string = ",\"description\":"
@@ -1228,31 +1028,491 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in
 	}
 	out.RawByte('}')
 }
+func easyjson14b8084aDecode20212MAMBaInternalPkgDomain9(in *jlexer.Lexer, out *FilmPageInfoJson) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "film":
+			(out.FilmMain).UnmarshalEasyJSON(in)
+		case "reviews":
+			(out.Reviews).UnmarshalEasyJSON(in)
+		case "recommendations":
+			(out.Recommendations).UnmarshalEasyJSON(in)
+		case "my_review":
+			(out.MyReview).UnmarshalEasyJSON(in)
+		case "bookmarked":
+			out.Bookmarked = bool(in.Bool())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson14b8084aEncode20212MAMBaInternalPkgDomain9(out *jwriter.Writer, in FilmPageInfoJson) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"film\":"
+		out.RawString(prefix[1:])
+		(in.FilmMain).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"reviews\":"
+		out.RawString(prefix)
+		(in.Reviews).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"recommendations\":"
+		out.RawString(prefix)
+		(in.Recommendations).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"my_review\":"
+		out.RawString(prefix)
+		(in.MyReview).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"bookmarked\":"
+		out.RawString(prefix)
+		out.Bool(bool(in.Bookmarked))
+	}
+	out.RawByte('}')
+}
 
 // MarshalJSON supports json.Marshaler interface
-func (v FilmJson) MarshalJSON() ([]byte, error) {
+func (v FilmPageInfoJson) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson14b8084aEncode20212MAMBaInternalPkgDomain9(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v FilmPageInfoJson) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson14b8084aEncode20212MAMBaInternalPkgDomain9(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *FilmPageInfoJson) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson14b8084aDecode20212MAMBaInternalPkgDomain9(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *FilmPageInfoJson) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson14b8084aDecode20212MAMBaInternalPkgDomain9(l, v)
+}
+func easyjson14b8084aDecode20212MAMBaInternalPkgDomain10(in *jlexer.Lexer, out *FilmPageInfo) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "film":
+			if in.IsNull() {
+				in.Skip()
+				out.FilmMain = nil
+			} else {
+				if out.FilmMain == nil {
+					out.FilmMain = new(Film)
+				}
+				easyjson14b8084aDecode20212MAMBaInternalPkgDomain8(in, out.FilmMain)
+			}
+		case "reviews":
+			(out.Reviews).UnmarshalEasyJSON(in)
+		case "recommendations":
+			(out.Recommendations).UnmarshalEasyJSON(in)
+		case "my_review":
+			(out.MyReview).UnmarshalEasyJSON(in)
+		case "bookmarked":
+			out.Bookmarked = bool(in.Bool())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in FilmPageInfo) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"film\":"
+		out.RawString(prefix[1:])
+		if in.FilmMain == nil {
+			out.RawString("null")
+		} else {
+			out.Raw((*in.FilmMain).MarshalJSON())
+		}
+	}
+	{
+		const prefix string = ",\"reviews\":"
+		out.RawString(prefix)
+		(in.Reviews).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"recommendations\":"
+		out.RawString(prefix)
+		(in.Recommendations).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"my_review\":"
+		out.RawString(prefix)
+		(in.MyReview).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"bookmarked\":"
+		out.RawString(prefix)
+		out.Bool(bool(in.Bookmarked))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v FilmPageInfo) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v FilmJson) MarshalEasyJSON(w *jwriter.Writer) {
+func (v FilmPageInfo) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *FilmJson) UnmarshalJSON(data []byte) error {
+func (v *FilmPageInfo) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson14b8084aDecode20212MAMBaInternalPkgDomain10(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *FilmJson) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *FilmPageInfo) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson14b8084aDecode20212MAMBaInternalPkgDomain10(l, v)
 }
-func easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(in *jlexer.Lexer, out *FilmBookmarks) {
+func easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(in *jlexer.Lexer, out *FilmJson) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "id":
+			out.Id = uint64(in.Uint64())
+		case "title":
+			out.Title = string(in.String())
+		case "title_original":
+			out.TitleOriginal = string(in.String())
+		case "rating":
+			out.Rating = in.JsonNumber()
+		case "description":
+			out.Description = string(in.String())
+		case "total_revenue":
+			out.TotalRevenue = string(in.String())
+		case "poster_url":
+			out.PosterUrl = string(in.String())
+		case "trailer_url":
+			out.TrailerUrl = string(in.String())
+		case "content_type":
+			out.ContentType = string(in.String())
+		case "release_year":
+			out.ReleaseYear = int(in.Int())
+		case "duration":
+			out.Duration = int(in.Int())
+		case "premiere_ru":
+			out.PremiereRu = string(in.String())
+		case "origin_countries":
+			if in.IsNull() {
+				in.Skip()
+				out.OriginCountries = nil
+			} else {
+				in.Delim('[')
+				if out.OriginCountries == nil {
+					if !in.IsDelim(']') {
+						out.OriginCountries = make([]string, 0, 4)
+					} else {
+						out.OriginCountries = []string{}
+					}
+				} else {
+					out.OriginCountries = (out.OriginCountries)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v19 string
+					v19 = string(in.String())
+					out.OriginCountries = append(out.OriginCountries, v19)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "cast":
+			if in.IsNull() {
+				in.Skip()
+				out.Cast = nil
+			} else {
+				in.Delim('[')
+				if out.Cast == nil {
+					if !in.IsDelim(']') {
+						out.Cast = make([]Person, 0, 0)
+					} else {
+						out.Cast = []Person{}
+					}
+				} else {
+					out.Cast = (out.Cast)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v20 Person
+					(v20).UnmarshalEasyJSON(in)
+					out.Cast = append(out.Cast, v20)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "director":
+			(out.Director).UnmarshalEasyJSON(in)
+		case "screenwriter":
+			(out.Screenwriter).UnmarshalEasyJSON(in)
+		case "genres":
+			if in.IsNull() {
+				in.Skip()
+				out.Genres = nil
+			} else {
+				in.Delim('[')
+				if out.Genres == nil {
+					if !in.IsDelim(']') {
+						out.Genres = make([]Genre, 0, 1)
+					} else {
+						out.Genres = []Genre{}
+					}
+				} else {
+					out.Genres = (out.Genres)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v21 Genre
+					(v21).UnmarshalEasyJSON(in)
+					out.Genres = append(out.Genres, v21)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(out *jwriter.Writer, in FilmJson) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	if in.Id != 0 {
+		const prefix string = ",\"id\":"
+		first = false
+		out.RawString(prefix[1:])
+		out.Uint64(uint64(in.Id))
+	}
+	if in.Title != "" {
+		const prefix string = ",\"title\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.String(string(in.Title))
+	}
+	if in.TitleOriginal != "" {
+		const prefix string = ",\"title_original\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.String(string(in.TitleOriginal))
+	}
+	{
+		const prefix string = ",\"rating\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.String(string(in.Rating))
+	}
+	if in.Description != "" {
+		const prefix string = ",\"description\":"
+		out.RawString(prefix)
+		out.String(string(in.Description))
+	}
+	if in.TotalRevenue != "" {
+		const prefix string = ",\"total_revenue\":"
+		out.RawString(prefix)
+		out.String(string(in.TotalRevenue))
+	}
+	if in.PosterUrl != "" {
+		const prefix string = ",\"poster_url\":"
+		out.RawString(prefix)
+		out.String(string(in.PosterUrl))
+	}
+	if in.TrailerUrl != "" {
+		const prefix string = ",\"trailer_url\":"
+		out.RawString(prefix)
+		out.String(string(in.TrailerUrl))
+	}
+	if in.ContentType != "" {
+		const prefix string = ",\"content_type\":"
+		out.RawString(prefix)
+		out.String(string(in.ContentType))
+	}
+	if in.ReleaseYear != 0 {
+		const prefix string = ",\"release_year\":"
+		out.RawString(prefix)
+		out.Int(int(in.ReleaseYear))
+	}
+	if in.Duration != 0 {
+		const prefix string = ",\"duration\":"
+		out.RawString(prefix)
+		out.Int(int(in.Duration))
+	}
+	if in.PremiereRu != "" {
+		const prefix string = ",\"premiere_ru\":"
+		out.RawString(prefix)
+		out.String(string(in.PremiereRu))
+	}
+	if len(in.OriginCountries) != 0 {
+		const prefix string = ",\"origin_countries\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v22, v23 := range in.OriginCountries {
+				if v22 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v23))
+			}
+			out.RawByte(']')
+		}
+	}
+	if len(in.Cast) != 0 {
+		const prefix string = ",\"cast\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v24, v25 := range in.Cast {
+				if v24 > 0 {
+					out.RawByte(',')
+				}
+				(v25).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
+	}
+	if true {
+		const prefix string = ",\"director\":"
+		out.RawString(prefix)
+		(in.Director).MarshalEasyJSON(out)
+	}
+	if true {
+		const prefix string = ",\"screenwriter\":"
+		out.RawString(prefix)
+		(in.Screenwriter).MarshalEasyJSON(out)
+	}
+	if len(in.Genres) != 0 {
+		const prefix string = ",\"genres\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v26, v27 := range in.Genres {
+				if v26 > 0 {
+					out.RawByte(',')
+				}
+				(v27).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v FilmJson) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v FilmJson) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *FilmJson) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *FilmJson) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(l, v)
+}
+func easyjson14b8084aDecode20212MAMBaInternalPkgDomain12(in *jlexer.Lexer, out *FilmBookmarks) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1287,9 +1547,9 @@ func easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(in *jlexer.Lexer, out *
 					out.FilmsList = (out.FilmsList)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v19 Film
-					(v19).UnmarshalEasyJSON(in)
-					out.FilmsList = append(out.FilmsList, v19)
+					var v28 Film
+					easyjson14b8084aDecode20212MAMBaInternalPkgDomain8(in, &v28)
+					out.FilmsList = append(out.FilmsList, v28)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -1314,7 +1574,7 @@ func easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(in *jlexer.Lexer, out *
 		in.Consumed()
 	}
 }
-func easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(out *jwriter.Writer, in FilmBookmarks) {
+func easyjson14b8084aEncode20212MAMBaInternalPkgDomain12(out *jwriter.Writer, in FilmBookmarks) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1325,11 +1585,11 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(out *jwriter.Writer, in
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v20, v21 := range in.FilmsList {
-				if v20 > 0 {
+			for v29, v30 := range in.FilmsList {
+				if v29 > 0 {
 					out.RawByte(',')
 				}
-				(v21).MarshalEasyJSON(out)
+				out.Raw((v30).MarshalJSON())
 			}
 			out.RawByte(']')
 		}
@@ -1365,373 +1625,24 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(out *jwriter.Writer, in
 // MarshalJSON supports json.Marshaler interface
 func (v FilmBookmarks) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(&w, v)
-	return w.Buffer.BuildBytes(), w.Error
-}
-
-// MarshalEasyJSON supports easyjson.Marshaler interface
-func (v FilmBookmarks) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson14b8084aEncode20212MAMBaInternalPkgDomain11(w, v)
-}
-
-// UnmarshalJSON supports json.Unmarshaler interface
-func (v *FilmBookmarks) UnmarshalJSON(data []byte) error {
-	r := jlexer.Lexer{Data: data}
-	easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(&r, v)
-	return r.Error()
-}
-
-// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *FilmBookmarks) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson14b8084aDecode20212MAMBaInternalPkgDomain11(l, v)
-}
-func easyjson14b8084aDecode20212MAMBaInternalPkgDomain12(in *jlexer.Lexer, out *Film) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "id":
-			out.Id = uint64(in.Uint64())
-		case "title":
-			out.Title = string(in.String())
-		case "title_original":
-			out.TitleOriginal = string(in.String())
-		case "rating":
-			out.Rating = float64(in.Float64())
-		case "description":
-			out.Description = string(in.String())
-		case "total_revenue":
-			out.TotalRevenue = string(in.String())
-		case "poster_url":
-			out.PosterUrl = string(in.String())
-		case "trailer_url":
-			out.TrailerUrl = string(in.String())
-		case "content_type":
-			out.ContentType = string(in.String())
-		case "release_year":
-			out.ReleaseYear = int(in.Int())
-		case "duration":
-			out.Duration = int(in.Int())
-		case "premiere_ru":
-			out.PremiereRu = string(in.String())
-		case "origin_countries":
-			if in.IsNull() {
-				in.Skip()
-				out.OriginCountries = nil
-			} else {
-				in.Delim('[')
-				if out.OriginCountries == nil {
-					if !in.IsDelim(']') {
-						out.OriginCountries = make([]string, 0, 4)
-					} else {
-						out.OriginCountries = []string{}
-					}
-				} else {
-					out.OriginCountries = (out.OriginCountries)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v22 string
-					v22 = string(in.String())
-					out.OriginCountries = append(out.OriginCountries, v22)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		case "cast":
-			if in.IsNull() {
-				in.Skip()
-				out.Cast = nil
-			} else {
-				in.Delim('[')
-				if out.Cast == nil {
-					if !in.IsDelim(']') {
-						out.Cast = make([]Person, 0, 0)
-					} else {
-						out.Cast = []Person{}
-					}
-				} else {
-					out.Cast = (out.Cast)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v23 Person
-					(v23).UnmarshalEasyJSON(in)
-					out.Cast = append(out.Cast, v23)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		case "director":
-			(out.Director).UnmarshalEasyJSON(in)
-		case "screenwriter":
-			(out.Screenwriter).UnmarshalEasyJSON(in)
-		case "genres":
-			if in.IsNull() {
-				in.Skip()
-				out.Genres = nil
-			} else {
-				in.Delim('[')
-				if out.Genres == nil {
-					if !in.IsDelim(']') {
-						out.Genres = make([]Genre, 0, 1)
-					} else {
-						out.Genres = []Genre{}
-					}
-				} else {
-					out.Genres = (out.Genres)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v24 Genre
-					(v24).UnmarshalEasyJSON(in)
-					out.Genres = append(out.Genres, v24)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson14b8084aEncode20212MAMBaInternalPkgDomain12(out *jwriter.Writer, in Film) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	if in.Id != 0 {
-		const prefix string = ",\"id\":"
-		first = false
-		out.RawString(prefix[1:])
-		out.Uint64(uint64(in.Id))
-	}
-	if in.Title != "" {
-		const prefix string = ",\"title\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.Title))
-	}
-	if in.TitleOriginal != "" {
-		const prefix string = ",\"title_original\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.TitleOriginal))
-	}
-	if in.Rating != 0 {
-		const prefix string = ",\"rating\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.Float64(float64(in.Rating))
-	}
-	if in.Description != "" {
-		const prefix string = ",\"description\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.Description))
-	}
-	if in.TotalRevenue != "" {
-		const prefix string = ",\"total_revenue\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.TotalRevenue))
-	}
-	if in.PosterUrl != "" {
-		const prefix string = ",\"poster_url\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.PosterUrl))
-	}
-	if in.TrailerUrl != "" {
-		const prefix string = ",\"trailer_url\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.TrailerUrl))
-	}
-	if in.ContentType != "" {
-		const prefix string = ",\"content_type\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.ContentType))
-	}
-	if in.ReleaseYear != 0 {
-		const prefix string = ",\"release_year\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.Int(int(in.ReleaseYear))
-	}
-	if in.Duration != 0 {
-		const prefix string = ",\"duration\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.Int(int(in.Duration))
-	}
-	if in.PremiereRu != "" {
-		const prefix string = ",\"premiere_ru\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.PremiereRu))
-	}
-	if len(in.OriginCountries) != 0 {
-		const prefix string = ",\"origin_countries\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		{
-			out.RawByte('[')
-			for v25, v26 := range in.OriginCountries {
-				if v25 > 0 {
-					out.RawByte(',')
-				}
-				out.String(string(v26))
-			}
-			out.RawByte(']')
-		}
-	}
-	if len(in.Cast) != 0 {
-		const prefix string = ",\"cast\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		{
-			out.RawByte('[')
-			for v27, v28 := range in.Cast {
-				if v27 > 0 {
-					out.RawByte(',')
-				}
-				(v28).MarshalEasyJSON(out)
-			}
-			out.RawByte(']')
-		}
-	}
-	if true {
-		const prefix string = ",\"director\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		(in.Director).MarshalEasyJSON(out)
-	}
-	if true {
-		const prefix string = ",\"screenwriter\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		(in.Screenwriter).MarshalEasyJSON(out)
-	}
-	if len(in.Genres) != 0 {
-		const prefix string = ",\"genres\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		{
-			out.RawByte('[')
-			for v29, v30 := range in.Genres {
-				if v29 > 0 {
-					out.RawByte(',')
-				}
-				(v30).MarshalEasyJSON(out)
-			}
-			out.RawByte(']')
-		}
-	}
-	out.RawByte('}')
-}
-
-// MarshalJSON supports json.Marshaler interface
-func (v Film) MarshalJSON() ([]byte, error) {
-	w := jwriter.Writer{}
 	easyjson14b8084aEncode20212MAMBaInternalPkgDomain12(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v Film) MarshalEasyJSON(w *jwriter.Writer) {
+func (v FilmBookmarks) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson14b8084aEncode20212MAMBaInternalPkgDomain12(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *Film) UnmarshalJSON(data []byte) error {
+func (v *FilmBookmarks) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson14b8084aDecode20212MAMBaInternalPkgDomain12(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *Film) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *FilmBookmarks) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson14b8084aDecode20212MAMBaInternalPkgDomain12(l, v)
 }
 func easyjson14b8084aDecode20212MAMBaInternalPkgDomain13(in *jlexer.Lexer, out *Country) {

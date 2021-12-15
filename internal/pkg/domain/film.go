@@ -55,12 +55,12 @@ type GenreFilmList struct {
 	Name      string   `json:"name"`
 	FilmsList FilmList `json:"films"`
 }
-
+//easyjson:skip
 type Film struct {
 	Id              uint64   `json:"id,omitempty"`
 	Title           string   `json:"title,omitempty"`
 	TitleOriginal   string   `json:"title_original,omitempty"`
-	Rating          float64  `json:"rating,omitempty"`
+	Rating          float64  `json:"rating"`
 	Description     string   `json:"description,omitempty"`
 	TotalRevenue    string   `json:"total_revenue,omitempty"`
 	PosterUrl       string   `json:"poster_url,omitempty"`
@@ -118,14 +118,14 @@ func (film *Film) toJsonNum() FilmJson {
 		Genres:          film.Genres,
 	}
 }
+/*
 func (f *Film) CustomEasyJSON() ([]byte, error) {
 	return f.toJsonNum().MarshalJSON()
-}
+}*/
 
-/*
 func (film *Film) MarshalJSON() ([]byte, error) {
 	return json.Marshal(film.toJsonNum())
-}*/
+}
 
 type FilmRecommendations struct {
 	RecommendationList  []Film `json:"recommendation_list"`
