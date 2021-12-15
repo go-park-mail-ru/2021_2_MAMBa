@@ -30,7 +30,6 @@ import (
 	"net/http"
 )
 
-
 func RunServer(configPath string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
@@ -92,7 +91,7 @@ func RunServer(configPath string) {
 	fileRouter.PathPrefix("/media/").Handler(fileServer)
 
 	server := http.Server{
-		Addr:    ":"+cfg.ListenPort,
+		Addr:    ":" + cfg.ListenPort,
 		Handler: r,
 	}
 

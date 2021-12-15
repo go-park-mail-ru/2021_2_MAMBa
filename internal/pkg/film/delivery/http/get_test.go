@@ -34,26 +34,26 @@ type testRow struct {
 
 var testTableGetFilmSuccess = [...]testRow{
 	{
-		inQuery: "id=8&skip_reviews=0&limit_reviews=10&skip_recommend=0&limit_recommend=10",
-		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
-		resultJSON:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":"8.5","description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
-		status:  http.StatusOK,
-		name:    `full works`,
-		skip:    0,
-		limit:   10,
-		skip1:   0,
-		limit1:  10,
+		inQuery:    "id=8&skip_reviews=0&limit_reviews=10&skip_recommend=0&limit_recommend=10",
+		out:        `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
+		resultJSON: `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":"8.5","description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
+		status:     http.StatusOK,
+		name:       `full works`,
+		skip:       0,
+		limit:      10,
+		skip1:      0,
+		limit1:     10,
 	},
 	{
-		inQuery: "id=8",
-		out:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
-		resultJSON:     `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":"8.5","description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
-		status:  http.StatusOK,
-		name:    `empty works`,
-		skip:    0,
-		limit:   10,
-		skip1:   0,
-		limit1:  10,
+		inQuery:    "id=8",
+		out:        `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":8.5,"description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
+		resultJSON: `{"film":{"id":8,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":"8.5","description":"третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер,Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","total_revenue":"$795,634,069.00","poster_url":"server/images/harry3.webp","trailer_url":"trailer","content_type":"фильм","release_year":2004,"duration":142,"origin_countries":["Великобритания","США"],"director":{"id":21,"name_rus":"Крис Коламбус","career":[""]},"screenwriter":{"id":26,"name_rus":"Альфонсо Куарон","career":[""]}},"reviews":{"review_list":[{"id":8,"film_id":8,"author_name":"Иван Иванов","author_picture_url":"/pic/1.jpg","review_text":"отвал башки","review_type":3,"stars":10,"date":"2021-10-31T00:00:00Z"},{"id":13,"film_id":8,"author_name":"Максим Дудник","author_picture_url":"/pic/1.jpg","review_text":"ffff","review_type":1,"stars":0,"date":"2021-10-31T00:00:00Z"}],"more_available":false,"review_total":2,"current_sort":"","current_limit":10,"current_skip":10},"recommendations":{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10},"my_review":{"id":0,"film_id":0,"review_type":0,"stars":0,"date":""},"bookmarked":false}` + "\n",
+		status:     http.StatusOK,
+		name:       `empty works`,
+		skip:       0,
+		limit:      10,
+		skip1:      0,
+		limit1:     10,
 	},
 }
 var testTableGetFilmFailure = [...]testRow{
@@ -364,22 +364,22 @@ func TestGetReviewsFailure(t *testing.T) {
 
 var testTableGetRecomSuccess = [...]testRow{
 	{
-		inQuery: "id=8&skips=0&limits=10",
-		out:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
-		resultJSON:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
-		status:  http.StatusOK,
-		name:    `full works`,
-		skip:    0,
-		limit:   10,
+		inQuery:    "id=8&skips=0&limits=10",
+		out:        `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
+		resultJSON: `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
+		status:     http.StatusOK,
+		name:       `full works`,
+		skip:       0,
+		limit:      10,
 	},
 	{
-		inQuery: "id=8",
-		out:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
-		resultJSON:     `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
-		status:  http.StatusOK,
-		name:    `empty works`,
-		skip:    0,
-		limit:   10,
+		inQuery:    "id=8",
+		out:        `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":0.0,"poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":0.0,"poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
+		resultJSON: `{"recommendation_list":[{"id":6,"title":"Гарри Поттер и философский камень","rating":"0.0","poster_url":"server/images/harry1.webp","director":{},"screenwriter":{}},{"id":7,"title":"Гарри Поттер и Тайная комната","rating":"0.0","poster_url":"server/images/harry2.webp","director":{},"screenwriter":{}}],"more_available":false,"recommendation_total":2,"current_limit":10,"current_skip":10}` + "\n",
+		status:     http.StatusOK,
+		name:       `empty works`,
+		skip:       0,
+		limit:      10,
 	},
 }
 var testTableGetRecomsFailure = [...]testRow{
@@ -450,22 +450,22 @@ func TestGetRecomFailure(t *testing.T) {
 
 var testTableGetMYSuccess = [...]testRow{
 	{
-		inQuery: "id=8&skips=0&limits=10&month=2&year=2010",
-		out:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
-		resultJSON:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
-		status:  http.StatusOK,
-		name:    `full works`,
-		skip:    0,
-		limit:   10,
+		inQuery:    "id=8&skips=0&limits=10&month=2&year=2010",
+		out:        `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		resultJSON: `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		status:     http.StatusOK,
+		name:       `full works`,
+		skip:       0,
+		limit:      10,
 	},
 	{
-		inQuery: "id=8&month=2&year=2010",
-		out:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
-		resultJSON:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
-		status:  http.StatusOK,
-		name:    `empty works`,
-		skip:    0,
-		limit:   10,
+		inQuery:    "id=8&month=2&year=2010",
+		out:        `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		resultJSON: `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		status:     http.StatusOK,
+		name:       `empty works`,
+		skip:       0,
+		limit:      10,
 	},
 }
 
@@ -553,22 +553,22 @@ func TestGetMYFailure(t *testing.T) {
 
 var testTableGetBMSuccess = [...]testRow{
 	{
-		inQuery: "id=8&skips=0&limits=10",
-		out:     `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
-		resultJSON:     `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
-		status:  http.StatusOK,
-		name:    `full works`,
-		skip:    0,
-		limit:   10,
+		inQuery:    "id=8&skips=0&limits=10",
+		out:        `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		resultJSON: `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		status:     http.StatusOK,
+		name:       `full works`,
+		skip:       0,
+		limit:      10,
 	},
 	{
-		inQuery: "id=8",
-		out:     `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
-		resultJSON:     `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
-		status:  http.StatusOK,
-		name:    `empty works`,
-		skip:    0,
-		limit:   10,
+		inQuery:    "id=8",
+		out:        `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		resultJSON: `{"bookmarks_list":null,"more_available":false,"films_total":0,"current_sort":"","current_limit":10,"current_skip":10}` + "\n",
+		status:     http.StatusOK,
+		name:       `empty works`,
+		skip:       0,
+		limit:      10,
 	},
 }
 var testTableGetBMFailure = [...]testRow{
@@ -696,13 +696,12 @@ func TestBookmarkSuccess(t *testing.T) {
 
 var testTableGetGenresSuccess = [...]testRow{
 	{
-		inQuery:    "id=2&bookmarked=false",
-		out:        `{"genres_list":[{"id":1,"name":"Боевик","picture_url":"/static/media/img/genres/action.svg"},{"id":2,"name":"Драма","picture_url":"/static/media/img/genres/drama.svg"},{"id":3,"name":"Комедия","picture_url":"/static/media/img/genres/comedy.svg"},{"id":4,"name":"Ужасы","picture_url":"/static/media/img/genres/horror.svg"},{"id":5,"name":"Мелодрама","picture_url":"/static/media/img/genres/romantic.svg"},{"id":6,"name":"Триллер","picture_url":"/static/media/img/genres/triller.svg"},{"id":7,"name":"Вестерн","picture_url":"/static/media/img/genres/western.svg"},{"id":8,"name":"Документальный","picture_url":"/static/media/img/genres/documentary.svg"},{"id":9,"name":"Фантастика","picture_url":"/static/media/img/genres/fantasy.svg"},{"id":10,"name":"Приключения","picture_url":"/static/media/img/genres/adventures.svg"},{"id":11,"name":"Семейный","picture_url":"/static/media/img/genres/family.svg"},{"id":12,"name":"Криминал","picture_url":"/static/media/img/genres/criminal.svg"},{"id":13,"name":"Исторический","picture_url":"/static/media/img/genres/historic.svg"},{"id":14,"name":"Аниме","picture_url":"/static/media/img/genres/anime.svg"},{"id":15,"name":"Детектив","picture_url":"/static/media/img/genres/detective.svg"}]}` + "\n",
-		status:     http.StatusOK,
-		name:       `normal`,
+		inQuery: "id=2&bookmarked=false",
+		out:     `{"genres_list":[{"id":1,"name":"Боевик","picture_url":"/static/media/img/genres/action.svg"},{"id":2,"name":"Драма","picture_url":"/static/media/img/genres/drama.svg"},{"id":3,"name":"Комедия","picture_url":"/static/media/img/genres/comedy.svg"},{"id":4,"name":"Ужасы","picture_url":"/static/media/img/genres/horror.svg"},{"id":5,"name":"Мелодрама","picture_url":"/static/media/img/genres/romantic.svg"},{"id":6,"name":"Триллер","picture_url":"/static/media/img/genres/triller.svg"},{"id":7,"name":"Вестерн","picture_url":"/static/media/img/genres/western.svg"},{"id":8,"name":"Документальный","picture_url":"/static/media/img/genres/documentary.svg"},{"id":9,"name":"Фантастика","picture_url":"/static/media/img/genres/fantasy.svg"},{"id":10,"name":"Приключения","picture_url":"/static/media/img/genres/adventures.svg"},{"id":11,"name":"Семейный","picture_url":"/static/media/img/genres/family.svg"},{"id":12,"name":"Криминал","picture_url":"/static/media/img/genres/criminal.svg"},{"id":13,"name":"Исторический","picture_url":"/static/media/img/genres/historic.svg"},{"id":14,"name":"Аниме","picture_url":"/static/media/img/genres/anime.svg"},{"id":15,"name":"Детектив","picture_url":"/static/media/img/genres/detective.svg"}]}` + "\n",
+		status:  http.StatusOK,
+		name:    `normal`,
 	},
 }
-
 
 func TestGetGenresSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -726,13 +725,12 @@ func TestGetGenresSuccess(t *testing.T) {
 
 var testTableGetBannersSuccess = [...]testRow{
 	{
-		inQuery:    "id=2&bookmarked=false",
-		out:        `{"banners_list":[{"id":1,"title":"Фильм «Гарри Поттер и философский камень»","description":"Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется.","picture_url":"/static/media/img/films/1.webp","link":"/films/1"},{"id":2,"title":"Подборка «Фильмы на вечер»","description":"Если на сегодняшний вечер у вас нет особых планов, а провести его хочется с приятностью, мы подобрали несколько интересных фильмов на самые разные вкусы.","picture_url":"/static/media/img/collections/7.webp","link":"/collections/7"},{"id":3,"title":"Фильм «Фокус»","description":"История об опытном мошеннике, который влюбляется в девушку, делающую первые шаги на поприще нелегального отъема средств у граждан. Отношения становятся для них проблемой, когда обнаруживается, что романтика мешает их нечестному бизнесу.","picture_url":"/static/media/img/films/4.jpg","link":"/films/4"}]}` + "\n",
-		status:     http.StatusOK,
-		name:       `normal`,
+		inQuery: "id=2&bookmarked=false",
+		out:     `{"banners_list":[{"id":1,"title":"Фильм «Гарри Поттер и философский камень»","description":"Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется.","picture_url":"/static/media/img/films/1.webp","link":"/films/1"},{"id":2,"title":"Подборка «Фильмы на вечер»","description":"Если на сегодняшний вечер у вас нет особых планов, а провести его хочется с приятностью, мы подобрали несколько интересных фильмов на самые разные вкусы.","picture_url":"/static/media/img/collections/7.webp","link":"/collections/7"},{"id":3,"title":"Фильм «Фокус»","description":"История об опытном мошеннике, который влюбляется в девушку, делающую первые шаги на поприще нелегального отъема средств у граждан. Отношения становятся для них проблемой, когда обнаруживается, что романтика мешает их нечестному бизнесу.","picture_url":"/static/media/img/films/4.jpg","link":"/films/4"}]}` + "\n",
+		status:  http.StatusOK,
+		name:    `normal`,
 	},
 }
-
 
 func TestGetBannersSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -757,13 +755,12 @@ func TestGetBannersSuccess(t *testing.T) {
 var testTableGetPopularSuccess = [...]testRow{
 	{
 		inQuery:    "id=2&bookmarked=false",
-		out:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
-		resultJSON:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		out:        `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		resultJSON: `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
 		status:     http.StatusOK,
 		name:       `normal`,
 	},
 }
-
 
 func TestGetPopularSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -785,16 +782,15 @@ func TestGetPopularSuccess(t *testing.T) {
 	}
 }
 
-
 var testTableGetGLSuccess = [...]testRow{
 	{
-		inQuery: "id=8&skips=0&limits=10",
-		out:     `{"id":9,"name":"Фантастика","films":{"film_list":[{"id":1,"title":"Гарри Поттер и философский камень","title_original":"Harry Potter and the Sorcerer's Stone","rating":6.8,"description":"Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.","poster_url":"/static/media/img/films/1.webp","release_year":2001,"premiere_ru":"2021-11-23","director":{},"screenwriter":{}},{"id":2,"title":"Гарри Поттер и Тайная комната","title_original":"Harry Potter and the Chamber of Secrets","rating":3.5,"description":"Гарри Поттер переходит на второй курс Школы чародейства и волшебства Хогвартс. Эльф Добби предупреждает Гарри об опасности, которая поджидает его там, и просит больше не возвращаться в школу. Юный волшебник не следует совету эльфа и становится свидетелем таинственных событий, разворачивающихся в Хогвартсе. Вскоре Гарри и его друзья узнают о существовании Тайной Комнаты и сталкиваются с новыми приключениями, пытаясь победить темные силы.","poster_url":"/static/media/img/films/2.webp","release_year":2002,"premiere_ru":"2022-01-22","director":{},"screenwriter":{}},{"id":3,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":2.0,"description":"В третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер, Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","poster_url":"/static/media/img/films/3.webp","release_year":2004,"premiere_ru":"2021-11-02","director":{},"screenwriter":{}}],"more_available":false,"film_total":3,"current_limit":5,"current_skip":5}}` + "\n",
-		resultJSON:     `{"id":9,"name":"Фантастика","films":{"film_list":[{"id":1,"title":"Гарри Поттер и философский камень","title_original":"Harry Potter and the Sorcerer's Stone","rating":"6.8","description":"Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.","poster_url":"/static/media/img/films/1.webp","release_year":2001,"premiere_ru":"2021-11-23","director":{},"screenwriter":{}},{"id":2,"title":"Гарри Поттер и Тайная комната","title_original":"Harry Potter and the Chamber of Secrets","rating":"3.5","description":"Гарри Поттер переходит на второй курс Школы чародейства и волшебства Хогвартс. Эльф Добби предупреждает Гарри об опасности, которая поджидает его там, и просит больше не возвращаться в школу. Юный волшебник не следует совету эльфа и становится свидетелем таинственных событий, разворачивающихся в Хогвартсе. Вскоре Гарри и его друзья узнают о существовании Тайной Комнаты и сталкиваются с новыми приключениями, пытаясь победить темные силы.","poster_url":"/static/media/img/films/2.webp","release_year":2002,"premiere_ru":"2022-01-22","director":{},"screenwriter":{}},{"id":3,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":"2.0","description":"В третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер, Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","poster_url":"/static/media/img/films/3.webp","release_year":2004,"premiere_ru":"2021-11-02","director":{},"screenwriter":{}}],"more_available":false,"film_total":3,"current_limit":5,"current_skip":5}}` + "\n",
-		status:  http.StatusOK,
-		name:    `full works`,
-		skip:    0,
-		limit:   10,
+		inQuery:    "id=8&skips=0&limits=10",
+		out:        `{"id":9,"name":"Фантастика","films":{"film_list":[{"id":1,"title":"Гарри Поттер и философский камень","title_original":"Harry Potter and the Sorcerer's Stone","rating":6.8,"description":"Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.","poster_url":"/static/media/img/films/1.webp","release_year":2001,"premiere_ru":"2021-11-23","director":{},"screenwriter":{}},{"id":2,"title":"Гарри Поттер и Тайная комната","title_original":"Harry Potter and the Chamber of Secrets","rating":3.5,"description":"Гарри Поттер переходит на второй курс Школы чародейства и волшебства Хогвартс. Эльф Добби предупреждает Гарри об опасности, которая поджидает его там, и просит больше не возвращаться в школу. Юный волшебник не следует совету эльфа и становится свидетелем таинственных событий, разворачивающихся в Хогвартсе. Вскоре Гарри и его друзья узнают о существовании Тайной Комнаты и сталкиваются с новыми приключениями, пытаясь победить темные силы.","poster_url":"/static/media/img/films/2.webp","release_year":2002,"premiere_ru":"2022-01-22","director":{},"screenwriter":{}},{"id":3,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":2.0,"description":"В третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер, Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","poster_url":"/static/media/img/films/3.webp","release_year":2004,"premiere_ru":"2021-11-02","director":{},"screenwriter":{}}],"more_available":false,"film_total":3,"current_limit":5,"current_skip":5}}` + "\n",
+		resultJSON: `{"id":9,"name":"Фантастика","films":{"film_list":[{"id":1,"title":"Гарри Поттер и философский камень","title_original":"Harry Potter and the Sorcerer's Stone","rating":"6.8","description":"Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.","poster_url":"/static/media/img/films/1.webp","release_year":2001,"premiere_ru":"2021-11-23","director":{},"screenwriter":{}},{"id":2,"title":"Гарри Поттер и Тайная комната","title_original":"Harry Potter and the Chamber of Secrets","rating":"3.5","description":"Гарри Поттер переходит на второй курс Школы чародейства и волшебства Хогвартс. Эльф Добби предупреждает Гарри об опасности, которая поджидает его там, и просит больше не возвращаться в школу. Юный волшебник не следует совету эльфа и становится свидетелем таинственных событий, разворачивающихся в Хогвартсе. Вскоре Гарри и его друзья узнают о существовании Тайной Комнаты и сталкиваются с новыми приключениями, пытаясь победить темные силы.","poster_url":"/static/media/img/films/2.webp","release_year":2002,"premiere_ru":"2022-01-22","director":{},"screenwriter":{}},{"id":3,"title":"Гарри Поттер и узник Азкабана","title_original":"Harry Potter and the Prisoner of Azkaban","rating":"2.0","description":"В третьей части истории о юном волшебнике полюбившиеся всем герои — Гарри Поттер, Рон и Гермиона — возвращаются уже на третий курс школы чародейства и волшебства Хогвартс. На этот раз они должны раскрыть тайну узника, сбежавшего из зловещей тюрьмы Азкабан, чье пребывание на воле создает для Гарри смертельную опасность...","poster_url":"/static/media/img/films/3.webp","release_year":2004,"premiere_ru":"2021-11-02","director":{},"screenwriter":{}}],"more_available":false,"film_total":3,"current_limit":5,"current_skip":5}}` + "\n",
+		status:     http.StatusOK,
+		name:       `full works`,
+		skip:       0,
+		limit:      10,
 	},
 }
 var testTableGetGLFailure = [...]testRow{

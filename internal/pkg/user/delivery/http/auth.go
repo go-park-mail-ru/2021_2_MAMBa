@@ -128,7 +128,7 @@ func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	idMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
 	st, _ := status.FromError(err)
 	s2, _ := status.FromError(customErrors.ErrorUserNotLoggedIn)
-	if st.Message() == s2.Message() && err != nil{
+	if st.Message() == s2.Message() && err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusForbidden}
 		resp.Write(w)
 		return
@@ -161,7 +161,7 @@ func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	idMessage, err := handler.AuthClient.CheckSession(r.Context(), &rq)
 	st, _ := status.FromError(err)
 	s2, _ := status.FromError(customErrors.ErrorUserNotLoggedIn)
-	if st.Message() == s2.Message() && err != nil{
+	if st.Message() == s2.Message() && err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorUserNotLoggedIn.Error()), Status: http.StatusForbidden}
 		resp.Write(w)
 		return

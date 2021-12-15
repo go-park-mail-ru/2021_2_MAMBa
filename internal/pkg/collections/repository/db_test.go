@@ -144,10 +144,7 @@ func TestGetCollInfoSuccess(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetCollection)).WithArgs(uint64(1)).WillReturnRows(rowsRecom)
 	pool.ExpectCommit()
 
-
 	actual, err := repository.GetCollectionInfo(1)
 	assert.NoError(t, err)
-	assert.Equal(t,coll, actual)
+	assert.Equal(t, coll, actual)
 }
-
-

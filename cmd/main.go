@@ -7,9 +7,9 @@ import (
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/messaging"
 	"fmt"
+	"github.com/spf13/pflag"
 	"google.golang.org/api/option"
 	"time"
-	"github.com/spf13/pflag"
 )
 
 func main() {

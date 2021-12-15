@@ -13,12 +13,12 @@ func RunServer(configPath string) {
 	cfg := config.ParseAuth(configPath)
 	lis, err := net.Listen("tcp", "localhost:"+cfg.AuthPort)
 	if err != nil {
-		log.Warn("failed to listen:"+ err.Error())
+		log.Warn("failed to listen:" + err.Error())
 	}
 	s := grpc.NewServer()
 	grpcSessionServer.RegisterSessionRPCServer(s, sessions.NewSessionManager(cfg.Secure))
-	log.Info("server listening at"+ lis.Addr().String())
+	log.Info("server listening at" + lis.Addr().String())
 	if err := s.Serve(lis); err != nil {
-		log.Warn("failed to listen:"+ err.Error())
+		log.Warn("failed to listen:" + err.Error())
 	}
 }

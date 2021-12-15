@@ -9,8 +9,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-
-
 type ConnectionPool interface {
 	Begin(context.Context) (pgx.Tx, error)
 	Close()

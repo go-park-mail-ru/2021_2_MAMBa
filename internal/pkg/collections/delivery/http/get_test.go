@@ -61,7 +61,7 @@ func TestGetCollsFailure(t *testing.T) {
 		var cl domain.Collections
 		_ = json.Unmarshal([]byte(test.out[:len(test.out)-1]), &cl)
 		bodyReader := strings.NewReader("")
-		handler:=CollectionsHandler{}
+		handler := CollectionsHandler{}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetCollections(w, r)

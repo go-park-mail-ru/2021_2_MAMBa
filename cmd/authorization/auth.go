@@ -5,8 +5,6 @@ import (
 	"github.com/spf13/pflag"
 )
 
-
-
 func main() {
 	var configPath string
 	pflag.StringVarP(&configPath, "config", "c", "./cfg/cfg.yaml",

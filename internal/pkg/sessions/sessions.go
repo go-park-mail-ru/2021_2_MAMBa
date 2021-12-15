@@ -19,7 +19,7 @@ var sessionName = "session-name"
 // MaxAge<0 means delete cookie immediately.
 // MaxAge>0 means Max-Age attribute present and given in seconds.
 
-type SessionManager struct{
+type SessionManager struct {
 	secure bool
 }
 

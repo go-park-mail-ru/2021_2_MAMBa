@@ -102,9 +102,9 @@ func ParseAuth(configPath string) ConfigParams {
 		Name: viper.GetString("auth.db.name"),
 	}
 	return ConfigParams{
-		Db:          db,
-		ListenPort:  viper.GetString("main.ports.serverPort"),
-		AuthPort:    viper.GetString("auth.ports.authPort"),
-		Secure:      viper.GetBool("auth.cookies.secure"),
+		Db:         db,
+		ListenPort: viper.GetString("main.ports.serverPort"),
+		AuthPort:   viper.GetString("auth.ports.authPort"),
+		Secure:     viper.GetBool("auth.cookies.secure"),
 	}
 }
