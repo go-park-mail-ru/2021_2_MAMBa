@@ -90,6 +90,6 @@ func ErrorToJson(src string) []byte {
 	return res
 }
 
-func Float64toJSONp1f (src float64) json.Number {
+func Float64toJSONp1f(src float64) json.Number {
 	return json.Number(fmt.Sprintf("%.1f", src))
 }

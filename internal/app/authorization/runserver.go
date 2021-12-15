@@ -9,7 +9,6 @@ import (
 )
 
 func RunServer(addr string) {
-
 	lis, err := net.Listen("tcp", "localhost:"+addr)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

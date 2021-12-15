@@ -55,6 +55,7 @@ type GenreFilmList struct {
 	Name      string   `json:"name"`
 	FilmsList FilmList `json:"films"`
 }
+
 //easyjson:skip
 type Film struct {
 	Id              uint64   `json:"id,omitempty"`
@@ -118,6 +119,7 @@ func (film *Film) toJsonNum() FilmJson {
 		Genres:          film.Genres,
 	}
 }
+
 /*
 func (f *Film) CustomEasyJSON() ([]byte, error) {
 	return f.toJsonNum().MarshalJSON()
