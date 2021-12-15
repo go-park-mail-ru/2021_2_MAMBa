@@ -22,8 +22,8 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	page, err := handler.PersonUsecase.GetPerson(id)
-	if err == customErrors.ErrorBadInput {
-		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+	if err == customErrors.ErrNotFound {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrNotFoundMsg), Status: http.StatusNotFound}
 		resp.Write(w)
 		return
 	}
@@ -32,6 +32,7 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 		resp.Write(w)
 		return
 	}
+
 	x, err := json.Marshal(page)
 	resp := domain.Response{
 		Body:   x,

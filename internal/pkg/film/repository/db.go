@@ -122,7 +122,21 @@ func (fr *dbFilmRepository) GetGenres() (domain.GenresList, error) {
 }
 
 func (fr *dbFilmRepository) GetFilmsByGenre(genreID uint64, limit int, skip int) (domain.GenreFilmList, error) {
-	result, err := fr.dbm.Query(queryCountFilmsByGenreID, genreID)
+	result, err := fr.dbm.Query(queryGetGenreName, genreID)
+	if err != nil {
+		return domain.GenreFilmList{}, err
+	}
+	if len(result) == 0 {
+		return domain.GenreFilmList{}, customErrors.ErrNotFound
+	}
+	genreName := cast.ToString(result[0][0])
+
+	genreFilmList := domain.GenreFilmList{
+		Id:   genreID,
+		Name: genreName,
+	}
+
+	result, err = fr.dbm.Query(queryCountFilmsByGenreID, genreID)
 	if err != nil {
 		return domain.GenreFilmList{}, customErrors.ErrorInternalServer
 	}
@@ -169,18 +183,8 @@ func (fr *dbFilmRepository) GetFilmsByGenre(genreID uint64, limit int, skip int)
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,
 	}
+	genreFilmList.FilmsList = filmList
 
-	result, err = fr.dbm.Query(queryGetGenreName, genreID)
-	if err != nil {
-		return domain.GenreFilmList{}, err
-	}
-	genreName := cast.ToString(result[0][0])
-
-	genreFilmList := domain.GenreFilmList{
-		Id:        genreID,
-		Name:      genreName,
-		FilmsList: filmList,
-	}
 	return genreFilmList, nil
 }
 

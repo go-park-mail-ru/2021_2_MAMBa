@@ -64,7 +64,7 @@ func (cr *dbCollectionsRepository) GetCollectionFilms(id uint64) ([]domain.Film,
 	}
 	dbSize := int(cast.ToUint64(result[0][0]))
 	if dbSize == 0 {
-		return []domain.Film{}, customErrors.ErrorBadInput
+		return []domain.Film{}, customErrors.ErrNotFound
 	}
 	result, err = cr.dbm.Query(queryGetFilms, id)
 	if err != nil {

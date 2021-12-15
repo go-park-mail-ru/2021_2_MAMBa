@@ -74,6 +74,13 @@ func (handler *FilmHandler) GetFilm(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 		return
 	}
+
+	if filmPageInfo.FilmMain.Id == 0 {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrNotFoundMsg), Status: http.StatusNotFound}
+		resp.Write(w)
+		return
+	}
+
 	x, err := json.Marshal(filmPageInfo)
 	resp := domain.Response{
 		Body:   x,
@@ -442,6 +449,11 @@ func (handler *FilmHandler) GetFilmsByGenre(w http.ResponseWriter, r *http.Reque
 	genreFilmList, err := handler.FilmUsecase.GetFilmsByGenre(genreID, limit, skip)
 	if err == customErrors.ErrorSkip {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrSkipMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	if err == customErrors.ErrNotFound {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrNotFoundMsg), Status: http.StatusNotFound}
 		resp.Write(w)
 		return
 	}

@@ -28,6 +28,9 @@ func (pr *dbPersonRepository) GetPerson(id uint64) (domain.Person, error) {
 	if err != nil {
 		return domain.Person{}, err
 	}
+	if len(result) == 0 {
+		return domain.Person{}, customErrors.ErrNotFound
+	}
 	height := float64(int(cast.ToUint32(result[0][5])))
 	person := domain.Person{
 		Id:           cast.ToUint64(result[0][0]),
