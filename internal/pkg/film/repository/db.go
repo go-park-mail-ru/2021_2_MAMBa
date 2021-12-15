@@ -86,7 +86,7 @@ func (fr *dbFilmRepository) GetBanners() (domain.BannersList, error) {
 	bufferBanners := make([]domain.Banner, 0)
 	for i := range result {
 		banner := domain.Banner{
-			Id:          uint64(cast.ToUint32(result[i][0])),
+			Id:          cast.ToUint64(result[i][0]),
 			Title:       cast.ToString(result[i][1]),
 			Description: cast.ToString(result[i][2]),
 			PictureURL:  cast.ToString(result[i][3]),
@@ -318,6 +318,7 @@ func (fr *dbFilmRepository) GetFilm(id uint64) (domain.Film, error) {
 		return domain.Film{}, err
 	}
 	film.Rating = cast.ToFloat64(result[0][0])
+
 	result, err = fr.dbm.Query(queryGetFilmCountries, id)
 	if err != nil || len(result) == 0 {
 		return domain.Film{}, err
