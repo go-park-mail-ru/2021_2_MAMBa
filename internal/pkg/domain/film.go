@@ -15,7 +15,8 @@ type Response struct {
 
 func (r *Response) Write(w http.ResponseWriter) {
 	w.WriteHeader(r.Status)
-	err := json.NewEncoder(w).Encode(r)
+	x, err := r.MarshalJSON()
+	_, err = w.Write(x)
 	if err != nil {
 		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
@@ -79,7 +80,7 @@ type FilmJson struct {
 	Id              uint64      `json:"id,omitempty"`
 	Title           string      `json:"title,omitempty"`
 	TitleOriginal   string      `json:"title_original,omitempty"`
-	Rating          json.Number `json:"rating,omitempty"`
+	Rating          json.Number `json:"rating"`
 	Description     string      `json:"description,omitempty"`
 	TotalRevenue    string      `json:"total_revenue,omitempty"`
 	PosterUrl       string      `json:"poster_url,omitempty"`

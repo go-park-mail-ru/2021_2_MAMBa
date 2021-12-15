@@ -8,6 +8,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/xss"
 	"github.com/gorilla/mux"
 	"github.com/mailru/easyjson"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -82,7 +83,7 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 	clientID := clientIDMessage.ID
 	profileForm := domain.Profile{}
 	var p []byte
-	_, err = r.Body.Read(p)
+	p, err = ioutil.ReadAll(r.Body)
 	err = easyjson.Unmarshal(p, &profileForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
@@ -118,8 +119,7 @@ func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Re
 	}
 	clientID := clientIDMessage.ID
 	profileForm := domain.Profile{}
-	var p []byte
-	_, err = r.Body.Read(p)
+	p, err := ioutil.ReadAll(r.Body)
 	err = easyjson.Unmarshal(p, &profileForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}

@@ -6,6 +6,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -44,8 +45,8 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 	defer r.Body.Close()
 	reviewForm := domain.Review{}
 	var p []byte
-	r.Body.Read(p)
-	err := reviewForm.UnmarshalJSON(p)
+	p, err := ioutil.ReadAll(r.Body)
+	err = reviewForm.UnmarshalJSON(p)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)

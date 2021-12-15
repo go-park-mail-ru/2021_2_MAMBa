@@ -7,6 +7,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/xss"
 	"github.com/gorilla/sessions"
 	"google.golang.org/grpc/status"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -14,8 +15,8 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	userForm := new(domain.User)
 	var p []byte
-	r.Body.Read(p)
-	err := userForm.UnmarshalJSON(p)
+	p, err := ioutil.ReadAll(r.Body)
+	err = userForm.UnmarshalJSON(p)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -66,9 +67,8 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	userForm := new(domain.UserToLogin)
-	var p []byte
-	r.Body.Read(p)
-	err := userForm.UnmarshalJSON(p)
+	p, err := ioutil.ReadAll(r.Body)
+	err = userForm.UnmarshalJSON(p)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)

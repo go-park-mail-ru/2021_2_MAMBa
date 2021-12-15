@@ -1124,7 +1124,7 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in
 		}
 		out.String(string(in.TitleOriginal))
 	}
-	if in.Rating != "" {
+	{
 		const prefix string = ",\"rating\":"
 		if first {
 			first = false
@@ -1136,92 +1136,47 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in
 	}
 	if in.Description != "" {
 		const prefix string = ",\"description\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.Description))
 	}
 	if in.TotalRevenue != "" {
 		const prefix string = ",\"total_revenue\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.TotalRevenue))
 	}
 	if in.PosterUrl != "" {
 		const prefix string = ",\"poster_url\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.PosterUrl))
 	}
 	if in.TrailerUrl != "" {
 		const prefix string = ",\"trailer_url\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.TrailerUrl))
 	}
 	if in.ContentType != "" {
 		const prefix string = ",\"content_type\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.ContentType))
 	}
 	if in.ReleaseYear != 0 {
 		const prefix string = ",\"release_year\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.Int(int(in.ReleaseYear))
 	}
 	if in.Duration != 0 {
 		const prefix string = ",\"duration\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.Int(int(in.Duration))
 	}
 	if in.PremiereRu != "" {
 		const prefix string = ",\"premiere_ru\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.PremiereRu))
 	}
 	if len(in.OriginCountries) != 0 {
 		const prefix string = ",\"origin_countries\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		{
 			out.RawByte('[')
 			for v13, v14 := range in.OriginCountries {
@@ -1235,12 +1190,7 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in
 	}
 	if len(in.Cast) != 0 {
 		const prefix string = ",\"cast\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		{
 			out.RawByte('[')
 			for v15, v16 := range in.Cast {
@@ -1254,32 +1204,17 @@ func easyjson14b8084aEncode20212MAMBaInternalPkgDomain10(out *jwriter.Writer, in
 	}
 	if true {
 		const prefix string = ",\"director\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		(in.Director).MarshalEasyJSON(out)
 	}
 	if true {
 		const prefix string = ",\"screenwriter\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		(in.Screenwriter).MarshalEasyJSON(out)
 	}
 	if len(in.Genres) != 0 {
 		const prefix string = ",\"genres\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		{
 			out.RawByte('[')
 			for v17, v18 := range in.Genres {
