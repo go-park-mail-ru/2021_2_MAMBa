@@ -57,7 +57,7 @@ CREATE TABLE Review
     Review_ID   BIGSERIAL NOT NULL PRIMARY KEY,
     Film_ID     BIGINT,
     Author_ID   BIGINT,
-    review_text varchar(2000),
+    review_text text,
     type        integer,
     stars       double precision,
     review_date timestamp,
@@ -87,8 +87,8 @@ CREATE TABLE Country
 DROP TABLE IF EXISTS Genre CASCADE;
 CREATE TABLE Genre
 (
-    Genre_ID   SERIAL NOT NULL PRIMARY KEY,
-    Genre_name varchar(50),
+    Genre_ID    SERIAL NOT NULL PRIMARY KEY,
+    Genre_name  varchar(50),
     Picture_url varchar(100)
 );
 
@@ -155,9 +155,19 @@ CREATE TABLE CollectionConnection
 DROP TABLE IF EXISTS Recommended CASCADE;
 CREATE TABLE Recommended
 (
-    Film_ID bigint NOT NULL,
+    Film_ID        bigint NOT NULL,
     Recommended_ID bigint NOT NULL,
-    CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM(Film_ID) ON DELETE CASCADE,
-    CONSTRAINT to_filmRecommended FOREIGN KEY (Film_ID) REFERENCES  FILM(Film_ID) ON DELETE CASCADE,
+    CONSTRAINT to_film FOREIGN KEY (Film_ID) REFERENCES FILM (Film_ID) ON DELETE CASCADE,
+    CONSTRAINT to_filmRecommended FOREIGN KEY (Film_ID) REFERENCES FILM (Film_ID) ON DELETE CASCADE,
     CONSTRAINT Recommended_ID PRIMARY KEY (Film_ID, Recommended_ID)
+);
+
+DROP TABLE IF EXISTS Banners CASCADE;
+CREATE TABLE Banners
+(
+    Banner_ID   BIGSERIAL NOT NULL PRIMARY KEY,
+    title       varchar(100),
+    description text,
+    picture_url varchar(100),
+    link        varchar(100)
 );

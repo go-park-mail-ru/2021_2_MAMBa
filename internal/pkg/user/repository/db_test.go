@@ -181,6 +181,7 @@ func TestGetReviewsSuccess(t *testing.T) {
 			FilmTitleOriginal: "Film",
 			FilmPictureUrl:    "Film.jpg",
 			AuthorName:        "Ivan Ivanovich",
+			AuthorId:          1,
 			ReviewText:        "Test review on film",
 			AuthorPictureUrl:  "pic1.jopeg",
 			ReviewType:        3,

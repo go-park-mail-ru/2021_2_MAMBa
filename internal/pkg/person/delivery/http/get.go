@@ -5,7 +5,6 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
-	"encoding/json"
 	"net/http"
 )
 
@@ -22,8 +21,8 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	page, err := handler.PersonUsecase.GetPerson(id)
-	if err == customErrors.ErrorBadInput {
-		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+	if err == customErrors.ErrNotFound {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrNotFoundMsg), Status: http.StatusNotFound}
 		resp.Write(w)
 		return
 	}
@@ -32,7 +31,8 @@ func (handler *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) 
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(page)
+
+	x, err := page.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -70,7 +70,7 @@ func (handler *PersonHandler) GetPersonFilms(w http.ResponseWriter, r *http.Requ
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(films)
+	x, err := films.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,

@@ -4,6 +4,7 @@ import (
 	authRPC "2021_2_MAMBa/internal/pkg/sessions/delivery/grpc"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"github.com/jackc/pgtype"
 	"math"
 	"net/http"
@@ -87,4 +88,8 @@ func StringToJson(src string) []byte {
 func ErrorToJson(src string) []byte {
 	res, _ := json.Marshal(JsonErr{Error: src})
 	return res
+}
+
+func Float64toJSONp1f(src float64) json.Number {
+	return json.Number(fmt.Sprintf("%.1f", src))
 }

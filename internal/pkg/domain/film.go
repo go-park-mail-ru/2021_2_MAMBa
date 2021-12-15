@@ -15,11 +15,24 @@ type Response struct {
 
 func (r *Response) Write(w http.ResponseWriter) {
 	w.WriteHeader(r.Status)
-	err := json.NewEncoder(w).Encode(r)
+	x, err := r.MarshalJSON()
+	_, err = w.Write(x)
 	if err != nil {
 		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
 		return
 	}
+}
+
+type Banner struct {
+	Id          uint64 `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description,omitempty"`
+	PictureURL  string `json:"picture_url,omitempty"`
+	Link        string `json:"link,omitempty"`
+}
+
+type BannersList struct {
+	BannersList []Banner `json:"banners_list"`
 }
 
 type Country struct {
@@ -43,11 +56,12 @@ type GenreFilmList struct {
 	FilmsList FilmList `json:"films"`
 }
 
+//easyjson:skip
 type Film struct {
 	Id              uint64   `json:"id,omitempty"`
 	Title           string   `json:"title,omitempty"`
 	TitleOriginal   string   `json:"title_original,omitempty"`
-	Rating          float64  `json:"rating,omitempty"`
+	Rating          float64  `json:"rating"`
 	Description     string   `json:"description,omitempty"`
 	TotalRevenue    string   `json:"total_revenue,omitempty"`
 	PosterUrl       string   `json:"poster_url,omitempty"`
@@ -67,7 +81,7 @@ type FilmJson struct {
 	Id              uint64      `json:"id,omitempty"`
 	Title           string      `json:"title,omitempty"`
 	TitleOriginal   string      `json:"title_original,omitempty"`
-	Rating          json.Number `json:"rating,omitempty"`
+	Rating          json.Number `json:"rating"`
 	Description     string      `json:"description,omitempty"`
 	TotalRevenue    string      `json:"total_revenue,omitempty"`
 	PosterUrl       string      `json:"poster_url,omitempty"`
@@ -105,6 +119,11 @@ func (film *Film) toJsonNum() FilmJson {
 		Genres:          film.Genres,
 	}
 }
+
+/*
+func (f *Film) CustomEasyJSON() ([]byte, error) {
+	return f.toJsonNum().MarshalJSON()
+}*/
 
 func (film *Film) MarshalJSON() ([]byte, error) {
 	return json.Marshal(film.toJsonNum())
@@ -152,14 +171,15 @@ type FilmPageInfoJson struct {
 	Bookmarked      bool                `json:"bookmarked"`
 }
 
-func (filmPage *FilmPageInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(FilmPageInfoJson{
+func (filmPage *FilmPageInfo) CustomEasyJSON() ([]byte, error) {
+	fpiJSON := FilmPageInfoJson{
 		FilmMain:        filmPage.FilmMain.toJsonNum(),
 		Reviews:         filmPage.Reviews,
 		Recommendations: filmPage.Recommendations,
 		MyReview:        filmPage.MyReview,
 		Bookmarked:      filmPage.Bookmarked,
-	})
+	}
+	return fpiJSON.MarshalJSON()
 }
 
 type NewRate struct {
@@ -184,6 +204,8 @@ type FilmRepository interface {
 	GetFilmsByMonthYear(month int, year int, limit int, skip int) (FilmList, error)
 	GetGenres() (GenresList, error)
 	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
+	GetBanners() (BannersList, error)
+	GetPopularFilms() (FilmList, error)
 }
 
 //go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
@@ -198,4 +220,6 @@ type FilmUsecase interface {
 	GetFilmsByMonthYear(month int, year int, limit int, skip int) (FilmList, error)
 	GetGenres() (GenresList, error)
 	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
+	GetBanners() (BannersList, error)
+	GetPopularFilms() (FilmList, error)
 }
