@@ -1,6 +1,7 @@
 package server
 
 import (
+	"2021_2_MAMBa/internal/app/config"
 	grpcCollection "2021_2_MAMBa/internal/pkg/collections/delivery/grpc"
 	collectionsDelivery "2021_2_MAMBa/internal/pkg/collections/delivery/http"
 	"2021_2_MAMBa/internal/pkg/database"
@@ -29,22 +30,27 @@ import (
 	"net/http"
 )
 
-func RunServer(addr string, collAddr string, authAddr string) {
+
+func RunServer(configPath string) {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
+	cfg := config.ParseMain(configPath)
 
-	middlewares.RegisterMetrics()
-
-	metrics := middlewares.InitMetrics()
 	// middleware
+	middlewares.RegisterMetrics()
+	metrics := middlewares.InitMetrics()
 	api.Use(middlewares.PanicRecovery)
 	api.Use(metrics.Metrics)
 	api.Use(middlewares.Logger)
-	api.Use(middlewares.CORS)
-	api.Use(middlewares.CSRF)
+	if cfg.CORS {
+		api.Use(middlewares.CORS)
+	}
+	if cfg.CSRF {
+		api.Use(middlewares.CSRF)
+	}
 
 	// database
-	db := database.Connect()
+	db := database.Connect(cfg.Db)
 	defer db.Disconnect()
 
 	userRepo := userRepository.NewUserRepository(db)
@@ -53,13 +59,13 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	reviewRepo := reviewsRepository.NewReviewRepository(db)
 	searchRepo := searchRepository.NewSearchRepository(db)
 
-	collConn, err := grpc.Dial("localhost:"+collAddr, grpc.WithInsecure())
+	collConn, err := grpc.Dial("localhost:"+cfg.CollectPort, grpc.WithInsecure())
 	if err != nil {
 		return
 	}
 	defer collConn.Close()
 	clientCollections := grpcCollection.NewCollectionsRPCClient(collConn)
-	authConn, err := grpc.Dial("localhost:"+authAddr, grpc.WithInsecure())
+	authConn, err := grpc.Dial("localhost:"+cfg.AuthPort, grpc.WithInsecure())
 	if err != nil {
 		return
 	}
@@ -86,11 +92,11 @@ func RunServer(addr string, collAddr string, authAddr string) {
 	fileRouter.PathPrefix("/media/").Handler(fileServer)
 
 	server := http.Server{
-		Addr:    addr,
+		Addr:    ":"+cfg.ListenPort,
 		Handler: r,
 	}
 
-	log.Info(fmt.Sprintf("Starting web-server at %s", addr))
+	log.Info(fmt.Sprintf("Starting web-server at %s", cfg.ListenPort))
 	err = server.ListenAndServe()
 	if err != nil {
 		log.Error(err)

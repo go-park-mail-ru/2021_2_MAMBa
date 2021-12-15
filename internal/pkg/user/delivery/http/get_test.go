@@ -7,7 +7,6 @@ import (
 	mockSessions "2021_2_MAMBa/internal/pkg/sessions/mock"
 	mock2 "2021_2_MAMBa/internal/pkg/user/usecase/mock"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
@@ -83,7 +82,7 @@ func TestGetBasicInfoSuccess(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		handler.GetBasicInfo(w, r)
-		result := `{"body":` + test.out + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":` + test.out + `,"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -109,7 +108,7 @@ func TestGetBasicInfoFailure(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		handler.GetBasicInfo(w, r)
-		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -148,7 +147,7 @@ func TestGetProfileInfoSuccess(t *testing.T) {
 	bodyReader := strings.NewReader(test.bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
 	mockSessions.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 1}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
@@ -166,7 +165,7 @@ func TestGetProfileInfoSuccess(t *testing.T) {
 		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{Name: "session-name", Value: "aaa"}).Return(&authRPC.ID{ID: 1}, nil).AnyTimes()
 		w = httptest.NewRecorder()
 		handler.GetProfile(w, r)
-		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}\n"
+		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, testCase.status, w.Code, "Test: "+test.name)
 	}
@@ -206,7 +205,7 @@ func TestUpdateProfileInfoSuccess(t *testing.T) {
 	bodyReader := strings.NewReader(test.bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
 	mockSessions.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 1}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
@@ -225,7 +224,7 @@ func TestUpdateProfileInfoSuccess(t *testing.T) {
 		w = httptest.NewRecorder()
 		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{Name: "session-name", Value: "aaa"}).Return(&authRPC.ID{ID: 1}, nil).AnyTimes()
 		handler.UpdateProfile(w, r)
-		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}\n"
+		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, testCase.status, w.Code, "Test: "+testCase.name)
 	}
@@ -241,9 +240,9 @@ func TestUpdateProfileInfoFailure(t *testing.T) {
 		r := httptest.NewRequest("GET", "/api/user/changeProfile?"+testCase.inQuery, bodyReader)
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
 		handler.UpdateProfile(w, r)
-		result := `{"body":{"error":"` + testCase.out + `"},"status":` + fmt.Sprint(testCase.status) + "}\n"
+		result := `{"body":{"error":"` + testCase.out + `"},"status":` + fmt.Sprint(testCase.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+testCase.name)
 	}
 }
@@ -282,7 +281,7 @@ func TestSubscribeSuccess(t *testing.T) {
 	bodyReader := strings.NewReader(test.bodyString)
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("POST", "/api/login", bodyReader)
-	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+	mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
 	mockSessions.EXPECT().StartSession(r.Context(), &authRPC.Request{ID: 1}).Return(&authRPC.Session{Name: "session-name", Value: "aaa"}, nil)
 	handler.Login(w, r)
 	require.Equal(t, http.StatusOK, w.Code)
@@ -301,7 +300,7 @@ func TestSubscribeSuccess(t *testing.T) {
 		w = httptest.NewRecorder()
 		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{Name: "session-name", Value: "aaa"}).Return(&authRPC.ID{ID: 1}, nil).AnyTimes()
 		handler.CreateSubscription(w, r)
-		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}\n"
+		result := `{"body":` + testCase.out + `,"status":` + fmt.Sprint(testCase.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, testCase.status, w.Code, "Test: "+testCase.name)
 	}
@@ -317,9 +316,9 @@ func TestSubscribeFailure(t *testing.T) {
 		r := httptest.NewRequest("GET", "/api/user/subscribeTo?"+testCase.inQuery, bodyReader)
 		w := httptest.NewRecorder()
 		w = httptest.NewRecorder()
-		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, errors.New(customErrors.RPCErrUserNotLoggedIn)).Times(1)
+		mockSessions.EXPECT().CheckSession(r.Context(), &authRPC.Request{ID: 0}).Return(&authRPC.ID{ID: 0}, customErrors.ErrorUserNotLoggedIn).Times(1)
 		handler.CreateSubscription(w, r)
-		result := `{"body":{"error":"` + testCase.out + `"},"status":` + fmt.Sprint(testCase.status) + "}\n"
+		result := `{"body":{"error":"` + testCase.out + `"},"status":` + fmt.Sprint(testCase.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+testCase.name)
 	}
 }
@@ -384,7 +383,7 @@ func TestGetReviewsSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.LoadUserReviews(w, r)
-		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -405,7 +404,7 @@ func TestGetReviewsFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.LoadUserReviews(w, r)
-		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":{"error":"` + test.out + `"},"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
