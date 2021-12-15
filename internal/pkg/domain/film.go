@@ -22,6 +22,18 @@ func (r *Response) Write(w http.ResponseWriter) {
 	}
 }
 
+type Banner struct {
+	Id          uint64 `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description,omitempty"`
+	PictureURL  string `json:"picture_url,omitempty"`
+	Link        string `json:"link,omitempty"`
+}
+
+type BannersList struct {
+	BannersList []Banner `json:"banners_list"`
+}
+
 type Country struct {
 	Id          uint64
 	CountryName string
@@ -184,6 +196,8 @@ type FilmRepository interface {
 	GetFilmsByMonthYear(month int, year int, limit int, skip int) (FilmList, error)
 	GetGenres() (GenresList, error)
 	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
+	GetBanners() (BannersList, error)
+	GetPopularFilms() (FilmList, error)
 }
 
 //go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
@@ -198,4 +212,6 @@ type FilmUsecase interface {
 	GetFilmsByMonthYear(month int, year int, limit int, skip int) (FilmList, error)
 	GetGenres() (GenresList, error)
 	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
+	GetBanners() (BannersList, error)
+	GetPopularFilms() (FilmList, error)
 }

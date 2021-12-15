@@ -389,6 +389,36 @@ func (handler *FilmHandler) GetGenres(w http.ResponseWriter, r *http.Request) {
 	resp.Write(w)
 }
 
+func (handler *FilmHandler) GetBanners(w http.ResponseWriter, r *http.Request) {
+	bannersList, err := handler.FilmUsecase.GetBanners()
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	x, err := json.Marshal(bannersList)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	resp.Write(w)
+}
+
+func (handler *FilmHandler) GetPopularFilms(w http.ResponseWriter, r *http.Request) {
+	filmsList, err := handler.FilmUsecase.GetPopularFilms()
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	x, err := json.Marshal(filmsList)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	resp.Write(w)
+}
+
 func (handler *FilmHandler) GetFilmsByGenre(w http.ResponseWriter, r *http.Request) {
 	genreID, err := queryChecker.CheckIsIn64(w, r, "id", 0, customErrors.ErrorSkip)
 	if err != nil {

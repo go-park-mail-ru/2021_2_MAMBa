@@ -48,11 +48,13 @@ func (uc *collectionsUsecase) GetCollectionPage(ctx context.Context, id *grpc.ID
 	bufferFilms := make([]*grpc.Film, 0)
 	for _, elem := range films {
 		bufferFilms = append(bufferFilms, &grpc.Film{
-			Id:          elem.Id,
-			Title:       elem.Title,
-			Description: elem.Description,
-			ReleaseYear: int64(elem.ReleaseYear),
-			PosterUrl:   elem.PosterUrl,
+			Id:            elem.Id,
+			Title:         elem.Title,
+			TitleOriginal: elem.TitleOriginal,
+			Rating:        elem.Rating,
+			Description:   elem.Description,
+			ReleaseYear:   int64(elem.ReleaseYear),
+			PosterUrl:     elem.PosterUrl,
 		})
 	}
 	if err != nil {

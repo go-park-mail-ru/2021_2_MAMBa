@@ -15,6 +15,22 @@ func NewFilmUsecase(u domain.FilmRepository) domain.FilmUsecase {
 	}
 }
 
+func (uc *FilmUsecase) GetPopularFilms() (domain.FilmList, error) {
+	filmsList, err := uc.FilmRepo.GetPopularFilms()
+	if err != nil {
+		return domain.FilmList{}, err
+	}
+	return filmsList, nil
+}
+
+func (uc *FilmUsecase) GetBanners() (domain.BannersList, error) {
+	bannersList, err := uc.FilmRepo.GetBanners()
+	if err != nil {
+		return domain.BannersList{}, err
+	}
+	return bannersList, nil
+}
+
 func (uc *FilmUsecase) GetGenres() (domain.GenresList, error) {
 	genresList, err := uc.FilmRepo.GetGenres()
 	if err != nil {

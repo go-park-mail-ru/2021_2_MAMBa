@@ -19,8 +19,9 @@ const (
 	queryCountCollections = "SELECT COUNT(*) FROM Collection"
 	queryGetCollections   = "SELECT collection_id, collection_name, picture_url FROM Collection LIMIT $1 OFFSET $2 "
 	queryCountFilms       = "SELECT COUNT(*) from film f join collectionconnection c on f.film_id = c.film_id WHERE collection_id = $1"
-	queryGetFilms         = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url from film f join collectionconnection c on f.film_id = c.film_id WHERE collection_id = $1 ORDER BY f.film_id"
+	queryGetFilms         = "SELECT f.film_id, f.title, f.title_original, f.description, f.release_year, f.poster_url from film f join collectionconnection c on f.film_id = c.film_id WHERE collection_id = $1 ORDER BY f.film_id"
 	queryGetCollection    = "SELECT * FROM collection WHERE collection_id = $1"
+	queryGetFilmRating    = "SELECT AVG(stars) FROM review WHERE film_id = $1 AND (NOT stars = 0)"
 )
 
 func (cr *dbCollectionsRepository) GetCollections(skip int, limit int) (domain.Collections, error) {
@@ -72,12 +73,20 @@ func (cr *dbCollectionsRepository) GetCollectionFilms(id uint64) ([]domain.Film,
 	filmList := make([]domain.Film, 0)
 	for i := range result {
 		film := domain.Film{
-			Id:          cast.ToUint64(result[i][0]),
-			Title:       cast.ToString(result[i][1]),
-			Description: cast.ToString(result[i][2]),
-			ReleaseYear: int(cast.ToUint32(result[i][3])),
-			PosterUrl:   cast.ToString(result[i][4]),
+			Id:            cast.ToUint64(result[i][0]),
+			Title:         cast.ToString(result[i][1]),
+			TitleOriginal: cast.ToString(result[i][2]),
+			Description:   cast.ToString(result[i][3]),
+			ReleaseYear:   int(cast.ToUint32(result[i][4])),
+			PosterUrl:     cast.ToString(result[i][5]),
 		}
+
+		resultRating, err := cr.dbm.Query(queryGetFilmRating, film.Id)
+		if err != nil {
+			return []domain.Film{}, err
+		}
+		film.Rating = cast.ToFloat64(resultRating[0][0])
+
 		filmList = append(filmList, film)
 	}
 	return filmList, nil
