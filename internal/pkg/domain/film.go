@@ -15,7 +15,7 @@ type Response struct {
 
 func (r *Response) Write(w http.ResponseWriter) {
 	w.WriteHeader(r.Status)
-	x, err := r.MarshalJSON()
+	x, err := json.Marshal(r)
 	_, err = w.Write(x)
 	if err != nil {
 		http.Error(w, customErrors.ErrEncMsg, http.StatusInternalServerError)
@@ -179,7 +179,8 @@ func (filmPage *FilmPageInfo) CustomEasyJSON() ([]byte, error) {
 		MyReview:        filmPage.MyReview,
 		Bookmarked:      filmPage.Bookmarked,
 	}
-	return fpiJSON.MarshalJSON()
+	ret, _ = json.Marshal(fpiJSON)
+	return ret
 }
 
 type NewRate struct {
