@@ -31,12 +31,18 @@ func (handler *UserHandler) AddUserToNotificationTopic(w http.ResponseWriter, r 
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		log.Warn(fmt.Sprintf("error initializing app: %v\n", err))
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
 	}
 
 	ctx := context.Background()
 	client, err := app.Messaging(ctx)
 	if err != nil {
 		log.Warn(fmt.Sprintf("error getting Messaging client: %v\n", err))
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
 	}
 
 	registrationTokens := []string{tokenForm.Token}
@@ -44,7 +50,11 @@ func (handler *UserHandler) AddUserToNotificationTopic(w http.ResponseWriter, r 
 	response, err := client.SubscribeToTopic(ctx, registrationTokens, "all")
 	if err != nil {
 		log.Error(err)
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
 	}
+
 	log.Info(strconv.Itoa(response.SuccessCount) + " tokens were subscribed successfully")
 
 	us := domain.UserNotificationToken{}
