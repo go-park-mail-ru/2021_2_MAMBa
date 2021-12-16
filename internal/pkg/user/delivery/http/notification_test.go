@@ -23,16 +23,6 @@ var testTablePostFailure = [...]testRow{
 	},
 }
 
-// var testTablePostFailure = [...]testRow{
-// 	{
-// 		inQuery:    "3",
-// 		bodyString: ``,
-// 		out:        customErrors.ErrIdMsg,
-// 		status:     http.StatusNotFound,
-// 		name:       "out of index",
-// 	},
-// }
-
 func TestAddUserToNotificationTopicFailure(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
