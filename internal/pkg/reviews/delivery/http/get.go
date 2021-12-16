@@ -6,7 +6,7 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
-	"io/ioutil"
+	"encoding/json"
 	"net/http"
 )
 
@@ -33,7 +33,7 @@ func (handler *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) 
 		resp.Write(w)
 		return
 	}
-	x, err := review.MarshalJSON()
+	x, err := json.Marshal(review)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -44,9 +44,7 @@ func (handler *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) 
 func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	reviewForm := domain.Review{}
-	var p []byte
-	p, err := ioutil.ReadAll(r.Body)
-	err = reviewForm.UnmarshalJSON(p)
+	err := json.NewDecoder(r.Body).Decode(&reviewForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -65,7 +63,7 @@ func (handler *ReviewHandler) PostReview(w http.ResponseWriter, r *http.Request)
 
 	reviewForm.AuthorId = authId
 	review, err := handler.ReiviewUsecase.PostReview(reviewForm)
-	x, err := review.MarshalJSON()
+	x, err := json.Marshal(review)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -109,7 +107,7 @@ func (handler *ReviewHandler) LoadExcept(w http.ResponseWriter, r *http.Request)
 		resp.Write(w)
 		return
 	}
-	x, err := review.MarshalJSON()
+	x, err := json.Marshal(review)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,

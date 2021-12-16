@@ -6,8 +6,8 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
+	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/mailru/easyjson"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -32,7 +32,7 @@ func (handler *UserHandler) GetBasicInfo(w http.ResponseWriter, r *http.Request)
 		resp.Write(w)
 		return
 	}
-	x, err := us.MarshalJSON()
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -64,7 +64,7 @@ func (handler *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	x, err := easyjson.Marshal(us)
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -84,7 +84,7 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 	profileForm := domain.Profile{}
 	var p []byte
 	p, err = ioutil.ReadAll(r.Body)
-	err = easyjson.Unmarshal(p, &profileForm)
+	err = json.Unmarshal(p, &profileForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -101,7 +101,7 @@ func (handler *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	x, err := easyjson.Marshal(us)
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -120,7 +120,7 @@ func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Re
 	clientID := clientIDMessage.ID
 	profileForm := domain.Profile{}
 	p, err := ioutil.ReadAll(r.Body)
-	err = easyjson.Unmarshal(p, &profileForm)
+	err = json.Unmarshal(p, &profileForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -134,7 +134,7 @@ func (handler *UserHandler) CreateSubscription(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	x, err := easyjson.Marshal(us)
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -173,7 +173,7 @@ func (handler *UserHandler) LoadUserReviews(w http.ResponseWriter, r *http.Reque
 		resp.Write(w)
 		return
 	}
-	x, err := easyjson.Marshal(review)
+	x, err := json.Marshal(review)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
