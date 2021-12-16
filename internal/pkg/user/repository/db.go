@@ -209,6 +209,7 @@ func (ur *dbUserRepository) LoadUserReviews(id uint64, skip int, limit int) (dom
 		review := domain.Review{
 			Id:         cast.ToUint64(result[i][0]),
 			FilmId:     cast.ToUint64(result[i][1]),
+			AuthorId:   cast.ToUint64(result[i][2]),
 			ReviewText: cast.ToString(result[i][3]),
 			ReviewType: int(cast.ToUint32(result[i][4])),
 			Stars:      cast.ToFloat64(result[i][5]),

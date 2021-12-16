@@ -5,7 +5,6 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
-	"encoding/json"
 	"net/http"
 )
 
@@ -59,7 +58,7 @@ func (handler *SearchHandler) GetSearch(w http.ResponseWriter, r *http.Request) 
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(searchResult)
+	x, err := searchResult.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,

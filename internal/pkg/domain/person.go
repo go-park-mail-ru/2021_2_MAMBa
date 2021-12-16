@@ -38,7 +38,7 @@ type PersonPage struct {
 	Films        FilmList `json:"films"`
 	PopularFilms FilmList `json:"popular_films"`
 }
-
+//go:generate mockgen -destination=../person/repository/mock/db_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain PersonRepository
 type PersonRepository interface {
 	GetPerson(id uint64) (Person, error)
 	GetFilms(id uint64, skip int, limit int) (FilmList, error)

@@ -15,7 +15,9 @@ var (
 	ErrSearchQuery        = "invalid search query"
 	ErrRateMsg            = "incorrect rating"
 	ErrNoReviewMsg        = "no review"
+	ErrNotFoundMsg        = "not found"
 	RPCErrUserNotLoggedIn = "rpc error: code = Unknown desc = user not logged in"
+	RPCErrNotFound        = "rpc error: code = Unknown desc = not found"
 	ErrorSkip             = errors.New(ErrSkipMsg)
 	ErrorLimit            = errors.New(ErrLimitMsg)
 	ErrorBookmarked       = errors.New(ErrBookmarkedMsg)
@@ -30,4 +32,5 @@ var (
 	ErrorNoUser           = errors.New("error - no user")
 	ErrorUserNotLoggedIn  = errors.New("user not logged in")
 	ErrorUint64Cast       = errors.New("id uint64 cast error")
+	ErrNotFound           = errors.New("not found")
 )

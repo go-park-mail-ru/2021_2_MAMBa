@@ -18,7 +18,7 @@ func NewFilmRepository(manager *database.DBManager) domain.FilmRepository {
 
 const (
 	queryCountFilmReviews         = "SELECT COUNT(*) FROM Review WHERE Film_ID = $1 AND (NOT type = 0)"
-	queryCountFilmRecommendations = "SELECT COUNT(*) FROM recommended WHERE Film_ID = $1"
+	queryCountFilmRecommendations = "SELECT COUNT(*) FROM (SELECT B.film_id, B.title, B.poster_url FROM filmgenres A JOIN film B ON A.film_id = B.film_id WHERE genre_id IN (SELECT genre_id FROM filmgenres WHERE film_id = $1) AND B.film_id != $1 GROUP BY B.film_id) AS C"
 	queryCountUserBookmarks       = "SELECT COUNT(*) FROM bookmark b WHERE user_id = $1"
 	queryCheckFilmBookmarked      = "SELECT COUNT(*) FROM bookmark b WHERE user_id = $1 AND film_id = $2"
 	queryGetFilmId                = "SELECT * FROM film WHERE film_id = $1"
@@ -27,7 +27,7 @@ const (
 	queryGetFilmGenres            = "SELECT genre.* FROM genre JOIN filmgenres f on genre.genre_id = f.genre_id WHERE f.film_id = $1"
 	queryGetFilmCast              = "SELECT p.person_id,p.name_en,p.name_rus,p.picture_url,p.career  FROM person p JOIN filmcast f on p.person_id = f.person_id WHERE f.film_id = $1"
 	queryGetFilmReviews           = "SELECT review.*, p.first_name, p.surname, p.picture_url FROM review join profile p on p.user_id = review.author_id WHERE film_id = $1 AND (NOT type = 0) ORDER BY review.review_date DESC LIMIT $2 OFFSET $3"
-	queryGetFilmRecommendations   = "SELECT f.film_id, f.title, f.poster_url FROM recommended r join film f on f.film_id = r.recommended_id WHERE r.film_id = $1 LIMIT $2 OFFSET $3"
+	queryGetFilmRecommendations   = "select B.film_id, B.title, B.poster_url from filmgenres A join film B on A.film_id = B.film_id where genre_id in (select genre_id from filmgenres where film_id = $1) and B.film_id != $1 GROUP BY B.film_id order by COUNT(*) DESC LIMIT $2 OFFSET $3"
 	queryGetFilmRating            = "SELECT AVG(stars) FROM review WHERE film_id = $1 AND (NOT stars = 0)"
 	queryPostRating               = "INSERT INTO  review (review_id, film_id, author_id, review_text, type, stars, review_date) VALUES (DEFAULT, $1, $2, '', $3, $4, $5)"
 	queryGetReviewByAuthor        = "SELECT * FROM review WHERE film_id = $1 AND author_id = $2"
@@ -43,7 +43,59 @@ const (
 	queryGetFilmsByGenreID        = "SELECT f.film_id, f.title, f.title_original, f.release_year, f.description, f.poster_url, f.premiere_ru FROM film f JOIN filmgenres g on f.film_id = g.film_id WHERE genre_id = $1 LIMIT $2 OFFSET $3"
 	queryCountFilmsByGenreID      = "SELECT COUNT(*) FROM film f JOIN filmgenres g on f.film_id = g.film_id WHERE genre_id = $1"
 	queryGetGenreName             = "SELECT genre_name FROM genre WHERE genre_id = $1"
+	queryGetBanners               = "SELECT * FROM banners"
+	queryGetPopularFilms          = "SELECT f.film_id, f.title, f.title_original, f.release_year, f.description, f.poster_url, f.premiere_ru, r.score from film f\n    join (SELECT review.film_id, AVG(stars) score FROM review WHERE NOT stars = 0 GROUP BY review.film_id) r on f.film_id = r.film_id\norder by r.score desc limit 10"
 )
+
+func (fr *dbFilmRepository) GetPopularFilms() (domain.FilmList, error) {
+	result, err := fr.dbm.Query(queryGetPopularFilms)
+	if err != nil {
+		return domain.FilmList{}, err
+	}
+
+	bufferFilms := make([]domain.Film, 0)
+	for i := range result {
+		film := domain.Film{
+			Id:            cast.ToUint64(result[i][0]),
+			Title:         cast.ToString(result[i][1]),
+			TitleOriginal: cast.ToString(result[i][2]),
+			ReleaseYear:   int(cast.ToUint32(result[i][3])),
+			Description:   cast.ToString(result[i][4]),
+			PosterUrl:     cast.ToString(result[i][5]),
+			Rating:        cast.ToFloat64(result[i][7]),
+		}
+		dateString, err := cast.DateToStringUnderscore(result[i][6])
+		if err != nil {
+			return domain.FilmList{}, err
+		}
+		film.PremiereRu = dateString
+		bufferFilms = append(bufferFilms, film)
+	}
+	filmList := domain.FilmList{
+		FilmList: bufferFilms,
+	}
+	return filmList, nil
+}
+
+func (fr *dbFilmRepository) GetBanners() (domain.BannersList, error) {
+	result, err := fr.dbm.Query(queryGetBanners)
+	if err != nil {
+		return domain.BannersList{}, customErrors.ErrorInternalServer
+	}
+
+	bufferBanners := make([]domain.Banner, 0)
+	for i := range result {
+		banner := domain.Banner{
+			Id:          cast.ToUint64(result[i][0]),
+			Title:       cast.ToString(result[i][1]),
+			Description: cast.ToString(result[i][2]),
+			PictureURL:  cast.ToString(result[i][3]),
+			Link:        cast.ToString(result[i][4]),
+		}
+		bufferBanners = append(bufferBanners, banner)
+	}
+	return domain.BannersList{BannersList: bufferBanners}, nil
+}
 
 func (fr *dbFilmRepository) GetGenres() (domain.GenresList, error) {
 	result, err := fr.dbm.Query(queryGetGenres)
@@ -64,7 +116,21 @@ func (fr *dbFilmRepository) GetGenres() (domain.GenresList, error) {
 }
 
 func (fr *dbFilmRepository) GetFilmsByGenre(genreID uint64, limit int, skip int) (domain.GenreFilmList, error) {
-	result, err := fr.dbm.Query(queryCountFilmsByGenreID, genreID)
+	result, err := fr.dbm.Query(queryGetGenreName, genreID)
+	if err != nil {
+		return domain.GenreFilmList{}, err
+	}
+	if len(result) == 0 {
+		return domain.GenreFilmList{}, customErrors.ErrNotFound
+	}
+	genreName := cast.ToString(result[0][0])
+
+	genreFilmList := domain.GenreFilmList{
+		Id:   genreID,
+		Name: genreName,
+	}
+
+	result, err = fr.dbm.Query(queryCountFilmsByGenreID, genreID)
 	if err != nil {
 		return domain.GenreFilmList{}, customErrors.ErrorInternalServer
 	}
@@ -94,6 +160,13 @@ func (fr *dbFilmRepository) GetFilmsByGenre(genreID uint64, limit int, skip int)
 			return domain.GenreFilmList{}, err
 		}
 		film.PremiereRu = dateString
+
+		resultRating, err := fr.dbm.Query(queryGetFilmRating, film.Id)
+		if err != nil {
+			return domain.GenreFilmList{}, err
+		}
+		film.Rating = cast.ToFloat64(resultRating[0][0])
+
 		bufferFilms = append(bufferFilms, film)
 	}
 
@@ -104,18 +177,8 @@ func (fr *dbFilmRepository) GetFilmsByGenre(genreID uint64, limit int, skip int)
 		CurrentLimit:  limit,
 		CurrentSkip:   skip + limit,
 	}
+	genreFilmList.FilmsList = filmList
 
-	result, err = fr.dbm.Query(queryGetGenreName, genreID)
-	if err != nil {
-		return domain.GenreFilmList{}, err
-	}
-	genreName := cast.ToString(result[0][0])
-
-	genreFilmList := domain.GenreFilmList{
-		Id:        genreID,
-		Name:      genreName,
-		FilmsList: filmList,
-	}
 	return genreFilmList, nil
 }
 
@@ -255,6 +318,7 @@ func (fr *dbFilmRepository) GetFilm(id uint64) (domain.Film, error) {
 		return domain.Film{}, err
 	}
 	film.Rating = cast.ToFloat64(result[0][0])
+
 	result, err = fr.dbm.Query(queryGetFilmCountries, id)
 	if err != nil || len(result) == 0 {
 		return domain.Film{}, err
@@ -326,6 +390,7 @@ func (fr *dbFilmRepository) GetFilmReviews(id uint64, skip int, limit int) (doma
 			Id:               cast.ToUint64(result[i][0]),
 			FilmId:           cast.ToUint64(result[i][1]),
 			AuthorName:       cast.ToString(result[i][7]) + " " + cast.ToString(result[i][8]),
+			AuthorId:         cast.ToUint64(result[i][2]),
 			ReviewText:       cast.ToString(result[i][3]),
 			AuthorPictureUrl: cast.ToString(result[i][9]),
 			ReviewType:       int(cast.ToUint32(result[i][4])),
@@ -424,6 +489,7 @@ func (fr *dbFilmRepository) GetMyReview(id uint64, author_id uint64) (domain.Rev
 	review := domain.Review{
 		Id:         cast.ToUint64(result[0][0]),
 		FilmId:     cast.ToUint64(result[0][1]),
+		AuthorId:   cast.ToUint64(result[0][2]),
 		ReviewText: cast.ToString(result[0][3]),
 		ReviewType: rtype,
 		Stars:      cast.ToFloat64(result[0][5]),

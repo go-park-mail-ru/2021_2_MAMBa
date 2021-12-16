@@ -48,6 +48,21 @@ func (mr *MockFilmUsecaseMockRecorder) BookmarkFilm(arg0, arg1, arg2 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BookmarkFilm", reflect.TypeOf((*MockFilmUsecase)(nil).BookmarkFilm), arg0, arg1, arg2)
 }
 
+// GetBanners mocks base method.
+func (m *MockFilmUsecase) GetBanners() (domain.BannersList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBanners")
+	ret0, _ := ret[0].(domain.BannersList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBanners indicates an expected call of GetBanners.
+func (mr *MockFilmUsecaseMockRecorder) GetBanners() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBanners", reflect.TypeOf((*MockFilmUsecase)(nil).GetBanners))
+}
+
 // GetFilm mocks base method.
 func (m *MockFilmUsecase) GetFilm(arg0, arg1 uint64, arg2, arg3, arg4, arg5 int) (domain.FilmPageInfo, error) {
 	m.ctrl.T.Helper()
@@ -106,6 +121,21 @@ func (m *MockFilmUsecase) GetGenres() (domain.GenresList, error) {
 func (mr *MockFilmUsecaseMockRecorder) GetGenres() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGenres", reflect.TypeOf((*MockFilmUsecase)(nil).GetGenres))
+}
+
+// GetPopularFilms mocks base method.
+func (m *MockFilmUsecase) GetPopularFilms() (domain.FilmList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPopularFilms")
+	ret0, _ := ret[0].(domain.FilmList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPopularFilms indicates an expected call of GetPopularFilms.
+func (mr *MockFilmUsecaseMockRecorder) GetPopularFilms() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPopularFilms", reflect.TypeOf((*MockFilmUsecase)(nil).GetPopularFilms))
 }
 
 // LoadFilmRecommendations mocks base method.

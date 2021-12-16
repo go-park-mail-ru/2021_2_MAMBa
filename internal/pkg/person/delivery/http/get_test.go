@@ -18,6 +18,7 @@ type testRow struct {
 	inQuery    string
 	bodyString string
 	out        string
+	outJSON    string
 	status     int
 	name       string
 	skip       int
@@ -30,6 +31,7 @@ var testTableGetPersonSuccess = [...]testRow{
 	{
 		inQuery: "id=9",
 		out:     `{"actor":{"id":9,"name_rus":"Сэм Клафлин","career":[""],"height":180,"age":20,"birthday":"0001-01-01 00:00:00 +0000 UTC","death":"0001-01-01 00:00:00 +0000 UTC","gender":"male"},"films":{"film_list":[{"id":2,"title":"С любовью, Рози","rating":0.0,"description":"Рози и Алекс были лучшими друзьями с детства, и теперь, по окончании школы, собираются вместе продолжить учёбу в университете.\\n\\nОднако в их судьбах происходит резкий поворот, когда после ночи со звездой школы Рози узнаёт, что у неё будет ребенок. Невзирая на то, что обстоятельства и жизненные ситуации разлучают героев, они и спустя годы продолжают помнить друг о друге и о том чувстве, что соединило их в юности…","poster_url":"server/images/love-rosie.webp","release_year":2014,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10},"popular_films":{"film_list":[{"id":2,"title":"С любовью, Рози","rating":0.0,"description":"Рози и Алекс были лучшими друзьями с детства, и теперь, по окончании школы, собираются вместе продолжить учёбу в университете.\\n\\nОднако в их судьбах происходит резкий поворот, когда после ночи со звездой школы Рози узнаёт, что у неё будет ребенок. Невзирая на то, что обстоятельства и жизненные ситуации разлучают героев, они и спустя годы продолжают помнить друг о друге и о том чувстве, что соединило их в юности…","poster_url":"server/images/love-rosie.webp","release_year":2014,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}}` + "\n",
+		outJSON: `{"actor":{"id":9,"name_rus":"Сэм Клафлин","career":[""],"height":180,"age":20,"birthday":"0001-01-01 00:00:00 +0000 UTC","death":"0001-01-01 00:00:00 +0000 UTC","gender":"male"},"films":{"film_list":[{"id":2,"title":"С любовью, Рози","rating":"0.0","description":"Рози и Алекс были лучшими друзьями с детства, и теперь, по окончании школы, собираются вместе продолжить учёбу в университете.\\n\\nОднако в их судьбах происходит резкий поворот, когда после ночи со звездой школы Рози узнаёт, что у неё будет ребенок. Невзирая на то, что обстоятельства и жизненные ситуации разлучают героев, они и спустя годы продолжают помнить друг о друге и о том чувстве, что соединило их в юности…","poster_url":"server/images/love-rosie.webp","release_year":2014,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10},"popular_films":{"film_list":[{"id":2,"title":"С любовью, Рози","rating":"0.0","description":"Рози и Алекс были лучшими друзьями с детства, и теперь, по окончании школы, собираются вместе продолжить учёбу в университете.\\n\\nОднако в их судьбах происходит резкий поворот, когда после ночи со звездой школы Рози узнаёт, что у неё будет ребенок. Невзирая на то, что обстоятельства и жизненные ситуации разлучают героев, они и спустя годы продолжают помнить друг о друге и о том чувстве, что соединило их в юности…","poster_url":"server/images/love-rosie.webp","release_year":2014,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}}` + "\n",
 		status:  http.StatusOK,
 		name:    `full works`,
 		skip:    0,
@@ -41,7 +43,7 @@ var testTableGetPersonSuccess = [...]testRow{
 var testTableGetPersonFailure = [...]testRow{
 	{
 		inQuery: "",
-		out:     customErrors.ErrIdMsg + "\n",
+		out:     customErrors.ErrorBadInput.Error() + "\n",
 		status:  http.StatusBadRequest,
 		name:    `no id`,
 	},
@@ -67,7 +69,7 @@ func TestGetPersonSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPerson(w, r)
-		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":` + test.outJSON[:len(test.outJSON)-1] + `,"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -79,9 +81,6 @@ func TestGetPersonFailure(t *testing.T) {
 	apiPath := "/api/person/getPerson?"
 	for i, test := range testTableGetPersonFailure {
 		mock := mock2.NewMockPersonUsecase(ctrl)
-		if i == 0 {
-			mock.EXPECT().GetPerson(uint64(0)).Times(1).Return(domain.PersonPage{}, customErrors.ErrorBadInput)
-		}
 		if i == 1 {
 			mock.EXPECT().GetPerson(uint64(10)).Times(1).Return(domain.PersonPage{}, customErrors.ErrorInternalServer)
 		}
@@ -90,7 +89,7 @@ func TestGetPersonFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPerson(w, r)
-		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }
@@ -99,6 +98,7 @@ var testTableGetPersonFilmsSuccess = [...]testRow{
 	{
 		inQuery: "id=5&skips=0&limits=10",
 		out:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		outJSON: `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `full works`,
 		skip:    0,
@@ -107,6 +107,7 @@ var testTableGetPersonFilmsSuccess = [...]testRow{
 	{
 		inQuery: "id=5",
 		out:     `{"film_list":[{"id":1,"title":"Еще по одной","rating":0.0,"description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
+		outJSON: `{"film_list":[{"id":1,"title":"Еще по одной","rating":"0.0","description":"В ресторане собираются учитель истории, психологии, музыки и физрук, чтобы отметить 40-летие одного из них. И решают проверить научную теорию о том, что c самого рождения человек страдает от нехватки алкоголя в крови, а чтобы стать по-настоящему счастливым, нужно быть немного нетрезвым. Друзья договариваются наблюдать, как возлияния скажутся на их работе и личной жизни, и устанавливают правила: не пить вечером и по выходным. Казалось бы, что может пойти не так?","poster_url":"server/images/one-more-drink.webp","release_year":2020,"director":{},"screenwriter":{}}],"more_available":false,"film_total":1,"current_limit":10,"current_skip":10}` + "\n",
 		status:  http.StatusOK,
 		name:    `empty works`,
 		skip:    0,
@@ -154,7 +155,7 @@ func TestGetRecomSuccess(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPersonFilms(w, r)
-		result := `{"body":` + test.out[:len(test.out)-1] + `,"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":` + test.outJSON[:len(test.outJSON)-1] + `,"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 		assert.Equal(t, test.status, w.Code, "Test: "+test.name)
 	}
@@ -174,7 +175,7 @@ func TestGetRecomFailure(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest("GET", apiPath+test.inQuery, bodyReader)
 		handler.GetPersonFilms(w, r)
-		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}\n"
+		result := `{"body":{"error":"` + test.out[:len(test.out)-1] + `"},"status":` + fmt.Sprint(test.status) + "}"
 		assert.Equal(t, result, w.Body.String(), "Test: "+test.name)
 	}
 }

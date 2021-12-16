@@ -29,6 +29,7 @@ type CollectionPage struct {
 	Coll  Collection `json:"collection"`
 }
 
+//go:generate mockgen -destination=../collections/repository/mock/db_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain CollectionsRepository
 type CollectionsRepository interface {
 	GetCollections(skip int, limit int) (Collections, error)
 	GetCollectionFilms(id uint64) ([]Film, error)

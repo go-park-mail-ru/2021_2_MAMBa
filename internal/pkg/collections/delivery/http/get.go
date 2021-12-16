@@ -7,7 +7,6 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/queryChecker"
 	"context"
-	"encoding/json"
 	"net/http"
 )
 
@@ -41,7 +40,7 @@ func (handler *CollectionsHandler) GetCollections(w http.ResponseWriter, r *http
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(collectionsList)
+	x, err := collectionsList.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -58,12 +57,18 @@ func (handler *CollectionsHandler) GetCollectionFilms(w http.ResponseWriter, r *
 	}
 
 	collectionFilms, err := handler.CollectionsClient.GetCollectionPage(context.Background(), &grpc.ID{Id: id})
+	if err != nil && err.Error() == customErrors.RPCErrNotFound {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrNotFoundMsg), Status: http.StatusNotFound}
+		resp.Write(w)
+		return
+	}
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
 		resp.Write(w)
 		return
 	}
-	x, err := json.Marshal(collectionFilms)
+
+	x, err := collectionFilms.MarshalJSON()
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
