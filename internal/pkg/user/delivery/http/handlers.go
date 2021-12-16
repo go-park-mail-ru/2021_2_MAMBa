@@ -30,6 +30,8 @@ func NewHandlers(router *mux.Router, uc domain.UserUsecase, auth authRPC.Session
 	router.HandleFunc("/user/getReviewsAndStars", handler.LoadUserReviews).Methods("GET", "OPTIONS")
 	router.HandleFunc("/user/avatar", handler.UploadAvatar).Methods("POST", "OPTIONS")
 	router.HandleFunc("/user/subscribePush", handler.AddUserToNotificationTopic).Methods("POST", "OPTIONS")
+	// Ручка для демонстрации на РК4
+	router.HandleFunc("/user/sendPushToAll", handler.SendPushToAll).Methods("POST", "OPTIONS")
 
 	router.HandleFunc("/csrf", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-CSRF-Token", csrf.Token(r))

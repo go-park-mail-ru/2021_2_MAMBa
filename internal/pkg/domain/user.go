@@ -34,6 +34,11 @@ type UserNotificationToken struct {
 	Token string `json:"token"`
 }
 
+type UserNotificationToSend struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
 //go:generate mockgen -destination=../user/repository/mock/repository_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain UserRepository
 type UserRepository interface {
 	GetProfileById(whoAskID, id uint64) (Profile, error)
