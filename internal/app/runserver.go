@@ -136,8 +136,14 @@ func notificationWorker(filmRepo domain.FilmRepository) {
 						comingFilms.Unlock()
 					}
 				}
+				log.Info(fmt.Sprintf("Found %d films released today", len(comingFilms.films)))
 			}
-			log.Info(fmt.Sprintf("Found %d films released today", len(comingFilms.films)))
+			if err != nil {
+				// retry delay
+				log.Warn("Error in updating coming this month films")
+				time.Sleep(1 * time.Minute)
+				continue
+			}
 			time.Sleep(24 * time.Hour)
 		}
 	}(filmRepo)
@@ -173,6 +179,7 @@ func notificationWorker(filmRepo domain.FilmRepository) {
 					response, err := client.Send(ctx, message)
 					if err != nil {
 						log.Error(err)
+						continue
 					}
 					log.Info(fmt.Sprintf("Successfully sent message: %v, for film id: %d", response, v.Id))
 				}
