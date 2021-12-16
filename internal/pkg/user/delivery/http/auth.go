@@ -5,18 +5,16 @@ import (
 	customErrors "2021_2_MAMBa/internal/pkg/domain/errors"
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/xss"
+	"encoding/json"
 	"github.com/gorilla/sessions"
 	"google.golang.org/grpc/status"
-	"io/ioutil"
 	"net/http"
 )
 
 func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	userForm := new(domain.User)
-	var p []byte
-	p, err := ioutil.ReadAll(r.Body)
-	err = userForm.UnmarshalJSON(p)
+	err := json.NewDecoder(r.Body).Decode(userForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -56,7 +54,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	x, err := us.MarshalJSON()
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusCreated,
@@ -67,8 +65,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	userForm := new(domain.UserToLogin)
-	p, err := ioutil.ReadAll(r.Body)
-	err = userForm.UnmarshalJSON(p)
+	err := json.NewDecoder(r.Body).Decode(userForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -115,7 +112,7 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		resp.Write(w)
 	}
 
-	x, err := us.MarshalJSON()
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -180,7 +177,7 @@ func (handler *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	x, err := us.MarshalJSON()
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,

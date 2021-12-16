@@ -6,12 +6,11 @@ import (
 	"2021_2_MAMBa/internal/pkg/utils/cast"
 	"2021_2_MAMBa/internal/pkg/utils/log"
 	"context"
+	"encoding/json"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/messaging"
 	"fmt"
-	"github.com/mailru/easyjson"
 	"google.golang.org/api/option"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -19,9 +18,7 @@ import (
 func (handler *UserHandler) AddUserToNotificationTopic(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	tokenForm := new(domain.UserNotificationToken)
-	var p []byte
-	p, err := ioutil.ReadAll(r.Body)
-	err = tokenForm.UnmarshalJSON(p)
+	err := json.NewDecoder(r.Body).Decode(tokenForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -59,7 +56,7 @@ func (handler *UserHandler) AddUserToNotificationTopic(w http.ResponseWriter, r 
 	log.Info(strconv.Itoa(response.SuccessCount) + " tokens were subscribed successfully")
 
 	us := domain.UserNotificationToken{}
-	x, err := easyjson.Marshal(us)
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
@@ -71,9 +68,7 @@ func (handler *UserHandler) AddUserToNotificationTopic(w http.ResponseWriter, r 
 func (handler *UserHandler) SendPushToAll(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	notificationForm := new(domain.UserNotificationToSend)
-	var p []byte
-	p, err := ioutil.ReadAll(r.Body)
-	err = notificationForm.UnmarshalJSON(p)
+	err := json.NewDecoder(r.Body).Decode(notificationForm)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrorBadInput.Error()), Status: http.StatusBadRequest}
 		resp.Write(w)
@@ -115,7 +110,7 @@ func (handler *UserHandler) SendPushToAll(w http.ResponseWriter, r *http.Request
 	log.Info("Successfully sent push to all users")
 
 	us := domain.UserNotificationToken{}
-	x, err := easyjson.Marshal(us)
+	x, err := json.Marshal(us)
 	resp := domain.Response{
 		Body:   x,
 		Status: http.StatusOK,
