@@ -190,7 +190,7 @@ type PostBookmarkResult struct {
 	FilmID     uint64 `json:"film_id"`
 	Bookmarked bool   `json:"bookmarked"`
 }
-
+//go:generate mockgen -destination=../film/repository/mock/db_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmRepository
 type FilmRepository interface {
 	GetFilm(id uint64) (Film, error)
 	GetFilmReviews(id uint64, skip int, limit int) (FilmReviews, error)
