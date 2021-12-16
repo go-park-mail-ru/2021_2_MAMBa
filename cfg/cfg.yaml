@@ -4,7 +4,7 @@ main:
     user: dev
     host: localhost
     port: 5432
-    pass: 1234
+    pass: placeholder
     name: film4u
   ports:
     serverPort: 8080
@@ -17,7 +17,7 @@ collections:
     user: dev
     host: localhost
     port: 5432
-    pass: 1234
+    pass: placeholder
     name: film4u
   ports:
     collectionsPort: 50040
@@ -27,7 +27,7 @@ auth:
     user: dev
     host: localhost
     port: 5432
-    pass: 1234
+    pass: placeholder
     name: film4u
   ports:
     authPort: 50041
