@@ -179,8 +179,8 @@ func (filmPage *FilmPageInfo) CustomEasyJSON() ([]byte, error) {
 		MyReview:        filmPage.MyReview,
 		Bookmarked:      filmPage.Bookmarked,
 	}
-	ret, _ = json.Marshal(fpiJSON)
-	return ret
+	ret, _ := json.Marshal(fpiJSON)
+	return ret, nil
 }
 
 type NewRate struct {
