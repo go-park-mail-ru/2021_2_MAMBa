@@ -22,3 +22,4 @@ profile.cov
 logs*.txt
 profile1.cov
 cfg.yaml
+firebasePrivateKey.json
