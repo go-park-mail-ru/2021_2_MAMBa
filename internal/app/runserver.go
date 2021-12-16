@@ -5,6 +5,7 @@ import (
 	grpcCollection "2021_2_MAMBa/internal/pkg/collections/delivery/grpc"
 	collectionsDelivery "2021_2_MAMBa/internal/pkg/collections/delivery/http"
 	"2021_2_MAMBa/internal/pkg/database"
+	"2021_2_MAMBa/internal/pkg/domain"
 	filmDelivery "2021_2_MAMBa/internal/pkg/film/delivery/http"
 	filmRepository "2021_2_MAMBa/internal/pkg/film/repository"
 	filmUsecase "2021_2_MAMBa/internal/pkg/film/usecase"
@@ -23,11 +24,18 @@ import (
 	userRepository "2021_2_MAMBa/internal/pkg/user/repository"
 	userUsecase "2021_2_MAMBa/internal/pkg/user/usecase"
 	"2021_2_MAMBa/internal/pkg/utils/log"
+	"context"
+	firebase "firebase.google.com/go"
+	"firebase.google.com/go/messaging"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/api/option"
 	"google.golang.org/grpc"
+	"math"
 	"net/http"
+	"sync"
+	"time"
 )
 
 func RunServer(configPath string) {
@@ -85,6 +93,8 @@ func RunServer(configPath string) {
 	searchDelivery.NewHandlers(api, searUsecase, clientAuth)
 	r.Handle("/metrics", promhttp.Handler())
 
+	go notificationWorker(filmRepo)
+
 	// Static files
 	fileRouter := r.PathPrefix("/static").Subrouter()
 	fileServer := http.StripPrefix("/static", http.FileServer(http.Dir("./static")))
@@ -100,4 +110,82 @@ func RunServer(configPath string) {
 	if err != nil {
 		log.Error(err)
 	}
+}
+
+func notificationWorker(filmRepo domain.FilmRepository) {
+	// storage for films released today
+	comingFilms := struct {
+		films []domain.Film
+		sync.RWMutex
+	}{}
+
+	// daemon to update coming this month films
+	go func(filmRepo domain.FilmRepository) {
+		for {
+			comingFilms.Lock()
+			comingFilms.films = []domain.Film{}
+			comingFilms.Unlock()
+
+			year, month, _ := time.Now().Date()
+			filmsBuffer, err := filmRepo.GetFilmsByMonthYear(int(month), year, math.MaxInt, 0)
+			if err == nil {
+				for _, v := range filmsBuffer.FilmList {
+					if time.Now().Format("2006-01-02") == v.PremiereRu {
+						comingFilms.Lock()
+						comingFilms.films = append(comingFilms.films, v)
+						comingFilms.Unlock()
+					}
+				}
+				log.Info(fmt.Sprintf("Found %d films released today", len(comingFilms.films)))
+			}
+			if err != nil {
+				// retry delay
+				log.Warn("Error in updating coming this month films")
+				time.Sleep(1 * time.Minute)
+				continue
+			}
+			time.Sleep(24 * time.Hour)
+		}
+	}(filmRepo)
+
+	// preparing firebase messages sender
+	opt := option.WithCredentialsFile("firebasePrivateKey.json")
+	app, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		log.Warn(fmt.Sprintf("error initializing Firebase app: %v\n", err))
+	}
+	ctx := context.Background()
+	client, err := app.Messaging(ctx)
+	if err != nil {
+		log.Warn(fmt.Sprintf("error getting Firebase Messaging client: %v\n", err))
+	}
+
+	// then we send notifications for all films that were released today
+	ticker := time.NewTicker(time.Minute)
+	for {
+		select {
+		case <-ticker.C:
+			hr, min, _ := time.Now().Clock()
+			if hr == 12 && min == 0 {
+				comingFilms.RLock()
+				for _, v := range comingFilms.films {
+					message := &messaging.Message{
+						Notification: &messaging.Notification{
+							Title: "Сегодня вышел в прокат фильм",
+							Body:  v.Title,
+						},
+						Topic: "all",
+					}
+					response, err := client.Send(ctx, message)
+					if err != nil {
+						log.Error(err)
+						continue
+					}
+					log.Info(fmt.Sprintf("Successfully sent message: %v, for film id: %d", response, v.Id))
+				}
+				comingFilms.RUnlock()
+			}
+		}
+	}
+
 }
