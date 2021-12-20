@@ -46,7 +46,7 @@ const (
 	queryGetGenreName             = "SELECT genre_name FROM genre WHERE genre_id = $1"
 	queryGetBanners               = "SELECT * FROM banners"
 	queryGetPopularFilms          = "SELECT f.film_id, f.title, f.title_original, f.release_year, f.description, f.poster_url, f.premiere_ru, r.score from film f\n    join (SELECT review.film_id, AVG(stars) score FROM review WHERE NOT stars = 0 GROUP BY review.film_id) r on f.film_id = r.film_id\norder by r.score desc limit 10"
-	queryCountAllFilms = "SELECT reltuples AS estimate FROM pg_class where relname = 'film'"
+	queryCountAllFilms = "SELECT CountFilm()"
 	queryGetRandomFilms1 = "select B.film_id, B.title, B.poster_url from filmgenres A join film B on A.film_id = B.film_id WHERE genre_id in (select genre_id from filmgenres where genre_id = $1 OR genre_id = $2 OR genre_id = $3) AND EXTRACT(YEAR FROM premiere_ru) BETWEEN $4 AND $5 GROUP BY B.film_id LIMIT 6 OFFSET $6"
 	queryGetRandomFilms2 = "select B.film_id, B.title, B.poster_url from  film B WHERE  EXTRACT(YEAR FROM premiere_ru) BETWEEN $1 AND $2 GROUP BY B.film_id LIMIT 6 OFFSET $3"
 )
@@ -530,7 +530,14 @@ func (fr *dbFilmRepository) GetRandomFilms (genre1 uint64, genre2 uint64, genre3
 		return domain.FilmList{}, err
 	}
 	count := cast.ToUint64(result[0][0])
-	startID := uint64(rand.Int63()) % count - 6
+	var startID uint64
+	if count <= 6 {
+		startID =0
+	} else {
+		startID = rand.Uint64() % (count-6) / 10
+	}
+
+
 	p := params{}
 	if dateEnd ==0 {
 		dateEnd = 2100
