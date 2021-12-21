@@ -214,10 +214,10 @@ func (mr *MockFilmRepositoryMockRecorder) GetPopularFilms() *gomock.Call {
 }
 
 // GetRandomFilms mocks base method.
-func (m *MockFilmRepository) GetRandomFilms(arg0, arg1, arg2 uint64, arg3, arg4 int) ([]domain.Film, error) {
+func (m *MockFilmRepository) GetRandomFilms(arg0, arg1, arg2 uint64, arg3, arg4 int) (domain.FilmList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRandomFilms", arg0, arg1, arg2, arg3, arg4)
-	ret0, _ := ret[0].([]domain.Film)
+	ret0, _ := ret[0].(domain.FilmList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
