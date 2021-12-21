@@ -166,3 +166,11 @@ func (uc *FilmUsecase) LoadMyReview(id uint64, authorId uint64) (domain.Review, 
 	}
 	return myRev, nil
 }
+
+func (uc *FilmUsecase) GetRandomFilms(genre1 uint64, genre2 uint64, genre3 uint64, dateStart int, dateEnd int) (domain.FilmList, error) {
+	list, err := uc.FilmRepo.GetRandomFilms(genre1, genre2, genre3, dateStart, dateEnd)
+	if err != nil {
+		return domain.FilmList{}, err
+	}
+	return list, nil
+}

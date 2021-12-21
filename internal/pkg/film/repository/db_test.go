@@ -235,15 +235,15 @@ func TestGetFilmPopSucess(t *testing.T) {
 
 	f := domain.FilmList{
 		FilmList: []domain.Film{{
-			Id:        1,
-			Title:     "Test_film",
+			Id:            1,
+			Title:         "Test_film",
 			TitleOriginal: "bnm",
-			ReleaseYear: 2021,
-			Description: "asdf",
-			Rating: 2.3,
-			PosterUrl: "/pic/TestPoster.webp",
-			PremiereRu: "2000-01-01"}},
-		MoreAvailable:       false,
+			ReleaseYear:   2021,
+			Description:   "asdf",
+			Rating:        2.3,
+			PosterUrl:     "/pic/TestPoster.webp",
+			PremiereRu:    "2000-01-01"}},
+		MoreAvailable: false,
 	}
 	byteId := make([]byte, 8)
 	binary.BigEndian.PutUint64(byteId, f.FilmList[0].Id)
@@ -256,8 +256,8 @@ func TestGetFilmPopSucess(t *testing.T) {
 	bytePrem := make([]byte, 4)
 	binary.BigEndian.PutUint32(bytePrem, 0)
 
-	rowsRecom := pgxmock.NewRows([]string{"id", "title", "title_or","release","desc","poster_url","premiere", "rate"})
-	rowsRecom.AddRow(byteId, []uint8(f.FilmList[0].Title),[]uint8(f.FilmList[0].TitleOriginal),byteRelease,[]uint8(f.FilmList[0].Description), []uint8(f.FilmList[0].PosterUrl),bytePrem, byteRating)
+	rowsRecom := pgxmock.NewRows([]string{"id", "title", "title_or", "release", "desc", "poster_url", "premiere", "rate"})
+	rowsRecom.AddRow(byteId, []uint8(f.FilmList[0].Title), []uint8(f.FilmList[0].TitleOriginal), byteRelease, []uint8(f.FilmList[0].Description), []uint8(f.FilmList[0].PosterUrl), bytePrem, byteRating)
 
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetPopularFilms)).WillReturnRows(rowsRecom)
@@ -276,11 +276,11 @@ func TestGetFilmBannersSucess(t *testing.T) {
 
 	f := domain.BannersList{
 		BannersList: []domain.Banner{{
-			Id:        1,
-			Title:     "Test_film",
+			Id:          1,
+			Title:       "Test_film",
 			Description: "asdf",
-			PictureURL: "/pic/TestPoster.webp",
-			Link: "2000-01-01"}},
+			PictureURL:  "/pic/TestPoster.webp",
+			Link:        "2000-01-01"}},
 	}
 	byteId := make([]byte, 8)
 	binary.BigEndian.PutUint64(byteId, f.BannersList[0].Id)
@@ -289,8 +289,8 @@ func TestGetFilmBannersSucess(t *testing.T) {
 	bytePrem := make([]byte, 4)
 	binary.BigEndian.PutUint32(bytePrem, 0)
 
-	rowsRecom := pgxmock.NewRows([]string{"id", "title", "desc","poster_url","link"})
-	rowsRecom.AddRow(byteId, []uint8(f.BannersList[0].Title),[]uint8(f.BannersList[0].Description), []uint8(f.BannersList[0].PictureURL),[]uint8(f.BannersList[0].Link))
+	rowsRecom := pgxmock.NewRows([]string{"id", "title", "desc", "poster_url", "link"})
+	rowsRecom.AddRow(byteId, []uint8(f.BannersList[0].Title), []uint8(f.BannersList[0].Description), []uint8(f.BannersList[0].PictureURL), []uint8(f.BannersList[0].Link))
 
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetBanners)).WillReturnRows(rowsRecom)
@@ -309,15 +309,15 @@ func TestGetGenresSucess(t *testing.T) {
 
 	f := domain.GenresList{
 		GenresList: []domain.Genre{{
-			Id:        1,
-			Name:     "Test_film",
+			Id:         1,
+			Name:       "Test_film",
 			PictureURL: "/pic/TestPoster.webp"}},
 	}
 	byteId := make([]byte, 4)
 	binary.BigEndian.PutUint32(byteId, uint32(f.GenresList[0].Id))
 
-	rowsRecom := pgxmock.NewRows([]string{"id", "title","poster_url"})
-	rowsRecom.AddRow(byteId, []uint8(f.GenresList[0].Name),[]uint8(f.GenresList[0].PictureURL))
+	rowsRecom := pgxmock.NewRows([]string{"id", "title", "poster_url"})
+	rowsRecom.AddRow(byteId, []uint8(f.GenresList[0].Name), []uint8(f.GenresList[0].PictureURL))
 
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetGenres)).WillReturnRows(rowsRecom)
@@ -345,12 +345,11 @@ func TestGetFilmByGenresSucess(t *testing.T) {
 			PosterUrl:     "/pic/TestPoster.webp",
 			PremiereRu:    "2000-01-01"}},
 		MoreAvailable: false,
-		FilmTotal:   1,
+		FilmTotal:     1,
 		CurrentLimit:  10,
 		CurrentSkip:   10,
-
 	}
-	g:= domain.GenreFilmList{
+	g := domain.GenreFilmList{
 		Id:        1,
 		Name:      "genre",
 		FilmsList: f,
@@ -369,9 +368,8 @@ func TestGetFilmByGenresSucess(t *testing.T) {
 	rowsGenre := pgxmock.NewRows([]string{"name"}).AddRow([]uint8("genre"))
 	rowsCount := pgxmock.NewRows([]string{"count"}).AddRow(byteCount)
 	rowsRate := pgxmock.NewRows([]string{"rating"}).AddRow(byteRating)
-	rowsRecom := pgxmock.NewRows([]string{"id", "title", "title_or", "release", "desc", "poster_url","premiere"})
-	rowsRecom.AddRow(byteId, []uint8(f.FilmList[0].Title), []uint8(f.FilmList[0].TitleOriginal), byteRelease, []uint8(f.FilmList[0].Description), []uint8(f.FilmList[0].PosterUrl),bytePrem)
-
+	rowsRecom := pgxmock.NewRows([]string{"id", "title", "title_or", "release", "desc", "poster_url", "premiere"})
+	rowsRecom.AddRow(byteId, []uint8(f.FilmList[0].Title), []uint8(f.FilmList[0].TitleOriginal), byteRelease, []uint8(f.FilmList[0].Description), []uint8(f.FilmList[0].PosterUrl), bytePrem)
 
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetGenreName)).WithArgs(uint64(1)).WillReturnRows(rowsGenre)
@@ -380,13 +378,13 @@ func TestGetFilmByGenresSucess(t *testing.T) {
 	pool.ExpectQuery(regexp.QuoteMeta(queryCountFilmsByGenreID)).WithArgs(uint64(1)).WillReturnRows(rowsCount)
 	pool.ExpectCommit()
 	pool.ExpectBegin()
-	pool.ExpectQuery(regexp.QuoteMeta(queryGetFilmsByGenreID)).WithArgs(uint64(1),10,0).WillReturnRows(rowsRecom)
+	pool.ExpectQuery(regexp.QuoteMeta(queryGetFilmsByGenreID)).WithArgs(uint64(1), 10, 0).WillReturnRows(rowsRecom)
 	pool.ExpectCommit()
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetFilmRating)).WillReturnRows(rowsRate)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetFilmsByGenre(uint64(1),10,0)
+	actual, err := repository.GetFilmsByGenre(uint64(1), 10, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, g, actual)
 }
@@ -425,24 +423,20 @@ func TestGetFilmByMYSucess(t *testing.T) {
 
 	rowsCount := pgxmock.NewRows([]string{"count"}).AddRow(byteCount)
 	rowsRate := pgxmock.NewRows([]string{"rating"}).AddRow(byteRating)
-	rowsRecom := pgxmock.NewRows([]string{"id", "title", "title_or", "release", "desc", "poster_url","premiere"})
-	rowsRecom.AddRow(byteId, []uint8(f.FilmList[0].Title), []uint8(f.FilmList[0].TitleOriginal), byteRelease, []uint8(f.FilmList[0].Description), []uint8(f.FilmList[0].PosterUrl),bytePrem)
-
+	rowsRecom := pgxmock.NewRows([]string{"id", "title", "title_or", "release", "desc", "poster_url", "premiere"})
+	rowsRecom.AddRow(byteId, []uint8(f.FilmList[0].Title), []uint8(f.FilmList[0].TitleOriginal), byteRelease, []uint8(f.FilmList[0].Description), []uint8(f.FilmList[0].PosterUrl), bytePrem)
 
 	pool.ExpectBegin()
-	pool.ExpectQuery(regexp.QuoteMeta(queryCountFilmsByMonthYear)).WithArgs(2,2012).WillReturnRows(rowsCount)
+	pool.ExpectQuery(regexp.QuoteMeta(queryCountFilmsByMonthYear)).WithArgs(2, 2012).WillReturnRows(rowsCount)
 	pool.ExpectCommit()
 	pool.ExpectBegin()
-	pool.ExpectQuery(regexp.QuoteMeta(queryGetFilmsByMonthYear)).WithArgs(2,2012,10,0).WillReturnRows(rowsRecom)
+	pool.ExpectQuery(regexp.QuoteMeta(queryGetFilmsByMonthYear)).WithArgs(2, 2012, 10, 0).WillReturnRows(rowsRecom)
 	pool.ExpectCommit()
 	pool.ExpectBegin()
 	pool.ExpectQuery(regexp.QuoteMeta(queryGetFilmRating)).WillReturnRows(rowsRate)
 	pool.ExpectCommit()
 
-	actual, err := repository.GetFilmsByMonthYear(2,2012,10,0)
+	actual, err := repository.GetFilmsByMonthYear(2, 2012, 10, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, f, actual)
 }
-
-
-
