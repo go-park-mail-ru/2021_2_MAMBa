@@ -501,7 +501,7 @@ func (handler *FilmHandler) GetRandomFilms(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	list, err  := handler.FilmUsecase.GetRandomFilms(genreID1, genreID2, genreID3, yearStart, yearEnd)
+	list, err := handler.FilmUsecase.GetRandomFilms(genreID1, genreID2, genreID3, yearStart, yearEnd)
 	if err != nil {
 		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
 		resp.Write(w)

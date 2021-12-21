@@ -191,6 +191,7 @@ type PostBookmarkResult struct {
 	FilmID     uint64 `json:"film_id"`
 	Bookmarked bool   `json:"bookmarked"`
 }
+
 //go:generate mockgen -destination=../film/repository/mock/db_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmRepository
 type FilmRepository interface {
 	GetFilm(id uint64) (Film, error)
@@ -207,7 +208,7 @@ type FilmRepository interface {
 	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
 	GetBanners() (BannersList, error)
 	GetPopularFilms() (FilmList, error)
-	GetRandomFilms (genre1 uint64, genre2 uint64, genre3 uint64, dateStart int, dateEnd int) (FilmList, error)
+	GetRandomFilms(genre1 uint64, genre2 uint64, genre3 uint64, dateStart int, dateEnd int) (FilmList, error)
 }
 
 //go:generate mockgen -destination=../film/usecase/mock/usecase_mock.go  -package=mock 2021_2_MAMBa/internal/pkg/domain FilmUsecase
@@ -224,5 +225,5 @@ type FilmUsecase interface {
 	GetFilmsByGenre(genreID uint64, limit int, skip int) (GenreFilmList, error)
 	GetBanners() (BannersList, error)
 	GetPopularFilms() (FilmList, error)
-	GetRandomFilms (genre1 uint64, genre2 uint64, genre3 uint64, dateStart int, dateEnd int) (FilmList, error)
+	GetRandomFilms(genre1 uint64, genre2 uint64, genre3 uint64, dateStart int, dateEnd int) (FilmList, error)
 }
