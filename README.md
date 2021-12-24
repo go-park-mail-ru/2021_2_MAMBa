@@ -3,9 +3,9 @@
 
  ## Деплой
  
- https://film4u.club/
+ https://park.film4u.club/
 
-## API
+## API (deprecated)
 
 https://app.swaggerhub.com/apis/MAMBa/Film4U-API
  
