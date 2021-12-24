@@ -468,3 +468,49 @@ func (handler *FilmHandler) GetFilmsByGenre(w http.ResponseWriter, r *http.Reque
 	}
 	resp.Write(w)
 }
+
+func (handler *FilmHandler) GetRandomFilms(w http.ResponseWriter, r *http.Request) {
+	genreID1, err := queryChecker.CheckIsIn64(w, r, "id1", 0, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	genreID2, err := queryChecker.CheckIsIn64(w, r, "id2", 0, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	genreID3, err := queryChecker.CheckIsIn64(w, r, "id3", 0, customErrors.ErrorSkip)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrIdMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	yearStart, err := queryChecker.CheckIsIn(w, r, "year_start", 0, customErrors.ErrorDate)
+	if err != nil || !(yearStart < maxYear && yearStart > minYear) {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDateMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+	yearEnd, err := queryChecker.CheckIsIn(w, r, "year_end", 0, customErrors.ErrorDate)
+	if err != nil || !(yearEnd < maxYear && yearEnd > minYear) {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDateMsg), Status: http.StatusBadRequest}
+		resp.Write(w)
+		return
+	}
+
+	list, err := handler.FilmUsecase.GetRandomFilms(genreID1, genreID2, genreID3, yearStart, yearEnd)
+	if err != nil {
+		resp := domain.Response{Body: cast.ErrorToJson(customErrors.ErrDBMsg), Status: http.StatusInternalServerError}
+		resp.Write(w)
+		return
+	}
+	x, err := json.Marshal(list)
+	resp := domain.Response{
+		Body:   x,
+		Status: http.StatusOK,
+	}
+	resp.Write(w)
+}

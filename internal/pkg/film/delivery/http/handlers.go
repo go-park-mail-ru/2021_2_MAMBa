@@ -30,4 +30,5 @@ func NewHandlers(router *mux.Router, uc domain.FilmUsecase, auth authRPC.Session
 	router.HandleFunc("/film/banners", handler.GetBanners).Methods("GET", "OPTIONS")
 	router.HandleFunc("/film/popularFilms", handler.GetPopularFilms).Methods("GET", "OPTIONS")
 	router.HandleFunc("/user/getBookmarks", handler.LoadUserBookmarks).Methods("GET", "OPTIONS")
+	router.HandleFunc("/film/getRandom", handler.GetRandomFilms).Methods("GET", "OPTIONS")
 }

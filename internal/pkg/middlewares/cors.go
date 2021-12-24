@@ -7,21 +7,38 @@ import (
 )
 
 var allowedOrigins = map[string]struct{}{
-	"http://localhost":           {},
-	"http://localhost:3001":      {},
-	"http://89.208.198.137":      {},
-	"http://89.208.198.137:3001": {},
-	"http://film4u.club":         {},
-	"http://film4u.club:3001":    {},
-	"http://film4u.club:3000":    {},
-	"http://film4u.club:9090":    {},
-	"http://film4u.club:9100":    {},
-	"":                           {}, // Для дебага локально
+	"http://localhost":             {},
+	"http://localhost:3001":        {},
+	"http://89.208.198.137":        {},
+	"http://89.208.198.137:3001":   {},
+	"http://film4u.club":           {},
+	"http://park.film4u.club":      {},
+	"http://film4u.club:3001":      {},
+	"http://park.film4u.club:3001": {},
+	"http://film4u.club:3000":      {},
+	"http://park.film4u.club:3000": {},
+	"http://film4u.club:9090":      {},
+	"http://park.film4u.club:9090": {},
+	"http://film4u.club:9100":      {},
+	"http://park.film4u.club:9100": {},
+	"":                             {}, // for local debug
 
-	"https://89.208.198.137":      {},
-	"https://89.208.198.137:3001": {},
-	"https://film4u.club":         {},
-	"https://film4u.club:3001":    {},
+	"https://89.208.198.137":        {},
+	"https://89.208.198.137:3001":   {},
+	"https://film4u.club":           {},
+	"https://park.film4u.club":      {},
+	"https://film4u.club:3001":      {},
+	"https://park.film4u.club:3001": {},
+
+	"http://localhost:8086":        {},
+	"http://89.208.198.137:50030":  {},
+	"https://www.film4u.club":      {},
+	"https://www.park.film4u.club": {},
+	"https://89.208.198.137:50030": {},
+	"https://localhost:50030":      {},
+	"http://localhost:50030":       {},
+	"http://89.208.198.137:9090":   {},
+	"https://89.208.198.137:9090":  {},
 }
 
 func CORS(h http.Handler) http.Handler {
