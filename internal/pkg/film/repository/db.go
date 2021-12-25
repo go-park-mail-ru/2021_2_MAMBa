@@ -47,6 +47,7 @@ const (
 	queryGetBanners               = "SELECT * FROM banners"
 	queryGetPopularFilms          = "SELECT f.film_id, f.title, f.title_original, f.release_year, f.description, f.poster_url, f.premiere_ru, r.score from film f\n    join (SELECT review.film_id, AVG(stars) score FROM review WHERE NOT stars = 0 GROUP BY review.film_id) r on f.film_id = r.film_id\norder by r.score desc limit 10"
 	queryCountAllFilms            = "SELECT CountFilm()"
+	queryCountFilmGenres          = "select COUNT(*) from filmgenres A join film B on A.film_id = B.film_id WHERE genre_id in (select genre_id from filmgenres where genre_id = $1 OR genre_id = $2 OR genre_id = $3)"
 	queryGetRandomFilms1          = "select B.film_id, B.title, B.poster_url from filmgenres A join film B on A.film_id = B.film_id WHERE genre_id in (select genre_id from filmgenres where genre_id = $1 OR genre_id = $2 OR genre_id = $3) AND EXTRACT(YEAR FROM premiere_ru) BETWEEN $4 AND $5 GROUP BY B.film_id LIMIT 6 OFFSET $6"
 	queryGetRandomFilms2          = "select B.film_id, B.title, B.poster_url from  film B WHERE  EXTRACT(YEAR FROM premiere_ru) BETWEEN $1 AND $2 GROUP BY B.film_id LIMIT 6 OFFSET $3"
 )
@@ -525,23 +526,25 @@ type params struct {
 }
 
 func (fr *dbFilmRepository) GetRandomFilms(genre1 uint64, genre2 uint64, genre3 uint64, dateStart int, dateEnd int) (domain.FilmList, error) {
-	result, err := fr.dbm.Query(queryCountAllFilms)
-	if err != nil {
-		return domain.FilmList{}, err
-	}
-	count := cast.ToUint64(result[0][0])
-	var startID uint64
-	if count <= 6 {
-		startID = 0
-	} else {
-		startID = rand.Uint64() % (count - 6) / 10
-	}
+	var result [][][]byte
+	var err error
 
 	p := params{}
 	if dateEnd == 0 {
 		dateEnd = 2100
 	}
 	if genre1+genre2+genre3 == 0 {
+		result, err = fr.dbm.Query(queryCountAllFilms)
+		if err != nil {
+			return domain.FilmList{}, err
+		}
+		count := cast.ToUint64(result[0][0])
+		var startID uint64
+		if count <= 6 {
+			startID = 0
+		} else {
+			startID = rand.Uint64() % (count - 6)
+		}
 		result, err = fr.dbm.Query(queryGetRandomFilms2, dateStart, dateEnd, startID)
 		if err != nil {
 			return domain.FilmList{}, err
@@ -555,6 +558,17 @@ func (fr *dbFilmRepository) GetRandomFilms(genre1 uint64, genre2 uint64, genre3 
 		}
 		if genre3 == 0 {
 			p.g3 = genre3
+		}
+		result, err = fr.dbm.Query(queryCountFilmGenres, p.g1, p.g2, p.g3)
+		if err != nil {
+			return domain.FilmList{}, err
+		}
+		count := cast.ToUint64(result[0][0])
+		var startID uint64
+		if count <= 6 {
+			startID = 0
+		} else {
+			startID = rand.Uint64() % (count - 6)
 		}
 		result, err = fr.dbm.Query(queryGetRandomFilms1, p.g1, p.g2, p.g3, dateStart, dateEnd, startID)
 		if err != nil {

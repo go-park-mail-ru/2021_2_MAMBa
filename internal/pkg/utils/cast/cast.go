@@ -43,6 +43,9 @@ func ToUint64(src []byte) uint64 {
 }
 
 func ToFloat64(src []byte) float64 {
+	if src == nil {
+		return 0
+	}
 	return math.Float64frombits(binary.BigEndian.Uint64(src))
 }
 
