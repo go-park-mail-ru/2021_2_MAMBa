@@ -14,7 +14,7 @@ type Person struct {
 	DeathPlace   string   `json:"death_place,omitempty"`
 	Gender       string   `json:"gender,omitempty"`
 	FamilyStatus string   `json:"family_status,omitempty"`
-	FilmNumber   int      `json:"film_number,omitempty"`
+	FilmNumber   int      `json:"film_number"`
 }
 
 type FilmList struct {

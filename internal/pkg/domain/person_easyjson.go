@@ -440,7 +440,7 @@ func easyjsonDb0593a3Encode20212MAMBaInternalPkgDomain2(out *jwriter.Writer, in 
 		}
 		out.String(string(in.FamilyStatus))
 	}
-	if in.FilmNumber != 0 {
+	{
 		const prefix string = ",\"film_number\":"
 		if first {
 			first = false
@@ -712,7 +712,7 @@ func easyjsonDb0593a3Decode20212MAMBaInternalPkgDomain4(in *jlexer.Lexer, out *F
 				}
 				for !in.IsDelim(']') {
 					var v12 Genre
-					easyjsonDb0593a3Decode20212MAMBaInternalPkgDomain5(in, &v12)
+					(v12).UnmarshalEasyJSON(in)
 					out.Genres = append(out.Genres, v12)
 					in.WantComma()
 				}
@@ -758,7 +758,7 @@ func easyjsonDb0593a3Encode20212MAMBaInternalPkgDomain4(out *jwriter.Writer, in 
 		}
 		out.String(string(in.TitleOriginal))
 	}
-	if in.Rating != 0 {
+	{
 		const prefix string = ",\"rating\":"
 		if first {
 			first = false
@@ -770,92 +770,47 @@ func easyjsonDb0593a3Encode20212MAMBaInternalPkgDomain4(out *jwriter.Writer, in 
 	}
 	if in.Description != "" {
 		const prefix string = ",\"description\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.Description))
 	}
 	if in.TotalRevenue != "" {
 		const prefix string = ",\"total_revenue\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.TotalRevenue))
 	}
 	if in.PosterUrl != "" {
 		const prefix string = ",\"poster_url\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.PosterUrl))
 	}
 	if in.TrailerUrl != "" {
 		const prefix string = ",\"trailer_url\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.TrailerUrl))
 	}
 	if in.ContentType != "" {
 		const prefix string = ",\"content_type\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.ContentType))
 	}
 	if in.ReleaseYear != 0 {
 		const prefix string = ",\"release_year\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.Int(int(in.ReleaseYear))
 	}
 	if in.Duration != 0 {
 		const prefix string = ",\"duration\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.Int(int(in.Duration))
 	}
 	if in.PremiereRu != "" {
 		const prefix string = ",\"premiere_ru\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		out.String(string(in.PremiereRu))
 	}
 	if len(in.OriginCountries) != 0 {
 		const prefix string = ",\"origin_countries\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		{
 			out.RawByte('[')
 			for v13, v14 := range in.OriginCountries {
@@ -869,12 +824,7 @@ func easyjsonDb0593a3Encode20212MAMBaInternalPkgDomain4(out *jwriter.Writer, in 
 	}
 	if len(in.Cast) != 0 {
 		const prefix string = ",\"cast\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		{
 			out.RawByte('[')
 			for v15, v16 := range in.Cast {
@@ -888,98 +838,27 @@ func easyjsonDb0593a3Encode20212MAMBaInternalPkgDomain4(out *jwriter.Writer, in 
 	}
 	if true {
 		const prefix string = ",\"director\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		(in.Director).MarshalEasyJSON(out)
 	}
 	if true {
 		const prefix string = ",\"screenwriter\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		(in.Screenwriter).MarshalEasyJSON(out)
 	}
 	if len(in.Genres) != 0 {
 		const prefix string = ",\"genres\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
+		out.RawString(prefix)
 		{
 			out.RawByte('[')
 			for v17, v18 := range in.Genres {
 				if v17 > 0 {
 					out.RawByte(',')
 				}
-				easyjsonDb0593a3Encode20212MAMBaInternalPkgDomain5(out, v18)
+				(v18).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
-	}
-	out.RawByte('}')
-}
-func easyjsonDb0593a3Decode20212MAMBaInternalPkgDomain5(in *jlexer.Lexer, out *Genre) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "id":
-			out.Id = uint64(in.Uint64())
-		case "name":
-			out.Name = string(in.String())
-		case "picture_url":
-			out.PictureURL = string(in.String())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjsonDb0593a3Encode20212MAMBaInternalPkgDomain5(out *jwriter.Writer, in Genre) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"id\":"
-		out.RawString(prefix[1:])
-		out.Uint64(uint64(in.Id))
-	}
-	{
-		const prefix string = ",\"name\":"
-		out.RawString(prefix)
-		out.String(string(in.Name))
-	}
-	if in.PictureURL != "" {
-		const prefix string = ",\"picture_url\":"
-		out.RawString(prefix)
-		out.String(string(in.PictureURL))
 	}
 	out.RawByte('}')
 }

@@ -21,6 +21,7 @@ const (
 	queryGetPersonFilms        = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url FROM filmcast JOIN film f on filmcast.film_id = f.film_id where filmcast.person_id = $1 LIMIT $2 OFFSET $3"
 	queryCountFilm             = "SELECT COUNT(*) FROM filmcast JOIN film f on filmcast.film_id = f.film_id where filmcast.person_id = $1"
 	queryGetPersonFilmsPopular = "SELECT f.film_id, f.title, f.description, f.release_year, f.poster_url, ord.avg FROM (filmcast JOIN film f on filmcast.film_id = f.film_id) JOIN (SELECT AVG(stars) as avg, film_id FROM review WHERE (NOT type = 0) GROUP BY film_id) ord ON ord.film_id = f.film_id where filmcast.person_id = $1 ORDER BY ord.avg DESC LIMIT $2 OFFSET $3"
+	queryCountPersonFilms      = "SELECT COUNT(*) FROM filmcast WHERE person_id = $1"
 )
 
 func (pr *dbPersonRepository) GetPerson(id uint64) (domain.Person, error) {
@@ -44,7 +45,6 @@ func (pr *dbPersonRepository) GetPerson(id uint64) (domain.Person, error) {
 		DeathPlace:   cast.ToString(result[0][10]),
 		Gender:       cast.ToString(result[0][11]),
 		FamilyStatus: cast.ToString(result[0][12]),
-		FilmNumber:   int(cast.ToUint32(result[0][13])),
 	}
 	timestamp, err := cast.DateToString(result[0][7])
 	if err != nil {
@@ -56,6 +56,14 @@ func (pr *dbPersonRepository) GetPerson(id uint64) (domain.Person, error) {
 	}
 	person.Birthday = timestamp
 	person.Death = timestamp2
+
+	result, err = pr.dbm.Query(queryCountPersonFilms, id)
+	if err != nil {
+		return domain.Person{}, err
+	}
+	filmNumber := int(cast.ToUint64(result[0][0]))
+	person.FilmNumber = filmNumber
+
 	return person, nil
 }
 func (pr *dbPersonRepository) GetFilms(id uint64, skip int, limit int) (domain.FilmList, error) {

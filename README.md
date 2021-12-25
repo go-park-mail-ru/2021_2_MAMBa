@@ -5,7 +5,7 @@
  
  https://park.film4u.club/
 
-## API (deprecated)
+## API (outdated)
 
 https://app.swaggerhub.com/apis/MAMBa/Film4U-API
  

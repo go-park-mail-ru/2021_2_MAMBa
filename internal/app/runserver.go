@@ -121,30 +121,33 @@ func notificationWorker(filmRepo domain.FilmRepository) {
 
 	// daemon to update coming this month films
 	go func(filmRepo domain.FilmRepository) {
+		ticker := time.NewTicker(time.Minute)
 		for {
-			comingFilms.Lock()
-			comingFilms.films = []domain.Film{}
-			comingFilms.Unlock()
+			select {
+			case <-ticker.C:
+				hr, min, _ := time.Now().Clock()
+				if hr == 11 && min == 59 {
+					comingFilms.Lock()
+					comingFilms.films = []domain.Film{}
+					comingFilms.Unlock()
 
-			year, month, _ := time.Now().Date()
-			filmsBuffer, err := filmRepo.GetFilmsByMonthYear(int(month), year, math.MaxInt, 0)
-			if err == nil {
-				for _, v := range filmsBuffer.FilmList {
-					if time.Now().Format("2006-01-02") == v.PremiereRu {
-						comingFilms.Lock()
-						comingFilms.films = append(comingFilms.films, v)
-						comingFilms.Unlock()
+					year, month, _ := time.Now().Date()
+					filmsBuffer, err := filmRepo.GetFilmsByMonthYear(int(month), year, math.MaxInt, 0)
+					if err == nil {
+						for _, v := range filmsBuffer.FilmList {
+							if time.Now().Format("2006-01-02") == v.PremiereRu {
+								comingFilms.Lock()
+								comingFilms.films = append(comingFilms.films, v)
+								comingFilms.Unlock()
+							}
+						}
+						log.Info(fmt.Sprintf("Found %d films released today", len(comingFilms.films)))
+					}
+					if err != nil {
+						log.Warn("Error in updating coming this month films")
 					}
 				}
-				log.Info(fmt.Sprintf("Found %d films released today", len(comingFilms.films)))
 			}
-			if err != nil {
-				// retry delay
-				log.Warn("Error in updating coming this month films")
-				time.Sleep(1 * time.Minute)
-				continue
-			}
-			time.Sleep(24 * time.Hour)
 		}
 	}(filmRepo)
 
